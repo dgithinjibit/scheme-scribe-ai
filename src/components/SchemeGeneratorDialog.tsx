@@ -24,12 +24,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { columnHeaders, kiswahiliSubjects } from "@/data/curriculum";
 
+const INDIGENOUS_LANGUAGES = [
+  "Kikuyu (Gĩkũyũ)", "Dholuo", "Kalenjin", "Luhya (Luyia)", "Kamba",
+  "Kisii (Ekegusii)", "Meru (Kĩmĩĩrũ)", "Mijikenda", "Maasai (Maa)",
+  "Turkana", "Somali", "Embu", "Tharaka", "Pokot", "Samburu",
+  "Taita", "Taveta", "Borana", "Rendille", "Swahili (Coastal dialects)",
+  "Teso", "Sabaot", "Nandi", "Kipsigis", "Tugen", "Elgeyo", "Marakwet",
+  "Bukusu", "Maragoli", "Isukha", "Idakho", "Wanga", "Nyala", "Tiriki",
+  "Suba", "Kuria", "Tachoni", "Kabras",
+];
+
 const SchemeGeneratorDialog = () => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
+  const [indigenousLanguage, setIndigenousLanguage] = useState("");
   const [strand, setStrand] = useState("");
   const [subStrand, setSubStrand] = useState("");
   const [context, setContext] = useState("");
@@ -87,6 +98,7 @@ const SchemeGeneratorDialog = () => {
     setStep(1);
     setGrade("");
     setSubject("");
+    setIndigenousLanguage("");
     setStrand("");
     setSubStrand("");
     setContext("");
@@ -124,7 +136,7 @@ const SchemeGeneratorDialog = () => {
       
       const lessonsPerWeek = getLessonsPerWeek(grade, subject);
       const { data, error } = await supabase.functions.invoke("generate-scheme", {
-        body: { grade, subject, strand, context, subStrands, lessonsPerWeek },
+        body: { grade, subject, strand, context, subStrands, lessonsPerWeek, indigenousLanguage: indigenousLanguage || undefined },
       });
 
       if (error) throw error;
@@ -230,12 +242,23 @@ const SchemeGeneratorDialog = () => {
             {step === 2 && (
               <div className="space-y-4 py-2">
                 <p className="text-sm text-muted-foreground">Select the subject for {grade}.</p>
-                <Select value={subject} onValueChange={(v) => { setSubject(v); setStrand(""); setStep(3); }}>
+                <Select value={subject} onValueChange={(v) => { setSubject(v); setIndigenousLanguage(""); setStrand(""); if (v === "Indigenous Language") { /* stay on step 2 to pick language */ } else { setStep(3); } }}>
                   <SelectTrigger><SelectValue placeholder="Select Subject" /></SelectTrigger>
                   <SelectContent>
                     {subjects.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                   </SelectContent>
                 </Select>
+                {subject === "Indigenous Language" && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">Which indigenous language does your school teach?</p>
+                    <Select value={indigenousLanguage} onValueChange={(v) => { setIndigenousLanguage(v); setStep(3); }}>
+                      <SelectTrigger><SelectValue placeholder="Select your language" /></SelectTrigger>
+                      <SelectContent>
+                        {INDIGENOUS_LANGUAGES.map((lang) => <SelectItem key={lang} value={lang}>{lang}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <Button variant="ghost" size="sm" onClick={() => { setStep(1); setGrade(""); }}>← Back</Button>
               </div>
             )}
@@ -281,7 +304,7 @@ const SchemeGeneratorDialog = () => {
               <div className="space-y-4 py-2">
                 <div className="rounded-lg bg-muted p-3 text-sm space-y-1">
                   <p><span className="font-medium">Grade:</span> {grade}</p>
-                  <p><span className="font-medium">Subject:</span> {subject}</p>
+                  <p><span className="font-medium">Subject:</span> {subject}{indigenousLanguage ? ` (${indigenousLanguage})` : ""}</p>
                   <p><span className="font-medium">Strand:</span> {strand}</p>
                   <p><span className="font-medium">Sub-Strand:</span> {subStrand}</p>
                 </div>
