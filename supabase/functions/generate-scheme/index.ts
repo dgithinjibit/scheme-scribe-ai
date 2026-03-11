@@ -430,12 +430,14 @@ RULES:
 
 Return ONLY a valid JSON array of ${batchLessons} objects. No other text.`;
 
-  const batchDesc = batchIndex > 0 ? ` (continuing from lesson ${batchIndex * MAX_LESSONS_PER_BATCH + 1})` : "";
+  const batchDesc = batchIndex > 0 ? ` (continuing from lesson ${batchIndex * MAX_LESSONS_PER_BATCH + 1} — do NOT repeat any content from previous lessons)` : "";
   const userPrompt = `Generate ${batchLessons} lesson rows for:
 - Grade: ${grade}, Subject: ${subject}
 - Strand: ${strand}
 - Sub-strand: ${subStrandName} (${totalLessons} total lessons, this batch: ${batchLessons})${batchDesc}
 ${context ? `- Additional Resources: ${context}` : ""}
+
+CRITICAL: Every lesson MUST be unique. Do NOT repeat learning outcomes, experiences, or content from any other lesson. Do NOT create "continued practice" or "revision" lessons — each lesson must introduce NEW content or a NEW skill progression.
 
 Each row: week, lesson, strand, subStrand, specificLearningOutcome, keyInquiryQuestion, learningExperiences, learningResources, assessmentMethods, reflection.
 The "strand" field = "${strand}", the "subStrand" field = "${subStrandName}".
