@@ -601,11 +601,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { grade, subject, strand, context, subStrands, lessonsPerWeek = 5, indigenousLanguage } = await req.json();
+    const { grade, subject, strand, context, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan } = await req.json();
 
-    if (!grade || !subject || !strand) {
+    if (!grade || !subject) {
       return new Response(
-        JSON.stringify({ error: "Grade, subject, and strand are required" }),
+        JSON.stringify({ error: "Grade and subject are required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -619,6 +619,79 @@ Deno.serve(async (req) => {
     }
 
     const isSw = kiswahiliSubjects.includes(subject);
+
+    // ── WEEKLY MODE: Generate all skill strands for a single week ──
+    if (weeklyMode && weeklyPlan && Array.isArray(weeklyPlan)) {
+      console.log(`Weekly mode: ${grade} ${subject} - ${term} Week ${weekNumber} (${weeklyPlan.length} strands)`);
+
+      const allRows: SchemeRow[] = [];
+      let lessonCounter = 1;
+
+      for (const plan of weeklyPlan as { strandName: string; subStrandName: string; lessons: number }[]) {
+        const subStrandInfo: SubStrandInfo = {
+          name: plan.subStrandName,
+          lessons: plan.lessons,
+        };
+
+        try {
+          const rows = await generateBatch(
+            GROQ_API_KEY, grade, subject, plan.strandName, subStrandInfo,
+            plan.lessons, context || "", isSw, weekNumber || 1, lessonsPerWeek, 0, indigenousLanguage
+          );
+
+          // Normalize and fix each row
+          const processed = rows.map((r: unknown) => {
+            const row = normalizeRowKeys(r as Record<string, unknown>);
+            row.week = weekNumber || 1;
+            row.lesson = lessonCounter++;
+            row.strand = plan.strandName;
+            row.subStrand = plan.subStrandName;
+            const filled = ensureNoEmptyFields(row, grade, subject);
+            filled.specificLearningOutcome = validateAndFixSLO(filled.specificLearningOutcome, isSw);
+            filled.learningExperiences = validateAndFixExperiences(filled.learningExperiences, isSw);
+            return filled;
+          });
+
+          allRows.push(...processed);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "Unknown";
+          console.error(`Error generating ${plan.strandName}: ${msg}`);
+          if (msg === "RATE_LIMIT") {
+            if (allRows.length > 0) {
+              return new Response(
+                JSON.stringify({ rows: allRows, source: "hardcoded_context", partial: true }),
+                { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+              );
+            }
+            return new Response(
+              JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+        }
+      }
+
+      if (allRows.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Failed to generate any lesson rows. Please try again." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      console.log(`Weekly mode: generated ${allRows.length} total lesson rows for Week ${weekNumber}`);
+      return new Response(
+        JSON.stringify({ rows: allRows, source: "hardcoded_context" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── STANDARD MODE ──
+    if (!strand) {
+      return new Response(
+        JSON.stringify({ error: "Strand is required for non-language subjects" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Fetch reference context from scraped schemes
     const referenceContext = await fetchReferenceContext(grade, subject, strand);
