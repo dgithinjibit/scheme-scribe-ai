@@ -23,6 +23,9 @@ export { grade4CreativeArts } from "./upper-primary/creative-arts";
 export { grade4English, grade5English, grade6English } from "./upper-primary/english";
 export { grade4IndigenousLanguage, grade5IndigenousLanguage } from "./upper-primary/indigenous-language";
 export { grade4SocialStudies } from "./upper-primary/social-studies";
+export { grade6SocialStudies } from "./upper-primary/social-studies-grade6";
+export { grade5Mathematics } from "./upper-primary/mathematics-grade5";
+export { grade6Mathematics } from "./upper-primary/mathematics-grade6";
 export { grade4Kiswahili } from "./upper-primary/kiswahili";
 export { grade1IRE, grade2IRE, grade3IRE } from "./lower-primary/ire";
 
