@@ -298,11 +298,12 @@ function validateAndSanitizeRows(
     row.learningExperiences = validateAndFixExperiences(row.learningExperiences, isSw);
     return row;
   });
+  // Guardrail: deduplicate by SLO content but only if we'd still have enough rows
   const seen = new Set<string>();
   const deduped = rows.filter((row) => {
     const key = row.specificLearningOutcome.substring(0, 100);
     if (seen.has(key)) {
-      console.warn(`Guardrails: removed duplicate row`);
+      console.warn(`Guardrails: found duplicate row, removing`);
       return false;
     }
     seen.add(key);
