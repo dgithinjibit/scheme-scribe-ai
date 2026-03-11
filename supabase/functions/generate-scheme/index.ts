@@ -402,7 +402,11 @@ KANUNI MUHIMU:
    - Zingatia mazingira mbalimbali ya kujifunza (shuleni, nje, nyumbani)
    
 5. **SWALI DADISI** — Tumia swali rasmi la KICD lililotolewa, au unda swali linalofanana. Swali liwe sahili kwa umri wa mtoto.
-6. **MAREJELEO** — "${subject} Curriculum Design ${grade.toLowerCase()}" pamoja na rasilimali za mazingira (vifaa vya kidijitali, mazingira ya karibu, chati, vitabu, vitu halisi).
+6. **MAREJELEO** — Lazima yawe MAHUSUSI na YENYE MAELEZO — si majina ya jumla tu. Kila rasilimali lazima ieleze NINI inajumuisha kuhusu somo hilo. Mfano:
+   - Badala ya "video" → "video ya matamshi sahihi ya maneno" au "video ya hadithi yenye maswali ya ufahamu"
+   - Badala ya "chati" → "chati ya ukutani yenye picha za vitu vinavyohusiana na mada"
+   - Badala ya "vitabu" → "${subject} Curriculum Design ${grade.toLowerCase()}, Kitabu cha Mwanafunzi"
+   Daima anza na "${subject} Curriculum Design ${grade.toLowerCase()}" kisha ongeza rasilimali 2-4 mahususi zinazohusiana na matokeo ya somo.
 7. **TATHMINI** — Njia za kutathmini: "Kuuliza na kujibu maswali, uchunguzi" au ongeza "zoezi la kuandika, evaluation ya kazi, tathmini ya wenzao".
 8. **MAONI** — Daima "".
 9. Nambari za wiki zianze kutoka ${weekStart}. Wiki moja = masomo ${lessonsPerWeek}. Nambari za somo ZIANZIE UPYA kila wiki: 1, 2, 3... mpaka ${lessonsPerWeek}, kisha rudi 1 kwa wiki inayofuata.
@@ -435,7 +439,13 @@ RULES:
    Use the official suggested experiences below as source material for the activities.
    Activities must account for diverse learning environments.
 5. **Key Inquiry Question**: Use the official KICD question provided, or create a closely related child-friendly variant per lesson. Must be age-appropriate.
-6. **Learning Resources**: "${subject} Curriculum Design ${grade.toLowerCase()}" plus contextual resources (digital devices, local environment, charts, textbooks, realia). Include locally available materials.
+6. **Learning Resources**: MUST be SPECIFIC and DETAILED — not just generic names. Every resource must describe WHAT it contains relevant to the lesson's sub-strand and topic. Examples:
+   - Instead of "audio clips" → "audio clips of word pronunciation for fluency practice" or "audio recording of a poem read with correct intonation"
+   - Instead of "flash cards" → "flash cards with CVC words featuring target letter-sound combinations" or "picture-word matching flash cards"
+   - Instead of "charts" → "wall chart showing steps of the water cycle" or "phonics chart with consonant blends"
+   - Instead of "textbooks" → "${subject} Curriculum Design ${grade.toLowerCase()}, Learner's Book pages [relevant topic]"
+   - Instead of "videos" → "video clip demonstrating proper handwriting posture" or "animated story video for comprehension"
+   Always include "${subject} Curriculum Design ${grade.toLowerCase()}" as the first resource, then add 2-4 specific contextual resources relevant to the lesson's learning outcomes.
 7. **Assessment**: Methods to evaluate learning — "oral questions, observation" or add "written exercise, portfolio, peer assessment" as appropriate. Must match the learning outcome.
 8. **Reflection**: always "".
 9. Week numbering starts from ${weekStart}. Fit exactly ${lessonsPerWeek} lessons per week. Lesson numbers RESET each week: 1, 2, 3... up to ${lessonsPerWeek}, then back to 1 for the next week. Example: Week 1 has lessons 1,2,3,4,5; Week 2 has lessons 1,2,3,4,5 — NOT lesson 6,7,8.
