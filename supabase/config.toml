@@ -1,13 +1,1 @@
-project_id = "ijvwhhcnotbmikvwummn"
-
-[functions.generate-scheme]
-verify_jwt = false
-
-[functions.fetch-strands]
-verify_jwt = false
-
-[functions.scrape-schemes]
-verify_jwt = false
-
-[functions.enrich-schemes]
-verify_jwt = false
+project_id = "dvfyxtqxdtzsiyxyhvpt"
