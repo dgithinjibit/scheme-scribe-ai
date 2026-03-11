@@ -20,6 +20,7 @@ export {
 export { grade6Agriculture } from "./upper-primary/agriculture";
 export { grade4CRE } from "./upper-primary/cre";
 export { grade4CreativeArts } from "./upper-primary/creative-arts";
+export { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
 export { grade4English, grade5English, grade6English } from "./upper-primary/english";
 export { grade4IndigenousLanguage, grade5IndigenousLanguage } from "./upper-primary/indigenous-language";
 export { grade4SocialStudies } from "./upper-primary/social-studies";
