@@ -259,8 +259,8 @@ function normalizeRowKeys(raw: Record<string, unknown>): SchemeRow {
 }
 
 /** GUARDRAIL 9: Enforce exact lesson count per sub-strand.
- *  If AI produced too few rows, duplicate the last row (with incremented lesson/week).
- *  If AI produced too many, trim the excess. */
+ *  If AI produced too many, trim the excess.
+ *  If AI produced too few, keep what we have (do NOT pad with fake "continued" lessons). */
 function enforceLessonCount(rows: SchemeRow[], expectedLessons: number, weekStart: number, lessonsPerWeek: number): SchemeRow[] {
   if (rows.length === expectedLessons) return rows;
 
@@ -270,21 +270,9 @@ function enforceLessonCount(rows: SchemeRow[], expectedLessons: number, weekStar
     return enforceWeekLessonNumbering(trimmed, weekStart, lessonsPerWeek);
   }
 
-  // Pad missing rows by duplicating the last row with adjusted outcomes
-  console.warn(`Guardrail 9: Padding ${rows.length} rows to expected ${expectedLessons} (${expectedLessons - rows.length} extra)`);
-  const padded = [...rows];
-  while (padded.length < expectedLessons) {
-    const lastRow = padded[padded.length - 1];
-    padded.push({
-      ...lastRow,
-      specificLearningOutcome: lastRow.specificLearningOutcome.replace(
-        /^(By the end of the lesson)/i,
-        "By the end of the lesson (continued practice)"
-      ),
-      learningExperiences: lastRow.learningExperiences,
-    });
-  }
-  return enforceWeekLessonNumbering(padded, weekStart, lessonsPerWeek);
+  // If we're short, just re-number what we have — do NOT duplicate/pad
+  console.warn(`Guardrail 9: Have ${rows.length} rows but expected ${expectedLessons}. Keeping all unique rows.`);
+  return enforceWeekLessonNumbering(rows, weekStart, lessonsPerWeek);
 }
 
 /**
@@ -310,11 +298,12 @@ function validateAndSanitizeRows(
     row.learningExperiences = validateAndFixExperiences(row.learningExperiences, isSw);
     return row;
   });
+  // Guardrail: deduplicate by SLO content but only if we'd still have enough rows
   const seen = new Set<string>();
   const deduped = rows.filter((row) => {
     const key = row.specificLearningOutcome.substring(0, 100);
     if (seen.has(key)) {
-      console.warn(`Guardrails: removed duplicate row`);
+      console.warn(`Guardrails: found duplicate row, removing`);
       return false;
     }
     seen.add(key);
@@ -441,12 +430,14 @@ RULES:
 
 Return ONLY a valid JSON array of ${batchLessons} objects. No other text.`;
 
-  const batchDesc = batchIndex > 0 ? ` (continuing from lesson ${batchIndex * MAX_LESSONS_PER_BATCH + 1})` : "";
+  const batchDesc = batchIndex > 0 ? ` (continuing from lesson ${batchIndex * MAX_LESSONS_PER_BATCH + 1} — do NOT repeat any content from previous lessons)` : "";
   const userPrompt = `Generate ${batchLessons} lesson rows for:
 - Grade: ${grade}, Subject: ${subject}
 - Strand: ${strand}
 - Sub-strand: ${subStrandName} (${totalLessons} total lessons, this batch: ${batchLessons})${batchDesc}
 ${context ? `- Additional Resources: ${context}` : ""}
+
+CRITICAL: Every lesson MUST be unique. Do NOT repeat learning outcomes, experiences, or content from any other lesson. Do NOT create "continued practice" or "revision" lessons — each lesson must introduce NEW content or a NEW skill progression.
 
 Each row: week, lesson, strand, subStrand, specificLearningOutcome, keyInquiryQuestion, learningExperiences, learningResources, assessmentMethods, reflection.
 The "strand" field = "${strand}", the "subStrand" field = "${subStrandName}".
