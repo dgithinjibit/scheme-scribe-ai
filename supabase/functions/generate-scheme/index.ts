@@ -402,7 +402,11 @@ KANUNI MUHIMU:
    - Zingatia mazingira mbalimbali ya kujifunza (shuleni, nje, nyumbani)
    
 5. **SWALI DADISI** — Tumia swali rasmi la KICD lililotolewa, au unda swali linalofanana. Swali liwe sahili kwa umri wa mtoto.
-6. **MAREJELEO** — "${subject} Curriculum Design ${grade.toLowerCase()}" pamoja na rasilimali za mazingira (vifaa vya kidijitali, mazingira ya karibu, chati, vitabu, vitu halisi).
+6. **MAREJELEO** — Lazima yawe MAHUSUSI na YENYE MAELEZO — si majina ya jumla tu. Kila rasilimali lazima ieleze NINI inajumuisha kuhusu somo hilo. Mfano:
+   - Badala ya "video" → "video ya matamshi sahihi ya maneno" au "video ya hadithi yenye maswali ya ufahamu"
+   - Badala ya "chati" → "chati ya ukutani yenye picha za vitu vinavyohusiana na mada"
+   - Badala ya "vitabu" → "${subject} Curriculum Design ${grade.toLowerCase()}, Kitabu cha Mwanafunzi"
+   Daima anza na "${subject} Curriculum Design ${grade.toLowerCase()}" kisha ongeza rasilimali 2-4 mahususi zinazohusiana na matokeo ya somo.
 7. **TATHMINI** — Njia za kutathmini: "Kuuliza na kujibu maswali, uchunguzi" au ongeza "zoezi la kuandika, evaluation ya kazi, tathmini ya wenzao".
 8. **MAONI** — Daima "".
 9. Nambari za wiki zianze kutoka ${weekStart}. Wiki moja = masomo ${lessonsPerWeek}. Nambari za somo ZIANZIE UPYA kila wiki: 1, 2, 3... mpaka ${lessonsPerWeek}, kisha rudi 1 kwa wiki inayofuata.
