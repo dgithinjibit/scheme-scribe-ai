@@ -368,6 +368,18 @@ async function generateBatch(
     officialContext = `\n\nKICD MADA (Thematic Topic): "${strand}"\nSub-strand skill area: "${subStrandName}"\nThis is a standard Kiswahili language skill area under the given Mada. Generate age-appropriate content for ${grade} learners practicing "${subStrandName}" within the theme of "${strand}".\n`;
   }
 
+  // Inject indigenous language context if provided
+  if (indigenousLanguage && subject === "Indigenous Language") {
+    officialContext += `\n\nINDIGENOUS LANGUAGE: ${indigenousLanguage}
+All content MUST be contextualized for the ${indigenousLanguage} language. This means:
+- Use examples, vocabulary, and cultural references specific to the ${indigenousLanguage}-speaking community
+- Reading passages, stories, and dialogues should reflect ${indigenousLanguage} cultural contexts (names, places, traditions, foods, activities)
+- Phonics/pronunciation exercises should reference ${indigenousLanguage} sound patterns
+- Creative writing and oral exercises should draw from ${indigenousLanguage} proverbs, songs, riddles, and oral traditions
+- The learning resources should include ${indigenousLanguage} textbooks, storybooks, and community elders as resource persons
+- While the scheme structure follows KICD standards, the CONTENT must feel authentically ${indigenousLanguage}\n`;
+  }
+
   const systemPrompt = isSw
     ? `Wewe ni mtaalamu wa mtaala wa CBC Kenya (KICD). Unatengeneza Mpango wa Kazi rasmi ambao unafuata viwango vya KICD kwa usahihi.
 
