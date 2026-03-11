@@ -50,6 +50,7 @@ import { grade1IRE, grade2IRE, grade3IRE } from "./lower-primary/ire";
 import { grade6Agriculture } from "./upper-primary/agriculture";
 import { grade4CRE } from "./upper-primary/cre";
 import { grade4CreativeArts } from "./upper-primary/creative-arts";
+import { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
 import { grade4English, grade5English, grade6English } from "./upper-primary/english";
 import { grade4IndigenousLanguage, grade5IndigenousLanguage } from "./upper-primary/indigenous-language";
 import { grade4SocialStudies } from "./upper-primary/social-studies";
