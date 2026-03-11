@@ -98,6 +98,7 @@ const SchemeGeneratorDialog = () => {
     setStep(1);
     setGrade("");
     setSubject("");
+    setIndigenousLanguage("");
     setStrand("");
     setSubStrand("");
     setContext("");
