@@ -328,6 +328,7 @@ async function generateBatch(
   weekStart: number,
   lessonsPerWeek: number,
   batchIndex: number,
+  indigenousLanguage?: string,
 ): Promise<SchemeRow[]> {
   const subStrandName = subStrand.name;
   const totalLessons = subStrand.lessons;
