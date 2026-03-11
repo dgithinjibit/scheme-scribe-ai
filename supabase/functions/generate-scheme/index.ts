@@ -259,8 +259,8 @@ function normalizeRowKeys(raw: Record<string, unknown>): SchemeRow {
 }
 
 /** GUARDRAIL 9: Enforce exact lesson count per sub-strand.
- *  If AI produced too few rows, duplicate the last row (with incremented lesson/week).
- *  If AI produced too many, trim the excess. */
+ *  If AI produced too many, trim the excess.
+ *  If AI produced too few, keep what we have (do NOT pad with fake "continued" lessons). */
 function enforceLessonCount(rows: SchemeRow[], expectedLessons: number, weekStart: number, lessonsPerWeek: number): SchemeRow[] {
   if (rows.length === expectedLessons) return rows;
 
@@ -270,21 +270,9 @@ function enforceLessonCount(rows: SchemeRow[], expectedLessons: number, weekStar
     return enforceWeekLessonNumbering(trimmed, weekStart, lessonsPerWeek);
   }
 
-  // Pad missing rows by duplicating the last row with adjusted outcomes
-  console.warn(`Guardrail 9: Padding ${rows.length} rows to expected ${expectedLessons} (${expectedLessons - rows.length} extra)`);
-  const padded = [...rows];
-  while (padded.length < expectedLessons) {
-    const lastRow = padded[padded.length - 1];
-    padded.push({
-      ...lastRow,
-      specificLearningOutcome: lastRow.specificLearningOutcome.replace(
-        /^(By the end of the lesson)/i,
-        "By the end of the lesson (continued practice)"
-      ),
-      learningExperiences: lastRow.learningExperiences,
-    });
-  }
-  return enforceWeekLessonNumbering(padded, weekStart, lessonsPerWeek);
+  // If we're short, just re-number what we have — do NOT duplicate/pad
+  console.warn(`Guardrail 9: Have ${rows.length} rows but expected ${expectedLessons}. Keeping all unique rows.`);
+  return enforceWeekLessonNumbering(rows, weekStart, lessonsPerWeek);
 }
 
 /**
