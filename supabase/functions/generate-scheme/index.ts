@@ -435,7 +435,13 @@ RULES:
    Use the official suggested experiences below as source material for the activities.
    Activities must account for diverse learning environments.
 5. **Key Inquiry Question**: Use the official KICD question provided, or create a closely related child-friendly variant per lesson. Must be age-appropriate.
-6. **Learning Resources**: "${subject} Curriculum Design ${grade.toLowerCase()}" plus contextual resources (digital devices, local environment, charts, textbooks, realia). Include locally available materials.
+6. **Learning Resources**: MUST be SPECIFIC and DETAILED — not just generic names. Every resource must describe WHAT it contains relevant to the lesson's sub-strand and topic. Examples:
+   - Instead of "audio clips" → "audio clips of word pronunciation for fluency practice" or "audio recording of a poem read with correct intonation"
+   - Instead of "flash cards" → "flash cards with CVC words featuring target letter-sound combinations" or "picture-word matching flash cards"
+   - Instead of "charts" → "wall chart showing steps of the water cycle" or "phonics chart with consonant blends"
+   - Instead of "textbooks" → "${subject} Curriculum Design ${grade.toLowerCase()}, Learner's Book pages [relevant topic]"
+   - Instead of "videos" → "video clip demonstrating proper handwriting posture" or "animated story video for comprehension"
+   Always include "${subject} Curriculum Design ${grade.toLowerCase()}" as the first resource, then add 2-4 specific contextual resources relevant to the lesson's learning outcomes.
 7. **Assessment**: Methods to evaluate learning — "oral questions, observation" or add "written exercise, portfolio, peer assessment" as appropriate. Must match the learning outcome.
 8. **Reflection**: always "".
 9. Week numbering starts from ${weekStart}. Fit exactly ${lessonsPerWeek} lessons per week. Lesson numbers RESET each week: 1, 2, 3... up to ${lessonsPerWeek}, then back to 1 for the next week. Example: Week 1 has lessons 1,2,3,4,5; Week 2 has lessons 1,2,3,4,5 — NOT lesson 6,7,8.
