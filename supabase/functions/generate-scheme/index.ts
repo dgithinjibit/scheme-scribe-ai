@@ -492,6 +492,7 @@ async function generateForSubStrand(
   isSw: boolean,
   weekStart: number,
   lessonsPerWeek: number,
+  indigenousLanguage?: string,
 ): Promise<{ rows: SchemeRow[]; weeksUsed: number }> {
   const allRows: SchemeRow[] = [];
   let remaining = subStrand.lessons;
