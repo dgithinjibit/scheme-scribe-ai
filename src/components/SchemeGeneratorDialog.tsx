@@ -304,7 +304,7 @@ const SchemeGeneratorDialog = () => {
               <div className="space-y-4 py-2">
                 <div className="rounded-lg bg-muted p-3 text-sm space-y-1">
                   <p><span className="font-medium">Grade:</span> {grade}</p>
-                  <p><span className="font-medium">Subject:</span> {subject}</p>
+                  <p><span className="font-medium">Subject:</span> {subject}{indigenousLanguage ? ` (${indigenousLanguage})` : ""}</p>
                   <p><span className="font-medium">Strand:</span> {strand}</p>
                   <p><span className="font-medium">Sub-Strand:</span> {subStrand}</p>
                 </div>
