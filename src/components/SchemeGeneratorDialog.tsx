@@ -24,12 +24,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { columnHeaders, kiswahiliSubjects } from "@/data/curriculum";
 
+const INDIGENOUS_LANGUAGES = [
+  "Kikuyu (Gĩkũyũ)", "Dholuo", "Kalenjin", "Luhya (Luyia)", "Kamba",
+  "Kisii (Ekegusii)", "Meru (Kĩmĩĩrũ)", "Mijikenda", "Maasai (Maa)",
+  "Turkana", "Somali", "Embu", "Tharaka", "Pokot", "Samburu",
+  "Taita", "Taveta", "Borana", "Rendille", "Swahili (Coastal dialects)",
+  "Teso", "Sabaot", "Nandi", "Kipsigis", "Tugen", "Elgeyo", "Marakwet",
+  "Bukusu", "Maragoli", "Isukha", "Idakho", "Wanga", "Nyala", "Tiriki",
+  "Suba", "Kuria", "Tachoni", "Kabras",
+];
+
 const SchemeGeneratorDialog = () => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [grade, setGrade] = useState("");
   const [subject, setSubject] = useState("");
+  const [indigenousLanguage, setIndigenousLanguage] = useState("");
   const [strand, setStrand] = useState("");
   const [subStrand, setSubStrand] = useState("");
   const [context, setContext] = useState("");
