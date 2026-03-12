@@ -36,20 +36,20 @@ const INDIGENOUS_LANGUAGES = [
 
 const LANGUAGE_SUBJECTS = ["English", "English Activities", "Kiswahili", "Indigenous Language"];
 
-// Weekly lesson distribution per strand for language subjects
+// Weekly lesson distribution per strand for language subjects (1 lesson per strand per week)
 const LANGUAGE_WEEKLY_DISTRIBUTION: Record<string, Record<string, number>> = {
   "English": {
-    "Listening and Speaking": 2,
+    "Listening and Speaking": 1,
     "Reading": 1,
     "Language Use": 1,
     "Grammar in Use": 1,
     "Writing": 1,
   },
   "English Activities": {
-    "Listening and Speaking": 2,
+    "Listening and Speaking": 1,
     "Reading": 1,
-    "Writing": 1,
     "Language Use": 1,
+    "Writing": 1,
   },
   "Kiswahili": {
     "Kusikiliza na Kuzungumza": 1,
@@ -60,8 +60,6 @@ const LANGUAGE_WEEKLY_DISTRIBUTION: Record<string, Record<string, number>> = {
   "Indigenous Language": {
     "Listening and Speaking": 1,
     "Reading": 1,
-    "Writing": 0,
-    "Showcasing Concepts and Skills": 0,
   },
 };
 
