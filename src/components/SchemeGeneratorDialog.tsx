@@ -191,7 +191,7 @@ const SchemeGeneratorDialog = () => {
 
   // ── Language weekly generation ──
   const handleGenerateWeekly = async () => {
-    if (!grade || !subject || !term || !weekNumber) {
+    if (!grade || !subject || !term) {
       toast({ title: "Missing fields", description: "Please select all required fields.", variant: "destructive" });
       return;
     }
@@ -409,44 +409,24 @@ const SchemeGeneratorDialog = () => {
               </div>
             )}
 
-            {/* ── LANGUAGE FLOW: Step 3 = Term + Week ── */}
+            {/* ── LANGUAGE FLOW: Step 3 = Term ── */}
             {step === 3 && isLanguage && (
               <div className="space-y-4 py-2">
                 <p className="text-sm text-muted-foreground">
-                  {kiswahiliSubjects.includes(subject) ? "Chagua muhula na wiki." : "Select the term and week to generate."}
+                  {kiswahiliSubjects.includes(subject) ? "Chagua muhula." : "Select the term to generate."}
                 </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{kiswahiliSubjects.includes(subject) ? "Muhula" : "Term"}</label>
-                    <Select value={term} onValueChange={setTerm}>
-                      <SelectTrigger><SelectValue placeholder="Select Term" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Term 1">Term 1</SelectItem>
-                        <SelectItem value="Term 2">Term 2</SelectItem>
-                        <SelectItem value="Term 3">Term 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{kiswahiliSubjects.includes(subject) ? "Wiki" : "Week"}</label>
-                    <Select value={weekNumber} onValueChange={setWeekNumber}>
-                      <SelectTrigger><SelectValue placeholder="Select Week" /></SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 13 }, (_, i) => i + 1).map((w) => (
-                          <SelectItem key={w} value={String(w)}>
-                            {kiswahiliSubjects.includes(subject) ? `Wiki ${w}` : `Week ${w}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{kiswahiliSubjects.includes(subject) ? "Muhula" : "Term"}</label>
+                  <Select value={term} onValueChange={(v) => { setTerm(v); setStep(4); }}>
+                    <SelectTrigger><SelectValue placeholder="Select Term" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Term 1">Term 1</SelectItem>
+                      <SelectItem value="Term 2">Term 2</SelectItem>
+                      <SelectItem value="Term 3">Term 3</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                {term && weekNumber && (
-                  <Button onClick={() => setStep(4)} className="mt-2">
-                    {kiswahiliSubjects.includes(subject) ? "Endelea" : "Continue"} →
-                  </Button>
-                )}
-                <Button variant="ghost" size="sm" onClick={() => { setStep(2); setSubject(""); setTerm(""); setWeekNumber(""); }}>← Back</Button>
+                <Button variant="ghost" size="sm" onClick={() => { setStep(2); setSubject(""); setTerm(""); }}>← Back</Button>
               </div>
             )}
 
@@ -517,7 +497,6 @@ const SchemeGeneratorDialog = () => {
                   <p><span className="font-medium">Grade:</span> {grade}</p>
                   <p><span className="font-medium">Subject:</span> {subject}{indigenousLanguage ? ` (${indigenousLanguage})` : ""}</p>
                   <p><span className="font-medium">{kiswahiliSubjects.includes(subject) ? "Muhula" : "Term"}:</span> {term}</p>
-                  <p><span className="font-medium">{kiswahiliSubjects.includes(subject) ? "Wiki" : "Week"}:</span> {weekNumber}</p>
                   <div className="mt-2 pt-2 border-t">
                     <p className="font-medium mb-1">{kiswahiliSubjects.includes(subject) ? "Mpango wa Wiki:" : "Weekly Plan:"}</p>
                     {weeklyDistribution.map(({ strandName, lessonsThisWeek }) => (
