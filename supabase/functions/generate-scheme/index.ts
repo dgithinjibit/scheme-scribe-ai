@@ -535,7 +535,7 @@ async function generateForSubStrand(
       try {
           rows = await generateBatch(
            _apiKey, grade, subject, strand, subStrand,
-          batchSize, context, isSw, currentWeek, lessonsPerWeek, batchIndex, indigenousLanguage
+          batchSize, context, isSw, currentWeek, lessonsPerWeek, batchIndex, indigenousLanguage, additionalInfo
         );
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Unknown";
