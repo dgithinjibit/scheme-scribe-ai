@@ -642,7 +642,7 @@ Deno.serve(async (req) => {
         try {
           const rows = await generateBatch(
             GROQ_API_KEY, grade, subject, plan.strandName, subStrandInfo,
-            plan.lessons, context || "", isSw, weekNumber || 1, lessonsPerWeek, 0, indigenousLanguage
+            plan.lessons, context || "", isSw, weekNumber || 1, lessonsPerWeek, 0, indigenousLanguage, additionalInfo
           );
 
           // Normalize and fix each row
