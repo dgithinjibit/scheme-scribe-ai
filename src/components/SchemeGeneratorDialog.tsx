@@ -228,6 +228,7 @@ const SchemeGeneratorDialog = () => {
           subject,
           strand: "Weekly Plan",
           context,
+          additionalInfo: additionalInfo || undefined,
           weeklyMode: true,
           weekNumber: parseInt(weekNumber),
           term,
