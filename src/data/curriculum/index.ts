@@ -30,6 +30,7 @@ export { grade6SocialStudies } from "./upper-primary/social-studies-grade6";
 export { grade5Mathematics } from "./upper-primary/mathematics-grade5";
 export { grade6Mathematics } from "./upper-primary/mathematics-grade6";
 export { grade4Kiswahili } from "./upper-primary/kiswahili";
+export { grade6Kiswahili } from "./upper-primary/kiswahili-grade6";
 export { grade1IRE, grade2IRE, grade3IRE } from "./lower-primary/ire";
 
 import type { StrandInfo } from "./types";
