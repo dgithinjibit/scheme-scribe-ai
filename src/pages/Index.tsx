@@ -1,5 +1,8 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import SchemeGeneratorDialog from "@/components/SchemeGeneratorDialog";
-import { BookOpen, CheckCircle, FileDown, Globe } from "lucide-react";
+import { BookOpen, CheckCircle, FileDown, Globe, LogIn, LogOut, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const features = [
   {
@@ -14,17 +17,20 @@ const features = [
   },
   {
     icon: CheckCircle,
-    title: "8-Column Format",
-    desc: "Strand, Sub-Strand, Outcomes, Experiences, Questions, Competencies, Values & PCIs.",
+    title: "Lesson Plans",
+    desc: "Generate detailed lesson plans from any scheme row with one click.",
   },
   {
     icon: FileDown,
-    title: "PDF Export",
-    desc: "Export professional landscape-oriented documents ready for official use.",
+    title: "PDF & DOCX Export",
+    desc: "Export professional documents ready for official use.",
   },
 ];
 
 const Index = () => {
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Accent bar */}
@@ -33,6 +39,27 @@ const Index = () => {
         <div className="flex-1 bg-kenya-red" />
         <div className="flex-1 bg-kenya-gold" />
       </div>
+
+      {/* Top nav */}
+      <nav className="flex items-center justify-end px-6 py-3 border-b border-border">
+        {!loading && (
+          user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                <User className="w-4 h-4" />
+                {user.user_metadata?.full_name || user.email}
+              </span>
+              <Button variant="ghost" size="sm" onClick={signOut} className="gap-1.5">
+                <LogOut className="w-4 h-4" /> Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1.5">
+              <LogIn className="w-4 h-4" /> Sign In
+            </Button>
+          )
+        )}
+      </nav>
 
       {/* Hero */}
       <header className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center">
@@ -43,7 +70,7 @@ const Index = () => {
           Schemer
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-xl">
-          Generate professional, CBC-compliant Schemes of Work in seconds. Built for Kenyan teachers, by educators.
+          Generate professional, CBC-compliant Schemes of Work and Lesson Plans in seconds. Built for Kenyan teachers, by educators.
         </p>
         <div className="mt-8">
           <SchemeGeneratorDialog />
@@ -65,10 +92,9 @@ const Index = () => {
         </div>
       </section>
 
-
       {/* Footer */}
       <footer className="py-6 text-center text-xs text-muted-foreground border-t border-border">
-        Schemer — CBC Scheme of Work Generator • Aligned with KICD Standards
+        Schemer — CBC Scheme of Work & Lesson Plan Generator • Aligned with KICD Standards
       </footer>
     </div>
   );
