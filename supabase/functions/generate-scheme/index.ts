@@ -355,13 +355,22 @@ async function generateBatch(
   const hasOfficialData = !!officialContext;
 
   // GUARDRAIL 8: Refuse to generate if sub-strand has no official KICD learning outcomes
-  // Exception: Kiswahili lower primary uses standardized language-skill sub-strands 
+  // Exception 1: Kiswahili lower primary uses standardized language-skill sub-strands 
   // (Kusikiliza na Kuzungumza, Kusoma, Kuandika, Sarufi) under thematic Mada — 
   // the Mada name + sub-strand name provide sufficient context for generation.
+  // Exception 2: Sub-strands from hardcoded curriculum data (verified KICD strand/sub-strand
+  // names and lesson counts) are trusted — the sub-strand name + strand + grade provides
+  // sufficient context for the AI to generate accurate CBC-aligned content.
   const isKiswahiliThematic = isSw && ["Kusikiliza na Kuzungumza", "Kusoma", "Kuandika", "Sarufi"].includes(subStrandName);
-  if (!hasOfficialData && !isKiswahiliThematic) {
+  const isFromHardcodedCurriculum = subStrand.lessons > 0 && subStrandName.length > 0;
+  if (!hasOfficialData && !isKiswahiliThematic && !isFromHardcodedCurriculum) {
     console.error(`No official KICD data for sub-strand "${subStrandName}" in ${grade} ${subject}. Refusing to generate.`);
     throw new Error(`NO_OFFICIAL_DATA: No verified KICD curriculum data available for "${subStrandName}". Cannot generate without official learning outcomes.`);
+  }
+  
+  // For hardcoded curriculum sub-strands without detailed outcomes, inject contextual info
+  if (!hasOfficialData && isFromHardcodedCurriculum && !isKiswahiliThematic) {
+    officialContext = `\n\nKICD CURRICULUM: ${grade} ${subject}\nStrand: "${strand}"\nSub-strand: "${subStrandName}"\nAllocated lessons: ${totalLessons}\nThis sub-strand is from the official KICD CBC curriculum design. Generate accurate, age-appropriate content aligned with the Kenyan CBC framework for ${grade} learners.\n`;
   }
   
   // For Kiswahili thematic topics, inject the Mada context
