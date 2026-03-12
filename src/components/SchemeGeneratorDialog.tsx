@@ -197,8 +197,8 @@ const SchemeGeneratorDialog = () => {
       return;
     }
 
-    // Build sub-strand selections for each strand
-    const weeklyPlan: { strandName: string; subStrandName: string; lessons: number }[] = [];
+    // Build sub-strand selections for each strand, including full KICD data
+    const weeklyPlan: { strandName: string; subStrandName: string; lessons: number; learningOutcomes?: string[]; suggestedExperiences?: string[]; keyInquiryQuestion?: string }[] = [];
     const distribution = getWeeklyDistribution(subject, fullStrandData);
 
     for (const dist of distribution) {
@@ -207,10 +207,16 @@ const SchemeGeneratorDialog = () => {
         toast({ title: "Missing selection", description: `Please select a sub-strand for "${dist.strandName}".`, variant: "destructive" });
         return;
       }
+      // Find the full sub-strand data with learningOutcomes etc.
+      const strandData = fullStrandData.find(s => s.name === dist.strandName);
+      const subStrandData = strandData?.subStrands.find(ss => ss.name === selectedSubStrand);
       weeklyPlan.push({
         strandName: dist.strandName,
         subStrandName: selectedSubStrand,
         lessons: dist.lessonsThisWeek,
+        learningOutcomes: subStrandData?.learningOutcomes,
+        suggestedExperiences: subStrandData?.suggestedExperiences,
+        keyInquiryQuestion: subStrandData?.keyInquiryQuestion,
       });
     }
 
