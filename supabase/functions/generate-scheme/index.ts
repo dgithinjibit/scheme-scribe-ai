@@ -627,10 +627,13 @@ Deno.serve(async (req) => {
       const allRows: SchemeRow[] = [];
       let lessonCounter = 1;
 
-      for (const plan of weeklyPlan as { strandName: string; subStrandName: string; lessons: number }[]) {
+      for (const plan of weeklyPlan as { strandName: string; subStrandName: string; lessons: number; learningOutcomes?: string[]; suggestedExperiences?: string[]; keyInquiryQuestion?: string }[]) {
         const subStrandInfo: SubStrandInfo = {
           name: plan.subStrandName,
           lessons: plan.lessons,
+          learningOutcomes: plan.learningOutcomes,
+          suggestedExperiences: plan.suggestedExperiences,
+          keyInquiryQuestion: plan.keyInquiryQuestion,
         };
 
         try {
