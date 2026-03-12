@@ -497,7 +497,6 @@ const SchemeGeneratorDialog = () => {
                   <p><span className="font-medium">Grade:</span> {grade}</p>
                   <p><span className="font-medium">Subject:</span> {subject}{indigenousLanguage ? ` (${indigenousLanguage})` : ""}</p>
                   <p><span className="font-medium">{kiswahiliSubjects.includes(subject) ? "Muhula" : "Term"}:</span> {term}</p>
-                  <p><span className="font-medium">{kiswahiliSubjects.includes(subject) ? "Wiki" : "Week"}:</span> {weekNumber}</p>
                   <div className="mt-2 pt-2 border-t">
                     <p className="font-medium mb-1">{kiswahiliSubjects.includes(subject) ? "Mpango wa Wiki:" : "Weekly Plan:"}</p>
                     {weeklyDistribution.map(({ strandName, lessonsThisWeek }) => (
