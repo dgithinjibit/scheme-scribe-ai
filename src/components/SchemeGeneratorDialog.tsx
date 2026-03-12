@@ -266,7 +266,7 @@ const SchemeGeneratorDialog = () => {
 
       const lessonsPerWeek = getLessonsPerWeek(grade, subject);
       const { data, error } = await supabase.functions.invoke("generate-scheme", {
-        body: { grade, subject, strand, context, subStrands, lessonsPerWeek, indigenousLanguage: indigenousLanguage || undefined },
+        body: { grade, subject, strand, context, additionalInfo: additionalInfo || undefined, subStrands, lessonsPerWeek, indigenousLanguage: indigenousLanguage || undefined },
       });
 
       if (error) throw error;
