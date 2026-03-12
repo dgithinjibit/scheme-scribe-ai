@@ -24,7 +24,7 @@ export { grade4CRE } from "./upper-primary/cre";
 export { grade4CreativeArts } from "./upper-primary/creative-arts";
 export { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
 export { grade4English, grade5English, grade6English } from "./upper-primary/english";
-export { grade4IndigenousLanguage, grade5IndigenousLanguage } from "./upper-primary/indigenous-language";
+export { grade4IndigenousLanguage, grade5IndigenousLanguage, grade6IndigenousLanguage } from "./upper-primary/indigenous-language";
 export { grade4SocialStudies } from "./upper-primary/social-studies";
 export { grade6SocialStudies } from "./upper-primary/social-studies-grade6";
 export { grade5Mathematics } from "./upper-primary/mathematics-grade5";
