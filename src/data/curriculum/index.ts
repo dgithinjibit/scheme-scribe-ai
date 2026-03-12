@@ -63,6 +63,7 @@ import { grade6SocialStudies } from "./upper-primary/social-studies-grade6";
 import { grade5Mathematics } from "./upper-primary/mathematics-grade5";
 import { grade6Mathematics } from "./upper-primary/mathematics-grade6";
 import { grade4Kiswahili } from "./upper-primary/kiswahili";
+import { grade6Kiswahili } from "./upper-primary/kiswahili-grade6";
 
 // ─── Strand registry keyed by "Grade X|Subject" ───
 
