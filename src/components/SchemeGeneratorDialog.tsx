@@ -18,11 +18,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { grades, getSubjectsForGrade, getHardcodedStrands, getSubStrandsForStrand, getLessonsPerWeek, type SchemeRow, type StrandInfo } from "@/data/curriculum";
 import SchemePreview from "./SchemePreview";
-import { FileText, Download, Save, Loader2, Sparkles, FileDown } from "lucide-react";
+import LessonPlanDialog from "./LessonPlanDialog";
+import { FileText, Download, Save, Loader2, Sparkles, FileDown, BookOpen } from "lucide-react";
 import { exportSchemeToDocx } from "@/utils/exportDocx";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { columnHeaders, kiswahiliSubjects } from "@/data/curriculum";
+import { useAuth } from "@/hooks/useAuth";
 
 const INDIGENOUS_LANGUAGES = [
   "Kikuyu (Gĩkũyũ)", "Dholuo", "Kalenjin", "Luhya (Luyia)", "Kamba",
