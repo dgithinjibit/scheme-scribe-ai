@@ -326,11 +326,24 @@ const SchemeGeneratorDialog = () => {
     toast({ title: "PDF Export", description: "Print dialog opened. Select 'Save as PDF' to export." });
   };
 
-  const handleSave = () => {
-    toast({
-      title: "Saved to Library",
-      description: "Your scheme has been saved locally. Connect a backend to enable cloud storage.",
-    });
+  const handleSave = async () => {
+    if (!generatedRows) return;
+    if (user) {
+      await supabase.from("generated_resources" as any).insert({
+        user_id: user.id,
+        resource_type: "scheme",
+        grade,
+        subject,
+        strand: isLanguage ? "Weekly Plan" : strand,
+        sub_strand: isLanguage ? undefined : subStrand,
+        term: term || undefined,
+        content: generatedRows,
+        input_params: { context, additionalInfo, strandSubStrandSelections },
+      } as any);
+      toast({ title: "Saved!", description: "Your scheme has been saved to your library." });
+    } else {
+      toast({ title: "Sign in required", description: "Sign in with Google to save schemes to your library.", variant: "destructive" });
+    }
   };
 
   const weeklyDistribution = isLanguage && fullStrandData.length > 0
