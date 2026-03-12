@@ -634,6 +634,23 @@ const SchemeGeneratorDialog = () => {
                     rows={3}
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    {kiswahiliSubjects.includes(subject)
+                      ? "Taarifa nyingine muhimu (si lazima)"
+                      : "Any other relevant information (optional)"}
+                  </label>
+                  <Textarea
+                    value={additionalInfo}
+                    onChange={(e) => setAdditionalInfo(e.target.value)}
+                    placeholder={
+                      kiswahiliSubjects.includes(subject)
+                        ? "k.m., mahitaji maalum ya wanafunzi, muktadha wa shule, malengo ya ziada..."
+                        : "e.g., special needs considerations, school context, specific teaching goals..."
+                    }
+                    rows={2}
+                  />
+                </div>
                 <div className="flex gap-2">
                   <Button variant="ghost" size="sm" onClick={() => { setStep(4); setSubStrand(""); }}>← Back</Button>
                   <Button onClick={handleGenerate} disabled={loading} className="ml-auto gap-2">
