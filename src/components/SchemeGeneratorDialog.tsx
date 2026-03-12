@@ -90,6 +90,7 @@ function getWeeklyDistribution(subject: string, strands: StrandInfo[]): { strand
 
 const SchemeGeneratorDialog = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [grade, setGrade] = useState("");
@@ -104,6 +105,8 @@ const SchemeGeneratorDialog = () => {
   const [availableStrands, setAvailableStrands] = useState<string[]>([]);
   const [availableSubStrands, setAvailableSubStrands] = useState<string[]>([]);
   const [loadingStrands, setLoadingStrands] = useState(false);
+  const [lessonPlanRow, setLessonPlanRow] = useState<SchemeRow | null>(null);
+  const [lessonPlanOpen, setLessonPlanOpen] = useState(false);
 
   // Language-specific state
   const [term, setTerm] = useState("");
