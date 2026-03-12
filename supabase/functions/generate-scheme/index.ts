@@ -459,6 +459,7 @@ Return ONLY a valid JSON array of ${batchLessons} objects. No other text.`;
 - Strand: ${strand}
 - Sub-strand: ${subStrandName} (${totalLessons} total lessons, this batch: ${batchLessons})${batchDesc}
 ${context ? `- Additional Resources: ${context}` : ""}
+${additionalInfo ? `- Additional Teacher Notes/Context: ${additionalInfo}` : ""}
 
 CRITICAL: Every lesson MUST be unique. Do NOT repeat learning outcomes, experiences, or content from any other lesson. Do NOT create "continued practice" or "revision" lessons — each lesson must introduce NEW content or a NEW skill progression.
 
