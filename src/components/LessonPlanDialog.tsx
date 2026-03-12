@@ -77,7 +77,7 @@ const LessonPlanDialog = ({ open, onOpenChange, row, grade, subject, term }: Les
 
       // Save to database if authenticated
       if (user) {
-        await supabase.from("generated_resources").insert({
+        await supabase.from("generated_resources" as any).insert({
           user_id: user.id,
           resource_type: "lesson_plan",
           grade,
@@ -87,7 +87,7 @@ const LessonPlanDialog = ({ open, onOpenChange, row, grade, subject, term }: Les
           term,
           content: data.plan,
           input_params: { row, additionalNotes },
-        });
+        } as any);
       }
 
       toast({ title: "Lesson Plan Generated!" });
