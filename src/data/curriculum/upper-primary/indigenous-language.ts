@@ -79,3 +79,42 @@ export const grade5IndigenousLanguage: StrandInfo[] = [
     ],
   },
 ];
+
+export const grade6IndigenousLanguage: StrandInfo[] = [
+  {
+    name: "Listening and Speaking",
+    subStrands: [
+      { name: "Attentive Listening", lessons: 2 },
+      { name: "Listening for Information (Vocabulary Building, Interrogatives)", lessons: 6 },
+      { name: "Listening for Comprehension", lessons: 2 },
+      { name: "Self-expression", lessons: 4 },
+      { name: "Language Strategies on Daily Experiences", lessons: 2 },
+      { name: "Socialising and Taking Action (Debate, Discussions)", lessons: 2 },
+    ],
+  },
+  {
+    name: "Reading",
+    subStrands: [
+      { name: "Reading for Information", lessons: 8 },
+      { name: "Reading Fluency (Intonation, Pause, Speed, Accuracy)", lessons: 4 },
+      { name: "Reading Comprehension", lessons: 4 },
+      { name: "Extensive Reading", lessons: 2 },
+    ],
+  },
+  {
+    name: "Writing",
+    subStrands: [
+      { name: "Handwriting", lessons: 4 },
+      { name: "Mechanics of Writing (Punctuation)", lessons: 2 },
+      { name: "Sequencing Ideas", lessons: 2 },
+      { name: "Creative Writing (Essays, Narratives, Poetry)", lessons: 6 },
+      { name: "Functional Writing (Formal Letter, Apology Letter)", lessons: 4 },
+    ],
+  },
+  {
+    name: "Showcasing Concepts and Skills",
+    subStrands: [
+      { name: "Showcasing Concepts and Skills in Indigenous Languages", lessons: 6 },
+    ],
+  },
+];

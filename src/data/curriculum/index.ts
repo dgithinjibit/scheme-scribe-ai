@@ -24,7 +24,7 @@ export { grade4CRE } from "./upper-primary/cre";
 export { grade4CreativeArts } from "./upper-primary/creative-arts";
 export { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
 export { grade4English, grade5English, grade6English } from "./upper-primary/english";
-export { grade4IndigenousLanguage, grade5IndigenousLanguage } from "./upper-primary/indigenous-language";
+export { grade4IndigenousLanguage, grade5IndigenousLanguage, grade6IndigenousLanguage } from "./upper-primary/indigenous-language";
 export { grade4SocialStudies } from "./upper-primary/social-studies";
 export { grade6SocialStudies } from "./upper-primary/social-studies-grade6";
 export { grade5Mathematics } from "./upper-primary/mathematics-grade5";
@@ -56,7 +56,7 @@ import { grade4CRE } from "./upper-primary/cre";
 import { grade4CreativeArts } from "./upper-primary/creative-arts";
 import { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
 import { grade4English, grade5English, grade6English } from "./upper-primary/english";
-import { grade4IndigenousLanguage, grade5IndigenousLanguage } from "./upper-primary/indigenous-language";
+import { grade4IndigenousLanguage, grade5IndigenousLanguage, grade6IndigenousLanguage } from "./upper-primary/indigenous-language";
 import { grade4SocialStudies } from "./upper-primary/social-studies";
 import { grade6SocialStudies } from "./upper-primary/social-studies-grade6";
 import { grade5Mathematics } from "./upper-primary/mathematics-grade5";
@@ -100,6 +100,7 @@ const hardcodedStrands: Record<CurriculumKey, StrandInfo[]> = {
   "Grade 4|Social Studies": grade4SocialStudies,
   "Grade 5|English": grade5English,
   "Grade 5|Indigenous Language": grade5IndigenousLanguage,
+  "Grade 6|Indigenous Language": grade6IndigenousLanguage,
   "Grade 6|English": grade6English,
   "Grade 4|Agriculture": grade4Agriculture,
   "Grade 6|Agriculture": grade6Agriculture,
