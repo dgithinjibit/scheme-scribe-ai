@@ -50,6 +50,8 @@ import {
 } from "./lower-primary/english-activities";
 import { grade1IRE, grade2IRE, grade3IRE } from "./lower-primary/ire";
 import { grade6Agriculture } from "./upper-primary/agriculture";
+import { grade4Agriculture } from "./upper-primary/agriculture-grade4";
+import { grade4ScienceTechnology } from "./upper-primary/science-technology-grade4";
 import { grade4CRE } from "./upper-primary/cre";
 import { grade4CreativeArts } from "./upper-primary/creative-arts";
 import { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
