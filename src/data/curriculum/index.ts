@@ -56,7 +56,7 @@ import { grade4CRE } from "./upper-primary/cre";
 import { grade4CreativeArts } from "./upper-primary/creative-arts";
 import { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
 import { grade4English, grade5English, grade6English } from "./upper-primary/english";
-import { grade4IndigenousLanguage, grade5IndigenousLanguage } from "./upper-primary/indigenous-language";
+import { grade4IndigenousLanguage, grade5IndigenousLanguage, grade6IndigenousLanguage } from "./upper-primary/indigenous-language";
 import { grade4SocialStudies } from "./upper-primary/social-studies";
 import { grade6SocialStudies } from "./upper-primary/social-studies-grade6";
 import { grade5Mathematics } from "./upper-primary/mathematics-grade5";
