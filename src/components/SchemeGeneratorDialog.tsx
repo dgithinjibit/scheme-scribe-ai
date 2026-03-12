@@ -18,11 +18,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { grades, getSubjectsForGrade, getHardcodedStrands, getSubStrandsForStrand, getLessonsPerWeek, type SchemeRow, type StrandInfo } from "@/data/curriculum";
 import SchemePreview from "./SchemePreview";
-import { FileText, Download, Save, Loader2, Sparkles, FileDown } from "lucide-react";
+import LessonPlanDialog from "./LessonPlanDialog";
+import { FileText, Download, Save, Loader2, Sparkles, FileDown, BookOpen } from "lucide-react";
 import { exportSchemeToDocx } from "@/utils/exportDocx";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { columnHeaders, kiswahiliSubjects } from "@/data/curriculum";
+import { useAuth } from "@/hooks/useAuth";
 
 const INDIGENOUS_LANGUAGES = [
   "Kikuyu (Gĩkũyũ)", "Dholuo", "Kalenjin", "Luhya (Luyia)", "Kamba",
@@ -88,6 +90,7 @@ function getWeeklyDistribution(subject: string, strands: StrandInfo[]): { strand
 
 const SchemeGeneratorDialog = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [grade, setGrade] = useState("");
@@ -102,6 +105,8 @@ const SchemeGeneratorDialog = () => {
   const [availableStrands, setAvailableStrands] = useState<string[]>([]);
   const [availableSubStrands, setAvailableSubStrands] = useState<string[]>([]);
   const [loadingStrands, setLoadingStrands] = useState(false);
+  const [lessonPlanRow, setLessonPlanRow] = useState<SchemeRow | null>(null);
+  const [lessonPlanOpen, setLessonPlanOpen] = useState(false);
 
   // Language-specific state
   const [term, setTerm] = useState("");
@@ -321,11 +326,24 @@ const SchemeGeneratorDialog = () => {
     toast({ title: "PDF Export", description: "Print dialog opened. Select 'Save as PDF' to export." });
   };
 
-  const handleSave = () => {
-    toast({
-      title: "Saved to Library",
-      description: "Your scheme has been saved locally. Connect a backend to enable cloud storage.",
-    });
+  const handleSave = async () => {
+    if (!generatedRows) return;
+    if (user) {
+      await supabase.from("generated_resources" as any).insert({
+        user_id: user.id,
+        resource_type: "scheme",
+        grade,
+        subject,
+        strand: isLanguage ? "Weekly Plan" : strand,
+        sub_strand: isLanguage ? undefined : subStrand,
+        term: term || undefined,
+        content: generatedRows,
+        input_params: { context, additionalInfo, strandSubStrandSelections },
+      } as any);
+      toast({ title: "Saved!", description: "Your scheme has been saved to your library." });
+    } else {
+      toast({ title: "Sign in required", description: "Sign in with Google to save schemes to your library.", variant: "destructive" });
+    }
   };
 
   const weeklyDistribution = isLanguage && fullStrandData.length > 0
@@ -643,7 +661,31 @@ const SchemeGeneratorDialog = () => {
             {/* ── Step 6: Preview (both flows) ── */}
             {step === 6 && generatedRows && (
               <div className="space-y-4 py-2">
-                <SchemePreview rows={generatedRows} subject={subject} grade={grade} strand={isLanguage ? `${term} - Week ${weekNumber}` : strand} />
+                <SchemePreview rows={generatedRows} subject={subject} grade={grade} strand={isLanguage ? `${term}` : strand} />
+                
+                {/* Per-lesson "Generate Lesson Plan" buttons */}
+                <div className="rounded-lg border p-3 space-y-2">
+                  <h4 className="text-sm font-semibold flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Generate Lesson Plans
+                  </h4>
+                  <p className="text-xs text-muted-foreground">Click on any lesson to generate a detailed lesson plan for it.</p>
+                  <div className="flex flex-wrap gap-2">
+                    {generatedRows.map((row, i) => (
+                      <Button
+                        key={i}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs gap-1"
+                        onClick={() => { setLessonPlanRow(row); setLessonPlanOpen(true); }}
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        Wk {row.week} L{row.lesson}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap gap-2 pt-2">
                   <Button variant="outline" onClick={() => { setStep(5); setGeneratedRows(null); }} className="gap-2">
                     <FileText className="w-4 h-4" /> Regenerate
@@ -653,7 +695,7 @@ const SchemeGeneratorDialog = () => {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => exportSchemeToDocx(generatedRows!, grade, subject, isLanguage ? `${term} - Week ${weekNumber}` : strand)}
+                    onClick={() => exportSchemeToDocx(generatedRows!, grade, subject, isLanguage ? `${term}` : strand)}
                     className="gap-2"
                   >
                     <FileDown className="w-4 h-4" /> Export DOCX
@@ -663,6 +705,18 @@ const SchemeGeneratorDialog = () => {
                   </Button>
                 </div>
               </div>
+            )}
+
+            {/* Lesson Plan Dialog */}
+            {lessonPlanRow && (
+              <LessonPlanDialog
+                open={lessonPlanOpen}
+                onOpenChange={setLessonPlanOpen}
+                row={lessonPlanRow}
+                grade={grade}
+                subject={subject}
+                term={term || undefined}
+              />
             )}
           </div>
         </DialogContent>

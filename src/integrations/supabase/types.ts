@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      generated_resources: {
+        Row: {
+          additional_info: string | null
+          content: Json
+          created_at: string
+          grade: string
+          id: string
+          input_params: Json | null
+          resource_type: string
+          strand: string | null
+          sub_strand: string | null
+          subject: string
+          term: string | null
+          user_id: string
+        }
+        Insert: {
+          additional_info?: string | null
+          content: Json
+          created_at?: string
+          grade: string
+          id?: string
+          input_params?: Json | null
+          resource_type?: string
+          strand?: string | null
+          sub_strand?: string | null
+          subject: string
+          term?: string | null
+          user_id: string
+        }
+        Update: {
+          additional_info?: string | null
+          content?: Json
+          created_at?: string
+          grade?: string
+          id?: string
+          input_params?: Json | null
+          resource_type?: string
+          strand?: string | null
+          sub_strand?: string | null
+          subject?: string
+          term?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scheme_references: {
         Row: {
           content_snippet: string | null
