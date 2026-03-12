@@ -96,6 +96,7 @@ const SchemeGeneratorDialog = () => {
   const [strand, setStrand] = useState("");
   const [subStrand, setSubStrand] = useState("");
   const [context, setContext] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedRows, setGeneratedRows] = useState<SchemeRow[] | null>(null);
   const [availableStrands, setAvailableStrands] = useState<string[]>([]);
