@@ -601,7 +601,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { grade, subject, strand, context, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan } = await req.json();
+    const { grade, subject, strand, context, additionalInfo, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan } = await req.json();
 
     if (!grade || !subject) {
       return new Response(
