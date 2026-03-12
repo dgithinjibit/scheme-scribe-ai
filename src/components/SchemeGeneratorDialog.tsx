@@ -96,6 +96,7 @@ const SchemeGeneratorDialog = () => {
   const [strand, setStrand] = useState("");
   const [subStrand, setSubStrand] = useState("");
   const [context, setContext] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedRows, setGeneratedRows] = useState<SchemeRow[] | null>(null);
   const [availableStrands, setAvailableStrands] = useState<string[]>([]);
@@ -227,6 +228,7 @@ const SchemeGeneratorDialog = () => {
           subject,
           strand: "Weekly Plan",
           context,
+          additionalInfo: additionalInfo || undefined,
           weeklyMode: true,
           weekNumber: parseInt(weekNumber),
           term,
@@ -264,7 +266,7 @@ const SchemeGeneratorDialog = () => {
 
       const lessonsPerWeek = getLessonsPerWeek(grade, subject);
       const { data, error } = await supabase.functions.invoke("generate-scheme", {
-        body: { grade, subject, strand, context, subStrands, lessonsPerWeek, indigenousLanguage: indigenousLanguage || undefined },
+        body: { grade, subject, strand, context, additionalInfo: additionalInfo || undefined, subStrands, lessonsPerWeek, indigenousLanguage: indigenousLanguage || undefined },
       });
 
       if (error) throw error;
@@ -542,6 +544,23 @@ const SchemeGeneratorDialog = () => {
                     rows={3}
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    {kiswahiliSubjects.includes(subject)
+                      ? "Taarifa nyingine muhimu (si lazima)"
+                      : "Any other relevant information (optional)"}
+                  </label>
+                  <Textarea
+                    value={additionalInfo}
+                    onChange={(e) => setAdditionalInfo(e.target.value)}
+                    placeholder={
+                      kiswahiliSubjects.includes(subject)
+                        ? "k.m., mahitaji maalum ya wanafunzi, muktadha wa shule, malengo ya ziada..."
+                        : "e.g., special needs considerations, school context, specific teaching goals..."
+                    }
+                    rows={2}
+                  />
+                </div>
                 <div className="flex gap-2">
                   <Button variant="ghost" size="sm" onClick={() => setStep(4)}>← Back</Button>
                   <Button onClick={handleGenerateWeekly} disabled={loading} className="ml-auto gap-2">
@@ -613,6 +632,23 @@ const SchemeGeneratorDialog = () => {
                     onChange={(e) => setContext(e.target.value)}
                     placeholder="e.g., textbooks, videos, art supplies, musical instruments, outdoor space..."
                     rows={3}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    {kiswahiliSubjects.includes(subject)
+                      ? "Taarifa nyingine muhimu (si lazima)"
+                      : "Any other relevant information (optional)"}
+                  </label>
+                  <Textarea
+                    value={additionalInfo}
+                    onChange={(e) => setAdditionalInfo(e.target.value)}
+                    placeholder={
+                      kiswahiliSubjects.includes(subject)
+                        ? "k.m., mahitaji maalum ya wanafunzi, muktadha wa shule, malengo ya ziada..."
+                        : "e.g., special needs considerations, school context, specific teaching goals..."
+                    }
+                    rows={2}
                   />
                 </div>
                 <div className="flex gap-2">

@@ -329,6 +329,7 @@ async function generateBatch(
   lessonsPerWeek: number,
   batchIndex: number,
   indigenousLanguage?: string,
+  additionalInfo?: string,
 ): Promise<SchemeRow[]> {
   const subStrandName = subStrand.name;
   const totalLessons = subStrand.lessons;
@@ -459,6 +460,7 @@ Return ONLY a valid JSON array of ${batchLessons} objects. No other text.`;
 - Strand: ${strand}
 - Sub-strand: ${subStrandName} (${totalLessons} total lessons, this batch: ${batchLessons})${batchDesc}
 ${context ? `- Additional Resources: ${context}` : ""}
+${additionalInfo ? `- Additional Teacher Notes/Context: ${additionalInfo}` : ""}
 
 CRITICAL: Every lesson MUST be unique. Do NOT repeat learning outcomes, experiences, or content from any other lesson. Do NOT create "continued practice" or "revision" lessons — each lesson must introduce NEW content or a NEW skill progression.
 
@@ -515,6 +517,7 @@ async function generateForSubStrand(
   weekStart: number,
   lessonsPerWeek: number,
   indigenousLanguage?: string,
+  additionalInfo?: string,
 ): Promise<{ rows: SchemeRow[]; weeksUsed: number }> {
   const allRows: SchemeRow[] = [];
   let remaining = subStrand.lessons;
@@ -532,7 +535,7 @@ async function generateForSubStrand(
       try {
           rows = await generateBatch(
            _apiKey, grade, subject, strand, subStrand,
-          batchSize, context, isSw, currentWeek, lessonsPerWeek, batchIndex, indigenousLanguage
+          batchSize, context, isSw, currentWeek, lessonsPerWeek, batchIndex, indigenousLanguage, additionalInfo
         );
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Unknown";
@@ -601,7 +604,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { grade, subject, strand, context, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan } = await req.json();
+    const { grade, subject, strand, context, additionalInfo, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan } = await req.json();
 
     if (!grade || !subject) {
       return new Response(
@@ -639,7 +642,7 @@ Deno.serve(async (req) => {
         try {
           const rows = await generateBatch(
             GROQ_API_KEY, grade, subject, plan.strandName, subStrandInfo,
-            plan.lessons, context || "", isSw, weekNumber || 1, lessonsPerWeek, 0, indigenousLanguage
+            plan.lessons, context || "", isSw, weekNumber || 1, lessonsPerWeek, 0, indigenousLanguage, additionalInfo
           );
 
           // Normalize and fix each row
@@ -711,7 +714,7 @@ Deno.serve(async (req) => {
         try {
             const enrichedContext = (context || "") + referenceContext;
             const { rows, weeksUsed } = await generateForSubStrand(
-              GROQ_API_KEY, grade, subject, strand, ss, enrichedContext, isSw, currentWeek, lessonsPerWeek, indigenousLanguage
+              GROQ_API_KEY, grade, subject, strand, ss, enrichedContext, isSw, currentWeek, lessonsPerWeek, indigenousLanguage, additionalInfo
             );
           allRows.push(...rows);
           currentWeek += weeksUsed;
