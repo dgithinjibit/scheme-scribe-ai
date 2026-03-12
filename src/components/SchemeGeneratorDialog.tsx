@@ -191,7 +191,7 @@ const SchemeGeneratorDialog = () => {
 
   // ── Language weekly generation ──
   const handleGenerateWeekly = async () => {
-    if (!grade || !subject || !term || !weekNumber) {
+    if (!grade || !subject || !term) {
       toast({ title: "Missing fields", description: "Please select all required fields.", variant: "destructive" });
       return;
     }
