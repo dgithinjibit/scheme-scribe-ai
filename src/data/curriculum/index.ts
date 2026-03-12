@@ -18,6 +18,8 @@ export {
   grade3EnglishActivities,
 } from "./lower-primary/english-activities";
 export { grade6Agriculture } from "./upper-primary/agriculture";
+export { grade4Agriculture } from "./upper-primary/agriculture-grade4";
+export { grade4ScienceTechnology } from "./upper-primary/science-technology-grade4";
 export { grade4CRE } from "./upper-primary/cre";
 export { grade4CreativeArts } from "./upper-primary/creative-arts";
 export { grade5CreativeArts } from "./upper-primary/creative-arts-grade5";
