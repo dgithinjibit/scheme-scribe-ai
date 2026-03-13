@@ -613,7 +613,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { grade, subject, strand, context, additionalInfo, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan } = await req.json();
+    const { grade, subject, strand, context, additionalInfo, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan, termMode, termPlan } = await req.json();
 
     if (!grade || !subject) {
       return new Response(
@@ -694,6 +694,64 @@ Deno.serve(async (req) => {
       }
 
       console.log(`Weekly mode: generated ${allRows.length} total lesson rows for Week ${weekNumber}`);
+      return new Response(
+        JSON.stringify({ rows: allRows, source: "hardcoded_context" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── TERM MODE: Generate full term scheme for non-language subjects ──
+    if (termMode && termPlan && Array.isArray(termPlan)) {
+      const totalSubStrands = (termPlan as { strandName: string; subStrands: SubStrandInfo[] }[])
+        .reduce((sum, s) => sum + s.subStrands.length, 0);
+      const totalLessons = (termPlan as { strandName: string; subStrands: SubStrandInfo[] }[])
+        .reduce((sum, s) => sum + s.subStrands.reduce((ss, sub) => ss + sub.lessons, 0), 0);
+      console.log(`Term mode: ${grade} ${subject} - ${term} (${totalSubStrands} sub-strands, ${totalLessons} total lessons)`);
+
+      const referenceContext = await fetchReferenceContext(grade, subject, "");
+
+      const allRows: SchemeRow[] = [];
+      let currentWeek = 1;
+
+      for (const strandPlan of termPlan as { strandName: string; subStrands: SubStrandInfo[] }[]) {
+        for (const ss of strandPlan.subStrands) {
+          try {
+            const enrichedContext = (context || "") + referenceContext;
+            const { rows, weeksUsed } = await generateForSubStrand(
+              GROQ_API_KEY, grade, subject, strandPlan.strandName, ss,
+              enrichedContext, isSw, currentWeek, lessonsPerWeek, indigenousLanguage, additionalInfo
+            );
+            allRows.push(...rows);
+            currentWeek += weeksUsed;
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : "Unknown";
+            console.error(`Error generating ${strandPlan.strandName}/${ss.name}: ${msg}`);
+            if (msg === "RATE_LIMIT") {
+              if (allRows.length > 0) {
+                console.warn(`Rate limited after ${allRows.length} rows, returning partial results`);
+                return new Response(
+                  JSON.stringify({ rows: allRows, source: "hardcoded_context", partial: true }),
+                  { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                );
+              }
+              return new Response(
+                JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+                { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+              );
+            }
+            // Continue with other sub-strands even if one fails
+          }
+        }
+      }
+
+      if (allRows.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Failed to generate any lesson rows. Please try again." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      console.log(`Term mode: generated ${allRows.length} total lesson rows for ${term}`);
       return new Response(
         JSON.stringify({ rows: allRows, source: "hardcoded_context" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }

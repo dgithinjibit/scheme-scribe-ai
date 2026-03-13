@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { grades, getSubjectsForGrade, getHardcodedStrands, getSubStrandsForStrand, getLessonsPerWeek, type SchemeRow, type StrandInfo } from "@/data/curriculum";
+import { getTermAllocation, getTermLessonCount } from "@/data/curriculum/term-mappings";
 import SchemePreview from "./SchemePreview";
 import LessonPlanDialog from "./LessonPlanDialog";
 import { FileText, Download, Save, Loader2, Sparkles, FileDown, BookOpen } from "lucide-react";
@@ -25,6 +26,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { columnHeaders, kiswahiliSubjects } from "@/data/curriculum";
 import { useAuth } from "@/hooks/useAuth";
+import type { SubStrandInfo } from "@/data/curriculum/types";
 
 const INDIGENOUS_LANGUAGES = [
   "Kikuyu (Gĩkũyũ)", "Dholuo", "Kalenjin", "Luhya (Luyia)", "Kamba",
@@ -72,14 +74,12 @@ function isLanguageSubject(subject: string): boolean {
 function getWeeklyDistribution(subject: string, strands: StrandInfo[]): { strandName: string; lessonsThisWeek: number }[] {
   const dist = LANGUAGE_WEEKLY_DISTRIBUTION[subject];
   if (!dist) {
-    // Fallback: distribute evenly
     const lessonsPerWeek = getLessonsPerWeek("Grade 4", subject);
     const perStrand = Math.max(1, Math.floor(lessonsPerWeek / strands.length));
     return strands.map(s => ({ strandName: s.name, lessonsThisWeek: perStrand }));
   }
 
   return strands.map(s => {
-    // Find matching key in distribution (partial match)
     const matchKey = Object.keys(dist).find(k => s.name.includes(k) || k.includes(s.name));
     return {
       strandName: s.name,
@@ -113,6 +113,9 @@ const SchemeGeneratorDialog = () => {
   const [weekNumber, setWeekNumber] = useState("");
   const [strandSubStrandSelections, setStrandSubStrandSelections] = useState<Record<string, string>>({});
   const [fullStrandData, setFullStrandData] = useState<StrandInfo[]>([]);
+
+  // Term-based state for non-language subjects
+  const [termAllocation, setTermAllocation] = useState<{ strandName: string; subStrands: SubStrandInfo[] }[] | null>(null);
 
   const subjects = getSubjectsForGrade(grade);
   const isLanguage = isLanguageSubject(subject);
@@ -162,6 +165,16 @@ const SchemeGeneratorDialog = () => {
     fetchStrands();
   }, [grade, subject]);
 
+  // Update term allocation when term changes (non-language)
+  useEffect(() => {
+    if (!grade || !subject || !term || isLanguage) {
+      setTermAllocation(null);
+      return;
+    }
+    const allocation = getTermAllocation(grade, subject, term);
+    setTermAllocation(allocation);
+  }, [grade, subject, term, isLanguage]);
+
   const resetForm = () => {
     setStep(1);
     setGrade("");
@@ -178,9 +191,10 @@ const SchemeGeneratorDialog = () => {
     setWeekNumber("");
     setStrandSubStrandSelections({});
     setFullStrandData([]);
+    setTermAllocation(null);
   };
 
-  // Populate sub-strands when strand is selected (non-language flow)
+  // Populate sub-strands when strand is selected (non-language flow - kept for fallback)
   useEffect(() => {
     if (!grade || !subject || !strand || isLanguage) {
       setAvailableSubStrands([]);
@@ -201,7 +215,6 @@ const SchemeGeneratorDialog = () => {
       return;
     }
 
-    // Build sub-strand selections for each strand, including full KICD data
     const weeklyPlan: { strandName: string; subStrandName: string; lessons: number; learningOutcomes?: string[]; suggestedExperiences?: string[]; keyInquiryQuestion?: string }[] = [];
     const distribution = getWeeklyDistribution(subject, fullStrandData);
 
@@ -211,7 +224,6 @@ const SchemeGeneratorDialog = () => {
         toast({ title: "Missing selection", description: `Please select a sub-strand for "${dist.strandName}".`, variant: "destructive" });
         return;
       }
-      // Find the full sub-strand data with learningOutcomes etc.
       const strandData = fullStrandData.find(s => s.name === dist.strandName);
       const subStrandData = strandData?.subStrands.find(ss => ss.name === selectedSubStrand);
       weeklyPlan.push({
@@ -257,21 +269,41 @@ const SchemeGeneratorDialog = () => {
     }
   };
 
-  // ── Standard (non-language) generation ──
-  const handleGenerate = async () => {
-    if (!grade || !subject || !strand || !subStrand) {
-      toast({ title: "Missing fields", description: "Please select grade, subject, strand, and sub-strand.", variant: "destructive" });
+  // ── Term-based generation for non-language subjects ──
+  const handleGenerateTerm = async () => {
+    if (!grade || !subject || !term || !termAllocation || termAllocation.length === 0) {
+      toast({ title: "Missing fields", description: "Please select all required fields.", variant: "destructive" });
       return;
     }
+
     setLoading(true);
     try {
-      const allSubs = getSubStrandsForStrand(grade, subject, strand);
-      const selectedSub = allSubs?.find(s => s.name === subStrand);
-      const subStrands = selectedSub ? [selectedSub] : [];
-
       const lessonsPerWeek = getLessonsPerWeek(grade, subject);
+
+      // Build the term plan: all strands with their sub-strands
+      const termPlan = termAllocation.map(a => ({
+        strandName: a.strandName,
+        subStrands: a.subStrands.map(ss => ({
+          name: ss.name,
+          lessons: ss.lessons,
+          learningOutcomes: ss.learningOutcomes,
+          suggestedExperiences: ss.suggestedExperiences,
+          keyInquiryQuestion: ss.keyInquiryQuestion,
+        })),
+      }));
+
       const { data, error } = await supabase.functions.invoke("generate-scheme", {
-        body: { grade, subject, strand, context, additionalInfo: additionalInfo || undefined, subStrands, lessonsPerWeek, indigenousLanguage: indigenousLanguage || undefined },
+        body: {
+          grade,
+          subject,
+          context,
+          additionalInfo: additionalInfo || undefined,
+          termMode: true,
+          term,
+          termPlan,
+          lessonsPerWeek,
+          indigenousLanguage: indigenousLanguage || undefined,
+        },
       });
 
       if (error) throw error;
@@ -279,10 +311,8 @@ const SchemeGeneratorDialog = () => {
 
       setGeneratedRows(data.rows);
       setStep(6);
-      const sourceMsg = data.source === "kicd_search"
-        ? "Generated using live KICD curriculum data."
-        : "Generated using AI curriculum knowledge.";
-      toast({ title: "Scheme Generated!", description: sourceMsg });
+      const totalLessons = data.rows?.length || 0;
+      toast({ title: "Term Scheme Generated!", description: `${term} scheme with ${totalLessons} lessons generated successfully.` });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "An error occurred. Please try again.";
       toast({ title: "Generation Failed", description: message, variant: "destructive" });
@@ -302,7 +332,7 @@ const SchemeGeneratorDialog = () => {
     const tableHTML = `
       <div style="text-align:center;margin-bottom:16px;">
         <h2 style="margin:0;font-size:16pt;">${isSw ? "Mpango wa Kazi" : "Scheme of Work"}</h2>
-        <p style="margin:4px 0;font-size:11pt;">${grade} — ${subject}${term ? ` — ${term}` : ""}${weekNumber ? ` — Week ${weekNumber}` : ` — ${strand}`}</p>
+        <p style="margin:4px 0;font-size:11pt;">${grade} — ${subject}${term ? ` — ${term}` : ""}${weekNumber ? ` — Week ${weekNumber}` : ""}</p>
         <p style="margin:0;font-size:9pt;color:#666;">${isSw ? "Mtaala wa CBC - KICD Kenya" : "CBC Curriculum — KICD Kenya"}</p>
       </div>
       <table>
@@ -334,11 +364,11 @@ const SchemeGeneratorDialog = () => {
         resource_type: "scheme",
         grade,
         subject,
-        strand: isLanguage ? "Weekly Plan" : strand,
-        sub_strand: isLanguage ? undefined : subStrand,
+        strand: isLanguage ? "Weekly Plan" : (term || strand),
+        sub_strand: isLanguage ? undefined : undefined,
         term: term || undefined,
         content: generatedRows,
-        input_params: { context, additionalInfo, strandSubStrandSelections },
+        input_params: { context, additionalInfo, strandSubStrandSelections, termAllocation },
       } as any);
       toast({ title: "Saved!", description: "Your scheme has been saved to your library." });
     } else {
@@ -349,6 +379,9 @@ const SchemeGeneratorDialog = () => {
   const weeklyDistribution = isLanguage && fullStrandData.length > 0
     ? getWeeklyDistribution(subject, fullStrandData)
     : [];
+
+  const termTotalLessons = termAllocation ? getTermLessonCount(termAllocation) : 0;
+  const termTotalWeeks = termAllocation ? Math.ceil(termTotalLessons / getLessonsPerWeek(grade, subject)) : 0;
 
   return (
     <>
@@ -369,7 +402,7 @@ const SchemeGeneratorDialog = () => {
 
           {step < 6 && (
             <div className="flex gap-1 mb-4">
-              {(isLanguage ? [1, 2, 3, 4, 5] : [1, 2, 3, 4, 5]).map((s) => (
+              {(isLanguage ? [1, 2, 3, 4, 5] : [1, 2, 3, 4]).map((s) => (
                 <div
                   key={s}
                   className={`h-1.5 flex-1 rounded-full transition-colors ${s <= step ? "bg-primary" : "bg-muted"}`}
@@ -401,6 +434,7 @@ const SchemeGeneratorDialog = () => {
                   setIndigenousLanguage("");
                   setStrand("");
                   setStrandSubStrandSelections({});
+                  setTermAllocation(null);
                   if (v === "Indigenous Language") {
                     /* stay to pick language */
                   } else {
@@ -570,60 +604,66 @@ const SchemeGeneratorDialog = () => {
               </div>
             )}
 
-            {/* ── NON-LANGUAGE FLOW: Step 3 = Strand ── */}
+            {/* ── NON-LANGUAGE FLOW: Step 3 = Term ── */}
             {step === 3 && !isLanguage && (
               <div className="space-y-4 py-2">
                 <p className="text-sm text-muted-foreground">
-                  {loadingStrands
-                    ? `Loading KICD strands for ${subject}...`
-                    : `Select a strand for ${subject}.`}
+                  Select the term to generate a full scheme of work for {subject}.
                 </p>
-                {loadingStrands ? (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Fetching strands from KICD curriculum...
-                  </div>
-                ) : (
-                  <Select value={strand} onValueChange={(v) => { setStrand(v); setSubStrand(""); setStep(4); }}>
-                    <SelectTrigger><SelectValue placeholder="Select Strand" /></SelectTrigger>
-                    <SelectContent>
-                      {availableStrands.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                )}
-                <Button variant="ghost" size="sm" onClick={() => { setStep(2); setSubject(""); }}>← Back</Button>
-              </div>
-            )}
-
-            {/* ── NON-LANGUAGE FLOW: Step 4 = Sub-Strand ── */}
-            {step === 4 && !isLanguage && (
-              <div className="space-y-4 py-2">
-                <p className="text-sm text-muted-foreground">Select a sub-strand for {strand}.</p>
-                <Select value={subStrand} onValueChange={(v) => { setSubStrand(v); setStep(5); }}>
-                  <SelectTrigger><SelectValue placeholder="Select Sub-Strand" /></SelectTrigger>
+                <Select value={term} onValueChange={(v) => { setTerm(v); setStep(4); }}>
+                  <SelectTrigger><SelectValue placeholder="Select Term" /></SelectTrigger>
                   <SelectContent>
-                    {availableSubStrands.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    <SelectItem value="Term 1">Term 1</SelectItem>
+                    <SelectItem value="Term 2">Term 2</SelectItem>
+                    <SelectItem value="Term 3">Term 3</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="ghost" size="sm" onClick={() => { setStep(3); setStrand(""); }}>← Back</Button>
+                <Button variant="ghost" size="sm" onClick={() => { setStep(2); setSubject(""); setTerm(""); }}>← Back</Button>
               </div>
             )}
 
-            {/* ── NON-LANGUAGE FLOW: Step 5 = Confirm & Generate ── */}
-            {step === 5 && !isLanguage && (
+            {/* ── NON-LANGUAGE FLOW: Step 4 = Review & Generate ── */}
+            {step === 4 && !isLanguage && (
               <div className="space-y-4 py-2">
                 <div className="rounded-lg bg-muted p-3 text-sm space-y-1">
                   <p><span className="font-medium">Grade:</span> {grade}</p>
                   <p><span className="font-medium">Subject:</span> {subject}</p>
-                  <p><span className="font-medium">Strand:</span> {strand}</p>
-                  <p><span className="font-medium">Sub-Strand:</span> {subStrand}</p>
+                  <p><span className="font-medium">Term:</span> {term}</p>
                 </div>
+
+                {termAllocation && termAllocation.length > 0 ? (
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium">Strands & sub-strands for this term:</p>
+                    {termAllocation.map(({ strandName, subStrands }) => (
+                      <div key={strandName} className="rounded-lg border p-3 space-y-1">
+                        <p className="text-sm font-semibold">{strandName}</p>
+                        {subStrands.map(ss => (
+                          <p key={ss.name} className="text-xs text-muted-foreground ml-2">
+                            • {ss.name} <span className="text-xs opacity-60">({ss.lessons} lessons)</span>
+                          </p>
+                        ))}
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground bg-accent/50 rounded-lg p-2">
+                      <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                      <span>Total: <strong>{termTotalLessons} lessons</strong> across ~{termTotalWeeks} weeks</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground py-4">
+                    {loadingStrands ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Loading curriculum data...
+                      </div>
+                    ) : (
+                      <p>No curriculum data available for {grade} {subject} {term}. The scheme will be generated using AI curriculum knowledge.</p>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {kiswahiliSubjects.includes(subject)
-                      ? "Unapanga kutumia rasilimali gani za kujifunza?"
-                      : "What learning resources do you plan on using?"}
-                  </label>
+                  <label className="text-sm font-medium">What learning resources do you plan on using?</label>
                   <Textarea
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
@@ -632,27 +672,19 @@ const SchemeGeneratorDialog = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    {kiswahiliSubjects.includes(subject)
-                      ? "Taarifa nyingine muhimu (si lazima)"
-                      : "Any other relevant information (optional)"}
-                  </label>
+                  <label className="text-sm font-medium text-muted-foreground">Any other relevant information (optional)</label>
                   <Textarea
                     value={additionalInfo}
                     onChange={(e) => setAdditionalInfo(e.target.value)}
-                    placeholder={
-                      kiswahiliSubjects.includes(subject)
-                        ? "k.m., mahitaji maalum ya wanafunzi, muktadha wa shule, malengo ya ziada..."
-                        : "e.g., special needs considerations, school context, specific teaching goals..."
-                    }
+                    placeholder="e.g., special needs considerations, school context, specific teaching goals..."
                     rows={2}
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" onClick={() => { setStep(4); setSubStrand(""); }}>← Back</Button>
-                  <Button onClick={handleGenerate} disabled={loading} className="ml-auto gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => { setStep(3); setTerm(""); setTermAllocation(null); }}>← Back</Button>
+                  <Button onClick={handleGenerateTerm} disabled={loading} className="ml-auto gap-2">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    {loading ? "Generating..." : "Generate Scheme"}
+                    {loading ? "Generating term scheme..." : `Generate ${term} Scheme`}
                   </Button>
                 </div>
               </div>
@@ -661,7 +693,7 @@ const SchemeGeneratorDialog = () => {
             {/* ── Step 6: Preview (both flows) ── */}
             {step === 6 && generatedRows && (
               <div className="space-y-4 py-2">
-                <SchemePreview rows={generatedRows} subject={subject} grade={grade} strand={isLanguage ? `${term}` : strand} />
+                <SchemePreview rows={generatedRows} subject={subject} grade={grade} strand={term || strand} />
                 
                 {/* Per-lesson "Generate Lesson Plan" buttons */}
                 <div className="rounded-lg border p-3 space-y-2">
@@ -687,7 +719,7 @@ const SchemeGeneratorDialog = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Button variant="outline" onClick={() => { setStep(5); setGeneratedRows(null); }} className="gap-2">
+                  <Button variant="outline" onClick={() => { setStep(4); setGeneratedRows(null); }} className="gap-2">
                     <FileText className="w-4 h-4" /> Regenerate
                   </Button>
                   <Button variant="secondary" onClick={handleSave} className="gap-2">
@@ -695,7 +727,7 @@ const SchemeGeneratorDialog = () => {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => exportSchemeToDocx(generatedRows!, grade, subject, isLanguage ? `${term}` : strand)}
+                    onClick={() => exportSchemeToDocx(generatedRows!, grade, subject, term || strand)}
                     className="gap-2"
                   >
                     <FileDown className="w-4 h-4" /> Export DOCX
