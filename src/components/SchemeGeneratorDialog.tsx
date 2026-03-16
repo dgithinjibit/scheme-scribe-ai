@@ -606,18 +606,20 @@ const SchemeGeneratorDialog = () => {
               </div>
             )}
 
-            {/* ── NON-LANGUAGE FLOW: Step 3 = Term ── */}
+            {/* ── NON-LANGUAGE FLOW (+ LP Kiswahili): Step 3 = Term ── */}
             {step === 3 && !isLanguage && (
               <div className="space-y-4 py-2">
                 <p className="text-sm text-muted-foreground">
-                  Select the term to generate a full scheme of work for {subject}.
+                  {isLPKiswahili
+                    ? "Chagua muhula wa kutengeneza mpango wa kazi."
+                    : `Select the term to generate a full scheme of work for ${subject}.`}
                 </p>
                 <Select value={term} onValueChange={(v) => { setTerm(v); setStep(4); }}>
-                  <SelectTrigger><SelectValue placeholder="Select Term" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={isLPKiswahili ? "Chagua Muhula" : "Select Term"} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Term 1">Term 1</SelectItem>
-                    <SelectItem value="Term 2">Term 2</SelectItem>
-                    <SelectItem value="Term 3">Term 3</SelectItem>
+                    <SelectItem value="Term 1">{isLPKiswahili ? "Muhula wa 1" : "Term 1"}</SelectItem>
+                    <SelectItem value="Term 2">{isLPKiswahili ? "Muhula wa 2" : "Term 2"}</SelectItem>
+                    <SelectItem value="Term 3">{isLPKiswahili ? "Muhula wa 3" : "Term 3"}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button variant="ghost" size="sm" onClick={() => { setStep(2); setSubject(""); setTerm(""); }}>← Back</Button>
