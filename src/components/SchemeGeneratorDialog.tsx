@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { grades, getSubjectsForGrade, getHardcodedStrands, getSubStrandsForStrand, getLessonsPerWeek, type SchemeRow, type StrandInfo } from "@/data/curriculum";
-import { getTermAllocation, getTermLessonCount } from "@/data/curriculum/term-mappings";
+import { getTermAllocation, getTermLessonCount, isLowerPrimaryKiswahili } from "@/data/curriculum/term-mappings";
 import SchemePreview from "./SchemePreview";
 import LessonPlanDialog from "./LessonPlanDialog";
 import { FileText, Download, Save, Loader2, Sparkles, FileDown, BookOpen } from "lucide-react";
