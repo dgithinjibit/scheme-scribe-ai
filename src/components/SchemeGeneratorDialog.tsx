@@ -118,7 +118,8 @@ const SchemeGeneratorDialog = () => {
   const [termAllocation, setTermAllocation] = useState<{ strandName: string; subStrands: SubStrandInfo[] }[] | null>(null);
 
   const subjects = getSubjectsForGrade(grade);
-  const isLanguage = isLanguageSubject(subject);
+  const isLPKiswahili = isLowerPrimaryKiswahili(grade, subject);
+  const isLanguage = isLanguageSubject(subject) && !isLPKiswahili;
 
   // Fetch strands dynamically when grade + subject are selected
   useEffect(() => {
