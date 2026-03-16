@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { grades, getSubjectsForGrade, getHardcodedStrands, getSubStrandsForStrand, getLessonsPerWeek, type SchemeRow, type StrandInfo } from "@/data/curriculum";
-import { getTermAllocation, getTermLessonCount } from "@/data/curriculum/term-mappings";
+import { getTermAllocation, getTermLessonCount, isLowerPrimaryKiswahili } from "@/data/curriculum/term-mappings";
 import SchemePreview from "./SchemePreview";
 import LessonPlanDialog from "./LessonPlanDialog";
 import { FileText, Download, Save, Loader2, Sparkles, FileDown, BookOpen } from "lucide-react";
@@ -118,7 +118,8 @@ const SchemeGeneratorDialog = () => {
   const [termAllocation, setTermAllocation] = useState<{ strandName: string; subStrands: SubStrandInfo[] }[] | null>(null);
 
   const subjects = getSubjectsForGrade(grade);
-  const isLanguage = isLanguageSubject(subject);
+  const isLPKiswahili = isLowerPrimaryKiswahili(grade, subject);
+  const isLanguage = isLanguageSubject(subject) && !isLPKiswahili;
 
   // Fetch strands dynamically when grade + subject are selected
   useEffect(() => {
@@ -165,15 +166,15 @@ const SchemeGeneratorDialog = () => {
     fetchStrands();
   }, [grade, subject]);
 
-  // Update term allocation when term changes (non-language)
+  // Update term allocation when term changes (non-language OR LP Kiswahili)
   useEffect(() => {
-    if (!grade || !subject || !term || isLanguage) {
+    if (!grade || !subject || !term || (isLanguage && !isLPKiswahili)) {
       setTermAllocation(null);
       return;
     }
     const allocation = getTermAllocation(grade, subject, term);
     setTermAllocation(allocation);
-  }, [grade, subject, term, isLanguage]);
+  }, [grade, subject, term, isLanguage, isLPKiswahili]);
 
   const resetForm = () => {
     setStep(1);
@@ -303,6 +304,7 @@ const SchemeGeneratorDialog = () => {
           termPlan,
           lessonsPerWeek,
           indigenousLanguage: indigenousLanguage || undefined,
+          madaCycleMode: isLPKiswahili, // Interleave sub-strands per Mada for LP Kiswahili
         },
       });
 
@@ -402,7 +404,7 @@ const SchemeGeneratorDialog = () => {
 
           {step < 6 && (
             <div className="flex gap-1 mb-4">
-              {(isLanguage ? [1, 2, 3, 4, 5] : [1, 2, 3, 4]).map((s) => (
+              {(isLanguage ? [1, 2, 3, 4, 5] : isLPKiswahili ? [1, 2, 3, 4] : [1, 2, 3, 4]).map((s) => (
                 <div
                   key={s}
                   className={`h-1.5 flex-1 rounded-full transition-colors ${s <= step ? "bg-primary" : "bg-muted"}`}
@@ -604,49 +606,59 @@ const SchemeGeneratorDialog = () => {
               </div>
             )}
 
-            {/* ── NON-LANGUAGE FLOW: Step 3 = Term ── */}
+            {/* ── NON-LANGUAGE FLOW (+ LP Kiswahili): Step 3 = Term ── */}
             {step === 3 && !isLanguage && (
               <div className="space-y-4 py-2">
                 <p className="text-sm text-muted-foreground">
-                  Select the term to generate a full scheme of work for {subject}.
+                  {isLPKiswahili
+                    ? "Chagua muhula wa kutengeneza mpango wa kazi."
+                    : `Select the term to generate a full scheme of work for ${subject}.`}
                 </p>
                 <Select value={term} onValueChange={(v) => { setTerm(v); setStep(4); }}>
-                  <SelectTrigger><SelectValue placeholder="Select Term" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={isLPKiswahili ? "Chagua Muhula" : "Select Term"} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Term 1">Term 1</SelectItem>
-                    <SelectItem value="Term 2">Term 2</SelectItem>
-                    <SelectItem value="Term 3">Term 3</SelectItem>
+                    <SelectItem value="Term 1">{isLPKiswahili ? "Muhula wa 1" : "Term 1"}</SelectItem>
+                    <SelectItem value="Term 2">{isLPKiswahili ? "Muhula wa 2" : "Term 2"}</SelectItem>
+                    <SelectItem value="Term 3">{isLPKiswahili ? "Muhula wa 3" : "Term 3"}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button variant="ghost" size="sm" onClick={() => { setStep(2); setSubject(""); setTerm(""); }}>← Back</Button>
               </div>
             )}
 
-            {/* ── NON-LANGUAGE FLOW: Step 4 = Review & Generate ── */}
+            {/* ── NON-LANGUAGE FLOW (+ LP Kiswahili): Step 4 = Review & Generate ── */}
             {step === 4 && !isLanguage && (
               <div className="space-y-4 py-2">
                 <div className="rounded-lg bg-muted p-3 text-sm space-y-1">
-                  <p><span className="font-medium">Grade:</span> {grade}</p>
-                  <p><span className="font-medium">Subject:</span> {subject}</p>
-                  <p><span className="font-medium">Term:</span> {term}</p>
+                  <p><span className="font-medium">{isLPKiswahili ? "Gredi:" : "Grade:"}</span> {grade}</p>
+                  <p><span className="font-medium">{isLPKiswahili ? "Somo:" : "Subject:"}</span> {subject}</p>
+                  <p><span className="font-medium">{isLPKiswahili ? "Muhula:" : "Term:"}</span> {term}</p>
                 </div>
 
                 {termAllocation && termAllocation.length > 0 ? (
                   <div className="space-y-3">
-                    <p className="text-sm font-medium">Strands & sub-strands for this term:</p>
+                    <p className="text-sm font-medium">
+                      {isLPKiswahili ? "Mada na mada ndogo za muhula huu:" : "Strands & sub-strands for this term:"}
+                    </p>
                     {termAllocation.map(({ strandName, subStrands }) => (
                       <div key={strandName} className="rounded-lg border p-3 space-y-1">
                         <p className="text-sm font-semibold">{strandName}</p>
                         {subStrands.map(ss => (
                           <p key={ss.name} className="text-xs text-muted-foreground ml-2">
-                            • {ss.name} <span className="text-xs opacity-60">({ss.lessons} lessons)</span>
+                            • {ss.name} <span className="text-xs opacity-60">({ss.lessons} {isLPKiswahili ? "vipindi" : "lessons"})</span>
                           </p>
                         ))}
                       </div>
                     ))}
+                    {isLPKiswahili && (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground bg-accent/50 rounded-lg p-2">
+                        <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                        <span>Kila Mada inachukua wiki 3: vipindi 4 kwa wiki (moja kwa kila mada ndogo)</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-xs text-muted-foreground bg-accent/50 rounded-lg p-2">
                       <BookOpen className="w-3.5 h-3.5 shrink-0" />
-                      <span>Total: <strong>{termTotalLessons} lessons</strong> across ~{termTotalWeeks} weeks</span>
+                      <span>{isLPKiswahili ? "Jumla" : "Total"}: <strong>{termTotalLessons} {isLPKiswahili ? "vipindi" : "lessons"}</strong> {isLPKiswahili ? "katika wiki" : "across"} ~{termTotalWeeks} {isLPKiswahili ? "" : "weeks"}</span>
                     </div>
                   </div>
                 ) : (
@@ -654,29 +666,39 @@ const SchemeGeneratorDialog = () => {
                     {loadingStrands ? (
                       <div className="flex items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Loading curriculum data...
+                        {isLPKiswahili ? "Inapakia data ya mtaala..." : "Loading curriculum data..."}
                       </div>
                     ) : (
-                      <p>No curriculum data available for {grade} {subject} {term}. The scheme will be generated using AI curriculum knowledge.</p>
+                      <p>{isLPKiswahili
+                        ? `Hakuna data ya mtaala kwa ${grade} ${subject} ${term}.`
+                        : `No curriculum data available for ${grade} ${subject} ${term}. The scheme will be generated using AI curriculum knowledge.`}</p>
                     )}
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">What learning resources do you plan on using?</label>
+                  <label className="text-sm font-medium">
+                    {isLPKiswahili ? "Unapanga kutumia rasilimali gani za kujifunza?" : "What learning resources do you plan on using?"}
+                  </label>
                   <Textarea
                     value={context}
                     onChange={(e) => setContext(e.target.value)}
-                    placeholder="e.g., textbooks, videos, art supplies, musical instruments, outdoor space..."
+                    placeholder={isLPKiswahili
+                      ? "k.m., vitabu vya kiada, video, vifaa vya sanaa..."
+                      : "e.g., textbooks, videos, art supplies, musical instruments, outdoor space..."}
                     rows={3}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Any other relevant information (optional)</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    {isLPKiswahili ? "Taarifa nyingine muhimu (si lazima)" : "Any other relevant information (optional)"}
+                  </label>
                   <Textarea
                     value={additionalInfo}
                     onChange={(e) => setAdditionalInfo(e.target.value)}
-                    placeholder="e.g., special needs considerations, school context, specific teaching goals..."
+                    placeholder={isLPKiswahili
+                      ? "k.m., mahitaji maalum ya wanafunzi, muktadha wa shule..."
+                      : "e.g., special needs considerations, school context, specific teaching goals..."}
                     rows={2}
                   />
                 </div>
@@ -684,7 +706,9 @@ const SchemeGeneratorDialog = () => {
                   <Button variant="ghost" size="sm" onClick={() => { setStep(3); setTerm(""); setTermAllocation(null); }}>← Back</Button>
                   <Button onClick={handleGenerateTerm} disabled={loading} className="ml-auto gap-2">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    {loading ? "Generating term scheme..." : `Generate ${term} Scheme`}
+                    {loading
+                      ? (isLPKiswahili ? "Inatengeneza mpango wa muhula..." : "Generating term scheme...")
+                      : (isLPKiswahili ? `Tengeneza Mpango wa ${term}` : `Generate ${term} Scheme`)}
                   </Button>
                 </div>
               </div>

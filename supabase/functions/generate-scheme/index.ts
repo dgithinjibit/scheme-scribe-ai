@@ -613,7 +613,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { grade, subject, strand, context, additionalInfo, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan, termMode, termPlan } = await req.json();
+    const { grade, subject, strand, context, additionalInfo, subStrands, lessonsPerWeek = 5, indigenousLanguage, weeklyMode, weekNumber, term, weeklyPlan, termMode, termPlan, madaCycleMode } = await req.json();
 
     if (!grade || !subject) {
       return new Response(
@@ -700,13 +700,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ── TERM MODE: Generate full term scheme for non-language subjects ──
+    // ── TERM MODE: Generate full term scheme ──
     if (termMode && termPlan && Array.isArray(termPlan)) {
       const totalSubStrands = (termPlan as { strandName: string; subStrands: SubStrandInfo[] }[])
         .reduce((sum, s) => sum + s.subStrands.length, 0);
       const totalLessons = (termPlan as { strandName: string; subStrands: SubStrandInfo[] }[])
         .reduce((sum, s) => sum + s.subStrands.reduce((ss, sub) => ss + sub.lessons, 0), 0);
-      console.log(`Term mode: ${grade} ${subject} - ${term} (${totalSubStrands} sub-strands, ${totalLessons} total lessons)`);
+      console.log(`Term mode${madaCycleMode ? ' (Mada cycle)' : ''}: ${grade} ${subject} - ${term} (${totalSubStrands} sub-strands, ${totalLessons} total lessons)`);
 
       const referenceContext = await fetchReferenceContext(grade, subject, "");
 
@@ -714,32 +714,92 @@ Deno.serve(async (req) => {
       let currentWeek = 1;
 
       for (const strandPlan of termPlan as { strandName: string; subStrands: SubStrandInfo[] }[]) {
-        for (const ss of strandPlan.subStrands) {
-          try {
-            const enrichedContext = (context || "") + referenceContext;
-            const { rows, weeksUsed } = await generateForSubStrand(
-              GROQ_API_KEY, grade, subject, strandPlan.strandName, ss,
-              enrichedContext, isSw, currentWeek, lessonsPerWeek, indigenousLanguage, additionalInfo
-            );
-            allRows.push(...rows);
-            currentWeek += weeksUsed;
-          } catch (e) {
-            const msg = e instanceof Error ? e.message : "Unknown";
-            console.error(`Error generating ${strandPlan.strandName}/${ss.name}: ${msg}`);
-            if (msg === "RATE_LIMIT") {
-              if (allRows.length > 0) {
-                console.warn(`Rate limited after ${allRows.length} rows, returning partial results`);
+        if (madaCycleMode) {
+          // ── MADA CYCLE MODE: Generate all sub-strands for this Mada, then interleave ──
+          // Each sub-strand generates its lessons separately, then we weave them into weeks
+          // Week 1: lesson 1 from each sub-strand, Week 2: lesson 2 from each, etc.
+          const subStrandRows: SchemeRow[][] = [];
+          const lessonsPerSS = strandPlan.subStrands[0]?.lessons || 3;
+
+          for (const ss of strandPlan.subStrands) {
+            try {
+              const enrichedContext = (context || "") + referenceContext;
+              const { rows } = await generateForSubStrand(
+                GROQ_API_KEY, grade, subject, strandPlan.strandName, ss,
+                enrichedContext, isSw, 1, ss.lessons, indigenousLanguage, additionalInfo
+              );
+              subStrandRows.push(rows);
+            } catch (e) {
+              const msg = e instanceof Error ? e.message : "Unknown";
+              console.error(`Error generating ${strandPlan.strandName}/${ss.name}: ${msg}`);
+              if (msg === "RATE_LIMIT" && allRows.length > 0) {
                 return new Response(
                   JSON.stringify({ rows: allRows, source: "hardcoded_context", partial: true }),
                   { headers: { ...corsHeaders, "Content-Type": "application/json" } }
                 );
               }
-              return new Response(
-                JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
-                { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-              );
+              if (msg === "RATE_LIMIT") {
+                return new Response(
+                  JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+                  { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                );
+              }
             }
-            // Continue with other sub-strands even if one fails
+          }
+
+          // Interleave: for each lesson index, pick one row from each sub-strand
+          for (let lessonIdx = 0; lessonIdx < lessonsPerSS; lessonIdx++) {
+            for (const ssRows of subStrandRows) {
+              if (lessonIdx < ssRows.length) {
+                const row = { ...ssRows[lessonIdx] };
+                allRows.push(row);
+              }
+            }
+          }
+
+          // Re-number the interleaved rows for this Mada
+          const madaRowCount = subStrandRows.reduce((sum, r) => sum + Math.min(r.length, lessonsPerSS), 0);
+          const madaStart = allRows.length - madaRowCount;
+          let weekLesson = 1;
+          for (let i = madaStart; i < allRows.length; i++) {
+            allRows[i].week = currentWeek;
+            allRows[i].lesson = weekLesson;
+            weekLesson++;
+            if (weekLesson > lessonsPerWeek) {
+              weekLesson = 1;
+              currentWeek++;
+            }
+          }
+          if (weekLesson > 1) currentWeek++; // Move to next week if partial
+
+        } else {
+          // ── STANDARD TERM MODE: sequential sub-strand generation ──
+          for (const ss of strandPlan.subStrands) {
+            try {
+              const enrichedContext = (context || "") + referenceContext;
+              const { rows, weeksUsed } = await generateForSubStrand(
+                GROQ_API_KEY, grade, subject, strandPlan.strandName, ss,
+                enrichedContext, isSw, currentWeek, lessonsPerWeek, indigenousLanguage, additionalInfo
+              );
+              allRows.push(...rows);
+              currentWeek += weeksUsed;
+            } catch (e) {
+              const msg = e instanceof Error ? e.message : "Unknown";
+              console.error(`Error generating ${strandPlan.strandName}/${ss.name}: ${msg}`);
+              if (msg === "RATE_LIMIT") {
+                if (allRows.length > 0) {
+                  console.warn(`Rate limited after ${allRows.length} rows, returning partial results`);
+                  return new Response(
+                    JSON.stringify({ rows: allRows, source: "hardcoded_context", partial: true }),
+                    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                  );
+                }
+                return new Response(
+                  JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+                  { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                );
+              }
+            }
           }
         }
       }
