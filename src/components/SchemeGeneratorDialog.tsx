@@ -166,15 +166,15 @@ const SchemeGeneratorDialog = () => {
     fetchStrands();
   }, [grade, subject]);
 
-  // Update term allocation when term changes (non-language)
+  // Update term allocation when term changes (non-language OR LP Kiswahili)
   useEffect(() => {
-    if (!grade || !subject || !term || isLanguage) {
+    if (!grade || !subject || !term || (isLanguage && !isLPKiswahili)) {
       setTermAllocation(null);
       return;
     }
     const allocation = getTermAllocation(grade, subject, term);
     setTermAllocation(allocation);
-  }, [grade, subject, term, isLanguage]);
+  }, [grade, subject, term, isLanguage, isLPKiswahili]);
 
   const resetForm = () => {
     setStep(1);
