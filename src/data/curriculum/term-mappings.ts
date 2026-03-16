@@ -2,23 +2,61 @@ import type { StrandInfo, SubStrandInfo } from "./types";
 import { getHardcodedStrands } from "./index";
 import { getLessonsPerWeek } from "./index";
 
+// ─── Lower Primary Kiswahili: Mada-based term mapping ───
+// Each Mada has 4 sub-strands × 3 lessons = 12 lessons = 3 weeks (at 4 lessons/week)
+// Term start indices (0-based) for each grade's 10 Mada
+const KISWAHILI_LP_TERM_START: Record<string, Record<string, number>> = {
+  "Grade 1": { "Term 1": 0, "Term 2": 4, "Term 3": 7 },
+  "Grade 2": { "Term 1": 0, "Term 2": 6, "Term 3": -1 }, // User confirmed: T2 starts at Mada 7 (index 6)
+  "Grade 3": { "Term 1": 0, "Term 2": 4, "Term 3": 7 },
+};
+
+const WEEKS_PER_TERM = 11;
+const WEEKS_PER_MADA = 3; // 4 sub-strands × 3 lessons ÷ 4 lessons/week
+
+/**
+ * Check if a grade+subject combo is lower primary Kiswahili (Mada-based).
+ */
+export function isLowerPrimaryKiswahili(grade: string, subject: string): boolean {
+  if (subject !== "Kiswahili") return false;
+  const num = parseInt(grade.replace("Grade ", ""));
+  return num >= 1 && num <= 3;
+}
+
+/**
+ * Get Mada-based term allocation for lower primary Kiswahili.
+ * Returns Mada as strands with their 4 language-skill sub-strands.
+ */
+export function getKiswahiliLPTermAllocation(
+  grade: string,
+  term: string
+): { strandName: string; subStrands: SubStrandInfo[] }[] | null {
+  const allStrands = getHardcodedStrands(grade, "Kiswahili");
+  if (!allStrands || allStrands.length === 0) return null;
+
+  const termStarts = KISWAHILI_LP_TERM_START[grade];
+  if (!termStarts) return null;
+
+  const startIdx = termStarts[term];
+  if (startIdx === undefined || startIdx < 0) return null;
+
+  const maxMada = Math.ceil(WEEKS_PER_TERM / WEEKS_PER_MADA);
+  const endIdx = Math.min(startIdx + maxMada, allStrands.length);
+
+  return allStrands.slice(startIdx, endIdx).map(mada => ({
+    strandName: mada.name,
+    subStrands: mada.subStrands,
+  }));
+}
+
 /**
  * Term-to-strand mapping for the Kenyan CBC curriculum.
  * Based on the rationalized 2024 curriculum structure from KICD.
- *
- * Pattern types:
- * - "rotate": Each strand maps to one term (e.g., Environmental Activities)
- * - "split": A strand spans multiple terms, sub-strands are divided (e.g., Math Numbers T1-T2)
- * - "all": All strands appear every term (handled by languages, not here)
- * - "sequential": Strands are distributed across terms by lesson budget (fallback)
  */
 
-// Keyword patterns to match strand names to terms
-// Each entry maps a term to an array of strand keyword patterns
 type StrandTermRule = Record<string, string[]>;
 
 const STRAND_TERM_RULES: Record<string, StrandTermRule> = {
-  // ─── Lower Primary ───
   "Environmental Activities": {
     "Term 1": ["Social"],
     "Term 2": ["Natural"],
@@ -29,8 +67,6 @@ const STRAND_TERM_RULES: Record<string, StrandTermRule> = {
     "Term 2": ["Performing"],
     "Term 3": ["Appreciation"],
   },
-
-  // ─── Upper Primary ───
   "Science & Technology": {
     "Term 1": ["Living Things"],
     "Term 2": ["Matter"],
@@ -43,19 +79,17 @@ const STRAND_TERM_RULES: Record<string, StrandTermRule> = {
   },
 };
 
-// Subjects where "Numbers" strand spans Terms 1+2, rest in Term 3
 const MATH_SUBJECT = "Mathematics";
 
 /**
  * Returns the strands and their sub-strands allocated to a specific term.
- * Uses explicit KICD-based rules where available, falls back to sequential distribution.
  */
 export function getTermAllocation(
   grade: string,
   subject: string,
   term: string
 ): { strandName: string; subStrands: SubStrandInfo[] }[] | null {
-  // ─── Lower Primary Kiswahili: Mada-based allocation ───
+  // Lower Primary Kiswahili: Mada-based allocation
   if (isLowerPrimaryKiswahili(grade, subject)) {
     return getKiswahiliLPTermAllocation(grade, term);
   }
@@ -66,24 +100,18 @@ export function getTermAllocation(
   const termIndex = ["Term 1", "Term 2", "Term 3"].indexOf(term);
   if (termIndex === -1) return null;
 
-  // ─── Mathematics: special handling ───
   if (subject === MATH_SUBJECT) {
     return getMathTermAllocation(allStrands, termIndex);
   }
 
-  // ─── Explicit strand-to-term rules ───
   const rules = STRAND_TERM_RULES[subject];
   if (rules) {
     return getExplicitTermAllocation(allStrands, rules, term);
   }
 
-  // ─── Fallback: sequential distribution by lesson budget ───
   return getSequentialTermAllocation(allStrands, grade, subject, termIndex);
 }
 
-/**
- * Math: Numbers in T1+T2 (split sub-strands), Measurement+Geometry+Data in T3
- */
 function getMathTermAllocation(
   allStrands: StrandInfo[],
   termIndex: number
@@ -92,11 +120,9 @@ function getMathTermAllocation(
   const otherStrands = allStrands.filter(s => !s.name.toLowerCase().includes("number"));
 
   if (termIndex === 2) {
-    // Term 3: everything except Numbers
     return otherStrands.map(s => ({ strandName: s.name, subStrands: s.subStrands }));
   }
 
-  // Terms 1 & 2: split Numbers sub-strands
   if (!numbersStrand) return [];
   const subs = numbersStrand.subStrands;
   const half = Math.ceil(subs.length / 2);
@@ -105,9 +131,6 @@ function getMathTermAllocation(
   return [{ strandName: numbersStrand.name, subStrands: termSubs }];
 }
 
-/**
- * Use explicit keyword rules to match strands to the selected term.
- */
 function getExplicitTermAllocation(
   allStrands: StrandInfo[],
   rules: StrandTermRule,
@@ -123,17 +146,12 @@ function getExplicitTermAllocation(
   return matched.map(s => ({ strandName: s.name, subStrands: s.subStrands }));
 }
 
-/**
- * Fallback: distribute strands sequentially across 3 terms by lesson budget.
- * Each term gets ~1/3 of total lessons.
- */
 function getSequentialTermAllocation(
   allStrands: StrandInfo[],
   grade: string,
   subject: string,
   termIndex: number
 ): { strandName: string; subStrands: SubStrandInfo[] }[] {
-  // Flatten all sub-strands with parent strand ref
   const items: { strand: StrandInfo; subStrand: SubStrandInfo }[] = [];
   for (const strand of allStrands) {
     for (const ss of strand.subStrands) {
@@ -144,7 +162,6 @@ function getSequentialTermAllocation(
   const totalLessons = items.reduce((sum, i) => sum + i.subStrand.lessons, 0);
   const targetPerTerm = Math.ceil(totalLessons / 3);
 
-  // Walk through items, accumulating into terms
   let accumulated = 0;
   let currentTermIdx = 0;
   const termBuckets: { strand: StrandInfo; subStrand: SubStrandInfo }[][] = [[], [], []];
@@ -153,14 +170,12 @@ function getSequentialTermAllocation(
     termBuckets[currentTermIdx].push(item);
     accumulated += item.subStrand.lessons;
 
-    // Move to next term if budget exceeded (but not on last term)
     if (accumulated >= targetPerTerm && currentTermIdx < 2) {
       accumulated = 0;
       currentTermIdx++;
     }
   }
 
-  // Group the selected term's items by strand
   const termItems = termBuckets[termIndex];
   const grouped = new Map<string, { strandName: string; subStrands: SubStrandInfo[] }>();
 
