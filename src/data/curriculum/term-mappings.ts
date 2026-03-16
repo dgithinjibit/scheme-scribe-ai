@@ -55,6 +55,11 @@ export function getTermAllocation(
   subject: string,
   term: string
 ): { strandName: string; subStrands: SubStrandInfo[] }[] | null {
+  // ─── Lower Primary Kiswahili: Mada-based allocation ───
+  if (isLowerPrimaryKiswahili(grade, subject)) {
+    return getKiswahiliLPTermAllocation(grade, term);
+  }
+
   const allStrands = getHardcodedStrands(grade, subject);
   if (!allStrands || allStrands.length === 0) return null;
 
