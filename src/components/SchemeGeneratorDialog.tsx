@@ -304,6 +304,7 @@ const SchemeGeneratorDialog = () => {
           termPlan,
           lessonsPerWeek,
           indigenousLanguage: indigenousLanguage || undefined,
+          madaCycleMode: isLPKiswahili, // Interleave sub-strands per Mada for LP Kiswahili
         },
       });
 
