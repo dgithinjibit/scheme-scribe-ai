@@ -404,7 +404,7 @@ const SchemeGeneratorDialog = () => {
 
           {step < 6 && (
             <div className="flex gap-1 mb-4">
-              {(isLanguage ? [1, 2, 3, 4, 5] : [1, 2, 3, 4]).map((s) => (
+              {(isLanguage ? [1, 2, 3, 4, 5] : isLPKiswahili ? [1, 2, 3, 4] : [1, 2, 3, 4]).map((s) => (
                 <div
                   key={s}
                   className={`h-1.5 flex-1 rounded-full transition-colors ${s <= step ? "bg-primary" : "bg-muted"}`}
