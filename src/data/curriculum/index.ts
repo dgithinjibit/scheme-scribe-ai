@@ -142,10 +142,10 @@ export const columnHeaders = {
     "Assessment", "Refl",
   ],
   sw: [
-    "WK", "LSN", "Mada", "Mada Ndogo",
-    "Matokeo ya Ujifunzaji", "Shughuli za Ujifunzaji",
-    "Swali la Uchunguzi", "Rasilimali za Kujifunza",
-    "Mbinu za Tathmini", "Tafak",
+    "WIKI", "SOMO", "MADA", "MADA NDOGO",
+    "MATOKEO MAALUM YANAYOTARAJIWA", "MAPENDEKEZO YA SHUGHULI ZA UJIFUNZAJI",
+    "SWALI DADISI", "MAREJELEO",
+    "TATHMINI", "MAONI",
   ],
 };
 
