@@ -53,8 +53,24 @@ export const grade2Kiswahili: StrandInfo[] = [
       { name: "8.4 Sarufi – Matumizi ya huu na hii", lessons: 3 },
     ],
   },
-  mada("9.0 Hospitalini"),
-  mada("10.0 Hali ya Anga"),
+  {
+    name: "9.0 Hospitalini",
+    subStrands: [
+      { name: "9.1 Kusikiliza na Kuzungumza – Mazungumzo ya papo kwa hapo", lessons: 3 },
+      { name: "9.2 Kusoma kwa ufahamu – Kifungu", lessons: 3 },
+      { name: "9.3 Kuandika – Kuandika Kifungu", lessons: 3 },
+      { name: "9.4 Sarufi – Matumizi ya vizuri na vibaya, polepole na haraka", lessons: 3 },
+    ],
+  },
+  {
+    name: "10.0 Hali ya Anga",
+    subStrands: [
+      { name: "10.1 Kusikiliza na Kuzungumza – Matamshi Bora (Alfabeti ya Kiswahili)", lessons: 3 },
+      { name: "10.2 Kusoma kwa ufasaha – Kusoma kifungu", lessons: 3 },
+      { name: "10.3 Kuandika – Kuchangamkia kusoma kwa ufasaha ili kufanikisha mawasiliano", lessons: 3 },
+      { name: "10.4 Sarufi – Msamiati wa suala lengwa", lessons: 3 },
+    ],
+  },
 ];
 
 // ─── Grade 3 Kiswahili (Verified from KICD PDF: Gredi ya 3) ───
