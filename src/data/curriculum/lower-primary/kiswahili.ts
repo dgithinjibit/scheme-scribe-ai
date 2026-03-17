@@ -44,7 +44,15 @@ export const grade2Kiswahili: StrandInfo[] = [
       { name: "7.4 Ukanusho wa nafsi ya pili, umoja na wingi", lessons: 3 },
     ],
   },
-  mada("8.0 Usalama Wangu"),
+  {
+    name: "8.0 Usalama Wangu",
+    subStrands: [
+      { name: "8.1 Kusikiliza na Kuzungumza – Matamshi Bora (Sauti: /sh/, /th/)", lessons: 3 },
+      { name: "8.2 Kusoma kwa ufasaha (Sauti: /sh/ na /th/)", lessons: 3 },
+      { name: "8.3 Kuandika – Tahajia", lessons: 3 },
+      { name: "8.4 Sarufi – Matumizi ya huu na hii", lessons: 3 },
+    ],
+  },
   mada("9.0 Hospitalini"),
   mada("10.0 Hali ya Anga"),
 ];
