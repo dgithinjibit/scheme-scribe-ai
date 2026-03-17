@@ -67,8 +67,8 @@ export const grade2Kiswahili: StrandInfo[] = [
     subStrands: [
       { name: "10.1 Kusikiliza na Kuzungumza – Matamshi Bora (Alfabeti ya Kiswahili)", lessons: 3 },
       { name: "10.2 Kusoma kwa ufasaha – Kusoma kifungu", lessons: 3 },
-      { name: "10.3 Kuandika – Kuchangamkia kusoma kwa ufasaha ili kufanikisha mawasiliano", lessons: 3 },
-      { name: "10.4 Sarufi – Msamiati wa suala lengwa", lessons: 3 },
+      { name: "10.3 Kuandika – Maneno Na Sentensi", lessons: 3 },
+      { name: "10.4 Sarufi – Vinyume vya Vitendo", lessons: 3 },
     ],
   },
 ];
