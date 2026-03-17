@@ -35,7 +35,15 @@ export const grade2Kiswahili: StrandInfo[] = [
   mada("4.0 Usafiri"),
   mada("5.0 Mnyama Nimpendaye"),
   mada("6.0 Ukoo"),
-  mada("7.0 Sebuleni"),
+  {
+    name: "7.0 Sebuleni",
+    subStrands: [
+      { name: "7.1 Maagizo – Maagizo ya hatua mbili", lessons: 3 },
+      { name: "7.2 Kusoma kwa Ufahamu – Kifungu", lessons: 3 },
+      { name: "7.3 Uhariri – Vipengele vya kuhariri", lessons: 3 },
+      { name: "7.4 Ukanusho wa nafsi ya pili, umoja na wingi", lessons: 3 },
+    ],
+  },
   mada("8.0 Usalama Wangu"),
   mada("9.0 Hospitalini"),
   mada("10.0 Hali ya Anga"),
