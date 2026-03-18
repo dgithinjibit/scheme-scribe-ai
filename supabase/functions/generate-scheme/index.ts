@@ -351,6 +351,9 @@ function validateAndSanitizeRows(
     row.learningExperiences = validateAndFixExperiences(row.learningExperiences, isSw);
     return row;
   });
+  // GUARDRAIL 10: Validate SLOs align with official KICD outcomes
+  rows = validateSLOAlignment(rows, officialOutcomes, isSw);
+
   // Guardrail: deduplicate by SLO content but only if we'd still have enough rows
   const seen = new Set<string>();
   const deduped = rows.filter((row) => {
