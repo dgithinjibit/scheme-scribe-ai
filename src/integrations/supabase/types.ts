@@ -86,6 +86,56 @@ export type Database = {
         }
         Relationships: []
       }
+      scheme_feedback: {
+        Row: {
+          created_at: string
+          feedback_text: string | null
+          generated_content: Json | null
+          grade: string
+          id: string
+          rating: string
+          resource_id: string | null
+          strand: string | null
+          subject: string
+          term: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_text?: string | null
+          generated_content?: Json | null
+          grade: string
+          id?: string
+          rating: string
+          resource_id?: string | null
+          strand?: string | null
+          subject: string
+          term?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback_text?: string | null
+          generated_content?: Json | null
+          grade?: string
+          id?: string
+          rating?: string
+          resource_id?: string | null
+          strand?: string | null
+          subject?: string
+          term?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheme_feedback_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "generated_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scheme_references: {
         Row: {
           content_snippet: string | null
