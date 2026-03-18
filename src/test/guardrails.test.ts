@@ -355,7 +355,7 @@ describe("Guardrail 10: SLO-to-KICD Alignment Validation", () => {
   });
 
   it("rewrites SLOs that don't align with any official outcome", () => {
-    const rows = [makeRow("By the end of the lesson, the learner should be able to:\na) handle unfavorable weather conditions\nb) build a shelter\nc) survive storms")];
+    const rows = [makeRow("By the end of the lesson, the learner should be able to:\na) cook traditional meals\nb) build a campfire\nc) enjoy outdoor dining")];
     const fixed = validateSLOAlignment(rows, officialOutcomes, false);
     expect(fixed[0].specificLearningOutcome).toContain("identify different weather conditions");
   });
