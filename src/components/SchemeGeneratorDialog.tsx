@@ -827,10 +827,92 @@ const SchemeGeneratorDialog = () => {
                   </div>
                 </div>
 
+                {/* Feedback Section */}
+                <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                  <h4 className="text-sm font-semibold flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
+                    How is this scheme?
+                  </h4>
+
+                  {!feedbackSubmitted && !showFeedbackInput && (
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant={feedbackRating === "positive" ? "default" : "outline"}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => handleSubmitFeedback("positive")}
+                      >
+                        <ThumbsUp className="w-4 h-4" /> Good
+                      </Button>
+                      <Button
+                        variant={feedbackRating === "negative" ? "destructive" : "outline"}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => handleSubmitFeedback("negative")}
+                      >
+                        <ThumbsDown className="w-4 h-4" /> Needs Improvement
+                      </Button>
+                    </div>
+                  )}
+
+                  {showFeedbackInput && !feedbackSubmitted && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        What should be improved? Be specific — e.g. "SLOs should focus on identifying weather, not handling it"
+                      </p>
+                      <Textarea
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        placeholder="Describe what needs to change..."
+                        rows={3}
+                        className="text-sm"
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleSubmitNegativeFeedback}
+                          className="gap-1.5"
+                        >
+                          <Save className="w-3.5 h-3.5" /> Save Feedback
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleRegenerateWithFeedback}
+                          disabled={regenerating || loading}
+                          className="gap-1.5"
+                        >
+                          {regenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                          {regenerating ? "Regenerating..." : "Regenerate with Feedback"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {feedbackSubmitted && feedbackRating === "positive" && (
+                    <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
+                      <ThumbsUp className="w-3.5 h-3.5" /> Thank you! Your feedback helps us improve.
+                    </p>
+                  )}
+
+                  {feedbackSubmitted && feedbackRating === "negative" && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        ✓ Feedback saved. Want to regenerate with your suggestions?
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={() => { setFeedbackSubmitted(false); setShowFeedbackInput(true); }}
+                        className="gap-1.5"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" /> Regenerate with Feedback
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Export buttons */}
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Button variant="outline" onClick={() => { setStep(4); setGeneratedRows(null); }} className="gap-2">
-                    <FileText className="w-4 h-4" /> Regenerate
-                  </Button>
                   <Button variant="secondary" onClick={handleSave} className="gap-2">
                     <Save className="w-4 h-4" /> Save to Library
                   </Button>
