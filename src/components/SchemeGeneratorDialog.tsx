@@ -108,6 +108,13 @@ const SchemeGeneratorDialog = () => {
   const [lessonPlanRow, setLessonPlanRow] = useState<SchemeRow | null>(null);
   const [lessonPlanOpen, setLessonPlanOpen] = useState(false);
 
+  // Feedback state
+  const [feedbackRating, setFeedbackRating] = useState<"positive" | "negative" | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [showFeedbackInput, setShowFeedbackInput] = useState(false);
+
   // Language-specific state
   const [term, setTerm] = useState("");
   const [weekNumber, setWeekNumber] = useState("");
