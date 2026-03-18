@@ -890,7 +890,7 @@ const SchemeGeneratorDialog = () => {
                   )}
 
                   {feedbackSubmitted && feedbackRating === "positive" && (
-                    <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
+                    <p className="text-xs text-primary flex items-center gap-1.5">
                       <ThumbsUp className="w-3.5 h-3.5" /> Thank you! Your feedback helps us improve.
                     </p>
                   )}
