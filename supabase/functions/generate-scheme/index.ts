@@ -620,7 +620,7 @@ async function generateForSubStrand(
   }
 
   // MASTER GUARDRAIL: validate & sanitize all rows
-  const fixedRows = validateAndSanitizeRows(allRows, strand, subStrand.name, grade, subject, weekStart, lessonsPerWeek, isSw);
+  const fixedRows = validateAndSanitizeRows(allRows, strand, subStrand.name, grade, subject, weekStart, lessonsPerWeek, isSw, subStrand.learningOutcomes);
 
   // GUARDRAIL 9: Enforce exact lesson count
   const finalRows = enforceLessonCount(fixedRows, subStrand.lessons, weekStart, lessonsPerWeek);
