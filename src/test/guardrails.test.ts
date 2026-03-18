@@ -295,3 +295,93 @@ describe("Guardrail 9: Lesson Count Enforcement", () => {
     expect(fixed[1].specificLearningOutcome).toContain("continued practice");
   });
 });
+
+// --- GUARDRAIL 10: SLO-to-KICD Alignment Validation ---
+
+function validateSLOAlignment(
+  rows: SchemeRow[],
+  officialOutcomes: string[] | undefined,
+  isSw: boolean,
+): SchemeRow[] {
+  if (!officialOutcomes || officialOutcomes.length === 0) return rows;
+  const outcomeKeywords: Set<string>[] = officialOutcomes.map(o =>
+    new Set(o.toLowerCase().split(/\s+/).filter(w => w.length >= 3))
+  );
+  function matchesAnyOutcome(sloText: string): boolean {
+    const sloLower = sloText.toLowerCase();
+    for (let i = 0; i < officialOutcomes!.length; i++) {
+      const keywords = outcomeKeywords[i];
+      let hits = 0;
+      for (const kw of keywords) {
+        if (sloLower.includes(kw)) hits++;
+      }
+      if (keywords.size > 0 && hits / keywords.size >= 0.4) return true;
+    }
+    return false;
+  }
+  let outcomeIndex = 0;
+  return rows.map((row, lessonIdx) => {
+    if (matchesAnyOutcome(row.specificLearningOutcome)) return row;
+    const primaryOutcome = officialOutcomes[outcomeIndex % officialOutcomes.length];
+    const secondaryOutcome = officialOutcomes[(outcomeIndex + 1) % officialOutcomes.length];
+    const tertiaryOutcome = officialOutcomes[(outcomeIndex + 2) % officialOutcomes.length];
+    outcomeIndex++;
+    const newSLO = isSw
+      ? `**Kufikia mwisho wa somo mwanafunzi aweze:**\n-${primaryOutcome}\n-${secondaryOutcome}\n-${tertiaryOutcome}`
+      : `By the end of the lesson, the learner should be able to:\na) ${primaryOutcome}\nb) ${secondaryOutcome}\nc) ${tertiaryOutcome}`;
+    return { ...row, specificLearningOutcome: newSLO };
+  });
+}
+
+describe("Guardrail 10: SLO-to-KICD Alignment Validation", () => {
+  const officialOutcomes = [
+    "identify different weather conditions in the locality",
+    "record weather conditions using symbols",
+    "describe the appearance of the sky during the day and at night",
+    "develop curiosity about the sky and weather conditions",
+  ];
+
+  const makeRow = (slo: string): SchemeRow => ({
+    week: 1, lesson: 1, strand: "S", subStrand: "SS",
+    specificLearningOutcome: slo, keyInquiryQuestion: "Q?",
+    learningExperiences: "Exp", learningResources: "Res",
+    assessmentMethods: "Assess", reflection: "",
+  });
+
+  it("keeps SLOs that align with official outcomes", () => {
+    const rows = [makeRow("By the end of the lesson, the learner should be able to:\na) identify different weather conditions in the locality\nb) draw weather symbols\nc) appreciate weather")];
+    const fixed = validateSLOAlignment(rows, officialOutcomes, false);
+    expect(fixed[0].specificLearningOutcome).toBe(rows[0].specificLearningOutcome);
+  });
+
+  it("rewrites SLOs that don't align with any official outcome", () => {
+    const rows = [makeRow("By the end of the lesson, the learner should be able to:\na) cook traditional meals\nb) build a campfire\nc) enjoy outdoor dining")];
+    const fixed = validateSLOAlignment(rows, officialOutcomes, false);
+    expect(fixed[0].specificLearningOutcome).toContain("identify different weather conditions");
+  });
+
+  it("returns rows unchanged when no official outcomes provided", () => {
+    const rows = [makeRow("anything goes here")];
+    const fixed = validateSLOAlignment(rows, undefined, false);
+    expect(fixed[0].specificLearningOutcome).toBe("anything goes here");
+  });
+
+  it("uses Kiswahili format when isSw is true", () => {
+    const rows = [makeRow("some unrelated content about cooking")];
+    const fixed = validateSLOAlignment(rows, officialOutcomes, true);
+    expect(fixed[0].specificLearningOutcome).toContain("Kufikia mwisho wa somo");
+  });
+
+  it("round-robins through outcomes for multiple non-aligned rows", () => {
+    const rows = [
+      makeRow("unrelated content A"),
+      makeRow("unrelated content B"),
+      makeRow("unrelated content C"),
+    ];
+    const fixed = validateSLOAlignment(rows, officialOutcomes, false);
+    // Each should get different primary outcomes
+    expect(fixed[0].specificLearningOutcome).toContain(officialOutcomes[0]);
+    expect(fixed[1].specificLearningOutcome).toContain(officialOutcomes[1]);
+    expect(fixed[2].specificLearningOutcome).toContain(officialOutcomes[2]);
+  });
+});

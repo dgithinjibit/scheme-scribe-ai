@@ -275,6 +275,58 @@ function enforceLessonCount(rows: SchemeRow[], expectedLessons: number, weekStar
   return enforceWeekLessonNumbering(rows, weekStart, lessonsPerWeek);
 }
 
+/** GUARDRAIL 10: Validate each SLO aligns with official KICD learning outcomes.
+ *  If the sub-strand has official outcomes, every generated SLO must reference
+ *  at least one of them. If a row's SLO doesn't match any official outcome,
+ *  rewrite it using the official outcomes in round-robin order. */
+function validateSLOAlignment(
+  rows: SchemeRow[],
+  officialOutcomes: string[] | undefined,
+  isSw: boolean,
+): SchemeRow[] {
+  if (!officialOutcomes || officialOutcomes.length === 0) return rows;
+
+  // Build keyword sets from each official outcome (lowercase, 3+ char words)
+  const outcomeKeywords: Set<string>[] = officialOutcomes.map(o =>
+    new Set(o.toLowerCase().split(/\s+/).filter(w => w.length >= 3))
+  );
+
+  // Check if an SLO text references at least one official outcome
+  function matchesAnyOutcome(sloText: string): boolean {
+    const sloLower = sloText.toLowerCase();
+    for (let i = 0; i < officialOutcomes!.length; i++) {
+      // Check if 40%+ of the outcome's keywords appear in the SLO
+      const keywords = outcomeKeywords[i];
+      let hits = 0;
+      for (const kw of keywords) {
+        if (sloLower.includes(kw)) hits++;
+      }
+      if (keywords.size > 0 && hits / keywords.size >= 0.4) return true;
+    }
+    return false;
+  }
+
+  let outcomeIndex = 0;
+  return rows.map((row, lessonIdx) => {
+    if (matchesAnyOutcome(row.specificLearningOutcome)) return row;
+
+    // This SLO doesn't align — rebuild from official outcomes
+    console.warn(`Guardrail 10: SLO for lesson ${lessonIdx + 1} doesn't align with KICD outcomes. Rewriting.`);
+    
+    // Distribute official outcomes across lessons round-robin
+    const primaryOutcome = officialOutcomes[outcomeIndex % officialOutcomes.length];
+    const secondaryOutcome = officialOutcomes[(outcomeIndex + 1) % officialOutcomes.length];
+    const tertiaryOutcome = officialOutcomes[(outcomeIndex + 2) % officialOutcomes.length];
+    outcomeIndex++;
+
+    const newSLO = isSw
+      ? `**Kufikia mwisho wa somo mwanafunzi aweze:**\n-${primaryOutcome}\n-${secondaryOutcome}\n-${tertiaryOutcome}`
+      : `By the end of the lesson, the learner should be able to:\na) ${primaryOutcome}\nb) ${secondaryOutcome}\nc) ${tertiaryOutcome}`;
+
+    return { ...row, specificLearningOutcome: newSLO };
+  });
+}
+
 /**
  * MASTER GUARDRAIL: Apply ALL validations in sequence.
  */
@@ -287,6 +339,7 @@ function validateAndSanitizeRows(
   weekStart: number,
   lessonsPerWeek: number,
   isSw: boolean,
+  officialOutcomes?: string[],
 ): SchemeRow[] {
   console.log(`Guardrails: processing ${rawRows.length} raw rows...`);
   let rows: SchemeRow[] = rawRows.map(r => normalizeRowKeys(r as Record<string, unknown>));
@@ -298,6 +351,9 @@ function validateAndSanitizeRows(
     row.learningExperiences = validateAndFixExperiences(row.learningExperiences, isSw);
     return row;
   });
+  // GUARDRAIL 10: Validate SLOs align with official KICD outcomes
+  rows = validateSLOAlignment(rows, officialOutcomes, isSw);
+
   // Guardrail: deduplicate by SLO content but only if we'd still have enough rows
   const seen = new Set<string>();
   const deduped = rows.filter((row) => {
@@ -564,7 +620,7 @@ async function generateForSubStrand(
   }
 
   // MASTER GUARDRAIL: validate & sanitize all rows
-  const fixedRows = validateAndSanitizeRows(allRows, strand, subStrand.name, grade, subject, weekStart, lessonsPerWeek, isSw);
+  const fixedRows = validateAndSanitizeRows(allRows, strand, subStrand.name, grade, subject, weekStart, lessonsPerWeek, isSw, subStrand.learningOutcomes);
 
   // GUARDRAIL 9: Enforce exact lesson count
   const finalRows = enforceLessonCount(fixedRows, subStrand.lessons, weekStart, lessonsPerWeek);
