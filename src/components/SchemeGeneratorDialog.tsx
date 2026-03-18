@@ -200,6 +200,84 @@ const SchemeGeneratorDialog = () => {
     setStrandSubStrandSelections({});
     setFullStrandData([]);
     setTermAllocation(null);
+    setFeedbackRating(null);
+    setFeedbackText("");
+    setFeedbackSubmitted(false);
+    setShowFeedbackInput(false);
+  };
+
+  const handleSubmitFeedback = async (rating: "positive" | "negative") => {
+    setFeedbackRating(rating);
+    if (rating === "negative") {
+      setShowFeedbackInput(true);
+      return; // Wait for user to type feedback before submitting
+    }
+    // Positive feedback — submit immediately
+    await saveFeedback(rating, "");
+  };
+
+  const handleSubmitNegativeFeedback = async () => {
+    if (!feedbackText.trim()) {
+      toast({ title: "Please describe the issue", description: "Tell us what needs to be improved so we can regenerate better.", variant: "destructive" });
+      return;
+    }
+    await saveFeedback("negative", feedbackText);
+  };
+
+  const saveFeedback = async (rating: "positive" | "negative", text: string) => {
+    if (!user) {
+      toast({ title: "Sign in required", description: "Sign in to submit feedback.", variant: "destructive" });
+      return;
+    }
+    try {
+      await supabase.from("scheme_feedback" as any).insert({
+        user_id: user.id,
+        grade,
+        subject,
+        term: term || undefined,
+        strand: isLanguage ? "Weekly Plan" : (term || strand),
+        rating,
+        feedback_text: text || undefined,
+        generated_content: generatedRows,
+      } as any);
+      setFeedbackSubmitted(true);
+      toast({ title: rating === "positive" ? "Thank you! 👍" : "Feedback received", description: rating === "positive" ? "Your positive feedback helps improve future generations." : "We'll use your feedback to improve. You can regenerate now." });
+    } catch (err) {
+      console.error("Failed to save feedback:", err);
+      toast({ title: "Failed to save feedback", variant: "destructive" });
+    }
+  };
+
+  const handleRegenerateWithFeedback = async () => {
+    if (!feedbackText.trim()) {
+      toast({ title: "Please describe what to improve", description: "Type your feedback so the AI knows what to fix.", variant: "destructive" });
+      return;
+    }
+    setRegenerating(true);
+    // Save feedback first
+    await saveFeedback("negative", feedbackText);
+    // Regenerate with feedback as additional context
+    const feedbackContext = `TEACHER FEEDBACK ON PREVIOUS GENERATION (MUST ADDRESS): ${feedbackText}`;
+    const originalAdditionalInfo = additionalInfo;
+    setAdditionalInfo(prev => prev ? `${prev}\n\n${feedbackContext}` : feedbackContext);
+    
+    // Trigger regeneration
+    try {
+      if (isLanguage) {
+        await handleGenerateWeekly();
+      } else {
+        await handleGenerateTerm();
+      }
+      setFeedbackRating(null);
+      setFeedbackText("");
+      setFeedbackSubmitted(false);
+      setShowFeedbackInput(false);
+    } catch {
+      // Error handled inside generation functions
+    } finally {
+      setAdditionalInfo(originalAdditionalInfo);
+      setRegenerating(false);
+    }
   };
 
   // Populate sub-strands when strand is selected (non-language flow - kept for fallback)
