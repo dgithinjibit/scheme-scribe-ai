@@ -20,7 +20,7 @@ import { grades, getSubjectsForGrade, getHardcodedStrands, getSubStrandsForStran
 import { getTermAllocation, getTermLessonCount, isLowerPrimaryKiswahili } from "@/data/curriculum/term-mappings";
 import SchemePreview from "./SchemePreview";
 import LessonPlanDialog from "./LessonPlanDialog";
-import { FileText, Download, Save, Loader2, Sparkles, FileDown, BookOpen } from "lucide-react";
+import { FileText, Download, Save, Loader2, Sparkles, FileDown, BookOpen, ThumbsUp, ThumbsDown, MessageSquare, RefreshCw } from "lucide-react";
 import { exportSchemeToDocx } from "@/utils/exportDocx";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
@@ -108,6 +108,13 @@ const SchemeGeneratorDialog = () => {
   const [lessonPlanRow, setLessonPlanRow] = useState<SchemeRow | null>(null);
   const [lessonPlanOpen, setLessonPlanOpen] = useState(false);
 
+  // Feedback state
+  const [feedbackRating, setFeedbackRating] = useState<"positive" | "negative" | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [showFeedbackInput, setShowFeedbackInput] = useState(false);
+
   // Language-specific state
   const [term, setTerm] = useState("");
   const [weekNumber, setWeekNumber] = useState("");
@@ -193,6 +200,84 @@ const SchemeGeneratorDialog = () => {
     setStrandSubStrandSelections({});
     setFullStrandData([]);
     setTermAllocation(null);
+    setFeedbackRating(null);
+    setFeedbackText("");
+    setFeedbackSubmitted(false);
+    setShowFeedbackInput(false);
+  };
+
+  const handleSubmitFeedback = async (rating: "positive" | "negative") => {
+    setFeedbackRating(rating);
+    if (rating === "negative") {
+      setShowFeedbackInput(true);
+      return; // Wait for user to type feedback before submitting
+    }
+    // Positive feedback — submit immediately
+    await saveFeedback(rating, "");
+  };
+
+  const handleSubmitNegativeFeedback = async () => {
+    if (!feedbackText.trim()) {
+      toast({ title: "Please describe the issue", description: "Tell us what needs to be improved so we can regenerate better.", variant: "destructive" });
+      return;
+    }
+    await saveFeedback("negative", feedbackText);
+  };
+
+  const saveFeedback = async (rating: "positive" | "negative", text: string) => {
+    if (!user) {
+      toast({ title: "Sign in required", description: "Sign in to submit feedback.", variant: "destructive" });
+      return;
+    }
+    try {
+      await supabase.from("scheme_feedback" as any).insert({
+        user_id: user.id,
+        grade,
+        subject,
+        term: term || undefined,
+        strand: isLanguage ? "Weekly Plan" : (term || strand),
+        rating,
+        feedback_text: text || undefined,
+        generated_content: generatedRows,
+      } as any);
+      setFeedbackSubmitted(true);
+      toast({ title: rating === "positive" ? "Thank you! 👍" : "Feedback received", description: rating === "positive" ? "Your positive feedback helps improve future generations." : "We'll use your feedback to improve. You can regenerate now." });
+    } catch (err) {
+      console.error("Failed to save feedback:", err);
+      toast({ title: "Failed to save feedback", variant: "destructive" });
+    }
+  };
+
+  const handleRegenerateWithFeedback = async () => {
+    if (!feedbackText.trim()) {
+      toast({ title: "Please describe what to improve", description: "Type your feedback so the AI knows what to fix.", variant: "destructive" });
+      return;
+    }
+    setRegenerating(true);
+    // Save feedback first
+    await saveFeedback("negative", feedbackText);
+    // Regenerate with feedback as additional context
+    const feedbackContext = `TEACHER FEEDBACK ON PREVIOUS GENERATION (MUST ADDRESS): ${feedbackText}`;
+    const originalAdditionalInfo = additionalInfo;
+    setAdditionalInfo(prev => prev ? `${prev}\n\n${feedbackContext}` : feedbackContext);
+    
+    // Trigger regeneration
+    try {
+      if (isLanguage) {
+        await handleGenerateWeekly();
+      } else {
+        await handleGenerateTerm();
+      }
+      setFeedbackRating(null);
+      setFeedbackText("");
+      setFeedbackSubmitted(false);
+      setShowFeedbackInput(false);
+    } catch {
+      // Error handled inside generation functions
+    } finally {
+      setAdditionalInfo(originalAdditionalInfo);
+      setRegenerating(false);
+    }
   };
 
   // Populate sub-strands when strand is selected (non-language flow - kept for fallback)
@@ -742,10 +827,92 @@ const SchemeGeneratorDialog = () => {
                   </div>
                 </div>
 
+                {/* Feedback Section */}
+                <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                  <h4 className="text-sm font-semibold flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
+                    How is this scheme?
+                  </h4>
+
+                  {!feedbackSubmitted && !showFeedbackInput && (
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant={feedbackRating === "positive" ? "default" : "outline"}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => handleSubmitFeedback("positive")}
+                      >
+                        <ThumbsUp className="w-4 h-4" /> Good
+                      </Button>
+                      <Button
+                        variant={feedbackRating === "negative" ? "destructive" : "outline"}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => handleSubmitFeedback("negative")}
+                      >
+                        <ThumbsDown className="w-4 h-4" /> Needs Improvement
+                      </Button>
+                    </div>
+                  )}
+
+                  {showFeedbackInput && !feedbackSubmitted && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        What should be improved? Be specific — e.g. "SLOs should focus on identifying weather, not handling it"
+                      </p>
+                      <Textarea
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        placeholder="Describe what needs to change..."
+                        rows={3}
+                        className="text-sm"
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleSubmitNegativeFeedback}
+                          className="gap-1.5"
+                        >
+                          <Save className="w-3.5 h-3.5" /> Save Feedback
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleRegenerateWithFeedback}
+                          disabled={regenerating || loading}
+                          className="gap-1.5"
+                        >
+                          {regenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                          {regenerating ? "Regenerating..." : "Regenerate with Feedback"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {feedbackSubmitted && feedbackRating === "positive" && (
+                    <p className="text-xs text-primary flex items-center gap-1.5">
+                      <ThumbsUp className="w-3.5 h-3.5" /> Thank you! Your feedback helps us improve.
+                    </p>
+                  )}
+
+                  {feedbackSubmitted && feedbackRating === "negative" && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        ✓ Feedback saved. Want to regenerate with your suggestions?
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={() => { setFeedbackSubmitted(false); setShowFeedbackInput(true); }}
+                        className="gap-1.5"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" /> Regenerate with Feedback
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Export buttons */}
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Button variant="outline" onClick={() => { setStep(4); setGeneratedRows(null); }} className="gap-2">
-                    <FileText className="w-4 h-4" /> Regenerate
-                  </Button>
                   <Button variant="secondary" onClick={handleSave} className="gap-2">
                     <Save className="w-4 h-4" /> Save to Library
                   </Button>
