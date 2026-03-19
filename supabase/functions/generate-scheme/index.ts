@@ -526,6 +526,17 @@ All content MUST be contextualized for the ${indigenousLanguage} language. This 
 
 SHARTI MUHIMU: Lazima utumie data rasmi ya KICD iliyotolewa hapa chini PEKEE. USIBUNI, USITENGENEZE, au USIZUSHE matokeo ya kujifunza, majina ya strand, majina ya sub-strand, au maudhui ya mtaala ambayo hayapo katika mfumo wa KICD.
 
+UMAHIRI WA CBC: Kila somo lazima lijeneze UMAHIRI — uwezo wa kutumia mchanganyiko wa Maarifa, Ujuzi, na Mitazamo (KSA) kutekeleza kazi.
+
+STADI MUHIMU ZA CBC (zingatia katika shughuli za kujifunza):
+- Mawasiliano na Ushirikiano (k.m., "Kufanya kazi kwa jozi...", "Kujadili katika vikundi...")
+- Kufikiri kwa Kina na Utatuzi wa Matatizo (k.m., "Kutafuta suluhisho la...", "Kulinganisha...")
+- Ujuzi wa Kidijitali (k.m., "Kutumia simu/kompyuta kutafuta...", "Kutazama video...")
+- Ubunifu na Uvumbuzi (k.m., "Kubuni muundo kwa kutumia...", "Kuunda mfano wa...")
+
+MAADILI YA CBC (zingatia katika matokeo ya Mitazamo):
+Heshima, Uwajibikaji, Upendo, Umoja, Amani, Uadilifu, Uzalendo, Haki ya Kijamii.
+
 KANUNI MUHIMU:
 1. Tengeneza HASA somo ${batchLessons} kwa wanafunzi wa ${grade}.
 2. Kila somo liwe FUPI, sahili, na linalofaa umri wa watoto.
