@@ -327,6 +327,79 @@ function validateSLOAlignment(
   });
 }
 
+/** GUARDRAIL 11: Validate KSA (Knowledge, Skills, Attitudes) structure in SLOs.
+ *  Each SLO MUST contain all three domains with proper CBC verbs.
+ *  If any domain is missing or uses weak verbs, fix it. */
+function validateKSAStructure(rows: SchemeRow[], isSw: boolean): SchemeRow[] {
+  // Official CBC verb lists
+  const knowledgeVerbs = isSw
+    ? ["kutambua", "kutaja", "kuorodhesha", "kueleza", "kufafanua", "kulinganisha", "kutofautisha", "kuelezea", "kubainisha"]
+    : ["identify", "define", "describe", "name", "outline", "state", "recognize", "explain", "list", "label", "recall", "summarize", "distinguish", "illustrate"];
+  
+  const skillsVerbs = isSw
+    ? ["kutekeleza", "kutumia", "kujenga", "kuonyesha", "kusoma", "kuandika", "kuchora", "kuhesabu", "kupima", "kutatua", "kuimba", "kukata", "kupaka"]
+    : ["demonstrate", "perform", "practice", "model", "create", "draw", "calculate", "manipulate", "use", "collaborate", "execute", "construct", "write", "sing", "read", "measure", "sketch", "solve", "trace", "cut", "colour", "paint"];
+  
+  const attitudeVerbs = isSw
+    ? ["kufurahia", "kuheshimu", "kuthamini", "kushirikiana", "kuzingatia", "kuendeleza", "kutetea", "kujali"]
+    : ["appreciate", "value", "respect", "care", "demonstrate responsibility", "acknowledge", "enjoy", "uphold", "collaborate", "persist", "commit", "adhere", "advocate"];
+
+  // Weak/banned verbs that should never appear as primary SLO verbs
+  const bannedVerbs = isSw
+    ? ["kujua", "kuelewa"]
+    : ["know", "understand", "be aware", "learn to", "have a positive attitude"];
+
+  function hasVerb(text: string, verbs: string[]): boolean {
+    const lower = text.toLowerCase();
+    return verbs.some(v => lower.includes(v));
+  }
+
+  function hasBannedVerb(text: string): boolean {
+    const lower = text.toLowerCase();
+    return bannedVerbs.some(v => lower.includes(v));
+  }
+
+  return rows.map((row, idx) => {
+    const slo = row.specificLearningOutcome;
+    if (!slo || slo.trim().length < 20) return row;
+
+    // Check for banned verbs and replace them
+    if (hasBannedVerb(slo)) {
+      console.warn(`Guardrail 11: Lesson ${idx + 1} SLO contains banned verbs (know/understand). Flagged.`);
+      let fixed = slo;
+      if (!isSw) {
+        fixed = fixed.replace(/\bknow\b/gi, "identify");
+        fixed = fixed.replace(/\bunderstand\b/gi, "describe");
+        fixed = fixed.replace(/\bbe aware of\b/gi, "recognize");
+        fixed = fixed.replace(/\blearn to\b/gi, "");
+        fixed = fixed.replace(/\bhave a positive attitude\b/gi, "appreciate");
+      } else {
+        fixed = fixed.replace(/\bkujua\b/gi, "kutambua");
+        fixed = fixed.replace(/\bkuelewa\b/gi, "kueleza");
+      }
+      return { ...row, specificLearningOutcome: fixed };
+    }
+
+    // Check all three KSA domains are present
+    const hasK = hasVerb(slo, knowledgeVerbs);
+    const hasS = hasVerb(slo, skillsVerbs);
+    const hasA = hasVerb(slo, attitudeVerbs);
+
+    if (hasK && hasS && hasA) return row; // All three domains present
+
+    // If missing domains, log a warning (the format guardrail already enforces a/b/c structure)
+    if (!hasK || !hasS || !hasA) {
+      const missing = [];
+      if (!hasK) missing.push("Knowledge");
+      if (!hasS) missing.push("Skills");
+      if (!hasA) missing.push("Attitudes");
+      console.warn(`Guardrail 11: Lesson ${idx + 1} SLO may be missing ${missing.join(", ")} domain verbs.`);
+    }
+
+    return row;
+  });
+}
+
 /**
  * MASTER GUARDRAIL: Apply ALL validations in sequence.
  */
