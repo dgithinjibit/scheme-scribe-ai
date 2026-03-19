@@ -426,6 +426,8 @@ function validateAndSanitizeRows(
   });
   // GUARDRAIL 10: Validate SLOs align with official KICD outcomes
   rows = validateSLOAlignment(rows, officialOutcomes, isSw);
+  // GUARDRAIL 11: Validate KSA structure and verb usage
+  rows = validateKSAStructure(rows, isSw);
 
   // Guardrail: deduplicate by SLO content but only if we'd still have enough rows
   const seen = new Set<string>();
