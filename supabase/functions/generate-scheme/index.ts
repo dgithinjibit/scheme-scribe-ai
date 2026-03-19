@@ -613,7 +613,7 @@ RULES:
    - Instead of "textbooks" → "${subject} Curriculum Design ${grade.toLowerCase()}, Learner's Book pages [relevant topic]"
    - Instead of "videos" → "video clip demonstrating proper handwriting posture" or "animated story video for comprehension"
    Always include "${subject} Curriculum Design ${grade.toLowerCase()}" as the first resource, then add 2-4 specific contextual resources relevant to the lesson's learning outcomes.
-7. **Assessment**: Methods to evaluate learning — "oral questions, observation" or add "written exercise, portfolio, peer assessment" as appropriate. Must match the learning outcome.`
+7. **Assessment**: Methods to evaluate learning — "oral questions, observation" or add "written exercise, portfolio, peer assessment" as appropriate. Must match the learning outcome.
 8. **Reflection**: always "".
 9. Week numbering starts from ${weekStart}. Fit exactly ${lessonsPerWeek} lessons per week. Lesson numbers RESET each week: 1, 2, 3... up to ${lessonsPerWeek}, then back to 1 for the next week. Example: Week 1 has lessons 1,2,3,4,5; Week 2 has lessons 1,2,3,4,5 — NOT lesson 6,7,8.
 10. Progress gradually across ${totalLessons} total lessons: INTRODUCE concepts → PRACTISE skills → APPLY in context → REVIEW and assess. Each lesson should build on the previous one.${officialContext}
