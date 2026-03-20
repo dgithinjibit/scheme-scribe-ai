@@ -85,6 +85,28 @@ function extractJsonArray(raw: string): SchemeRow[] {
 // These ensure production-quality output regardless of AI quirks
 // ============================================================
 
+/** Get the official KLB Visionary Learner's Book title for a subject+grade. */
+function getKLBBookTitle(subject: string, grade: string): string {
+  const gradeNum = parseInt(grade.replace("Grade ", ""));
+  const isSw = kiswahiliSubjects.includes(subject);
+  if (gradeNum >= 1 && gradeNum <= 3) {
+    const titles: Record<string, string> = {
+      "English Activities": `KLB Visionary English Literacy Activities ${grade}`,
+      "Kiswahili": `KLB Visionary Kiswahili Gredi ${gradeNum}`,
+      "Mathematics": `KLB Visionary Mathematical Activities ${grade}`,
+      "Environmental Activities": `KLB Visionary Environmental Activities ${grade}`,
+      "Creative Activities": `KLB Visionary Creative Activities ${grade}`,
+      "CRE": `KLB Visionary CRE Activities ${grade}`,
+      "IRE": `KLB Visionary IRE Activities ${grade}`,
+      "HRE": `KLB Visionary HRE Activities ${grade}`,
+      "Indigenous Language": `KLB Visionary Indigenous Language Activities ${grade}`,
+    };
+    return titles[subject] || `KLB Visionary ${subject} ${grade}`;
+  }
+  if (isSw) return `KLB Visionary Kiswahili Gredi ${gradeNum}`;
+  return `KLB Visionary ${subject} ${grade}`;
+}
+
 /** GUARDRAIL 1: Fix week/lesson numbering deterministically. */
 function enforceWeekLessonNumbering(rows: SchemeRow[], weekStart: number, lessonsPerWeek: number): SchemeRow[] {
   let currentWeek = weekStart;
