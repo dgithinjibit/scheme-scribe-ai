@@ -428,7 +428,49 @@ function validateAndSanitizeRows(
   rows = validateSLOAlignment(rows, officialOutcomes, isSw);
   // GUARDRAIL 11: Validate KSA structure and verb usage
   rows = validateKSAStructure(rows, isSw);
-
+  // GUARDRAIL 12: Replace inappropriate verbs for lower-primary non-language subjects
+  const gradeNum = parseInt(grade.replace("Grade ", ""));
+  const langSubjects = ["Kiswahili", "English Activities", "English", "Indigenous Language", "Arabic", "French", "German", "Mandarin"];
+  if (gradeNum >= 1 && gradeNum <= 3 && !langSubjects.includes(subject)) {
+    rows = rows.map((row, idx) => {
+      let slo = row.specificLearningOutcome;
+      let exp = row.learningExperiences;
+      const replacements: [RegExp, string][] = isSw
+        ? [
+            [/\bkuandika\b/gi, "kuchora"],
+            [/\bkusoma\b/gi, "kutazama"],
+            [/\bkufupisha\b/gi, "kutaja"],
+            [/\bkutunga\b/gi, "kuonyesha"],
+          ]
+        : [
+            [/\bwrite\b/gi, "draw"],
+            [/\bwriting\b/gi, "drawing"],
+            [/\bread\b/gi, "observe"],
+            [/\breading\b/gi, "observing"],
+            [/\bsummarize\b/gi, "name"],
+            [/\bsummarise\b/gi, "name"],
+            [/\bcreate\b/gi, "make"],
+            [/\bcreating\b/gi, "making"],
+            [/\bcompose\b/gi, "show"],
+            [/\banalyse\b/gi, "sort"],
+            [/\banalyze\b/gi, "sort"],
+            [/\bevaluate\b/gi, "show"],
+            [/\bsynthesize\b/gi, "group"],
+            [/\bhypothesize\b/gi, "guess"],
+            [/\bformulate\b/gi, "say"],
+            [/\bcompile\b/gi, "collect"],
+          ];
+      let changed = false;
+      for (const [pattern, replacement] of replacements) {
+        if (pattern.test(slo)) { slo = slo.replace(pattern, replacement); changed = true; }
+        if (pattern.test(exp)) { exp = exp.replace(pattern, replacement); changed = true; }
+      }
+      if (changed) {
+        console.warn(`Guardrail 12: Lesson ${idx + 1} — replaced inappropriate verbs for ${grade} ${subject}`);
+      }
+      return { ...row, specificLearningOutcome: slo, learningExperiences: exp };
+    });
+  }
   // Guardrail: deduplicate by SLO content but only if we'd still have enough rows
   const seen = new Set<string>();
   const deduped = rows.filter((row) => {
@@ -521,6 +563,38 @@ All content MUST be contextualized for the ${indigenousLanguage} language. This 
 - While the scheme structure follows KICD standards, the CONTENT must feel authentically ${indigenousLanguage}\n`;
   }
 
+  // GUARDRAIL: Grade 1-3 non-language subjects need simpler, age-appropriate verbs
+  const gradeNum = parseInt(grade.replace("Grade ", ""));
+  const languageSubjects = ["Kiswahili", "English Activities", "English", "Indigenous Language", "Arabic", "French", "German", "Mandarin"];
+  const isLanguageSubject = languageSubjects.includes(subject);
+  const isLowerPrimary = gradeNum >= 1 && gradeNum <= 3;
+
+  let verbRestrictionEn = "";
+  let verbRestrictionSw = "";
+  if (isLowerPrimary && !isLanguageSubject) {
+    verbRestrictionEn = `
+CRITICAL — GRADE 1-3 NON-LANGUAGE VERB RESTRICTIONS:
+Since this is ${grade} ${subject} (NOT a language subject), you MUST follow these rules:
+- NEVER use "write", "read", "summarize", "create", "construct", "compose", "author", "draft", "compile", "formulate", "journal", "record in writing" — these are language-specific verbs inappropriate for ${subject}.
+- NEVER use complex/abstract verbs like "analyse", "evaluate", "critique", "synthesize", "hypothesize", "infer", "deduce" — these are too advanced for Grade 1-3 learners.
+- PREFERRED VERBS for Knowledge: name, point to, tell, say, show, match, sort, group, count, pick, list, identify, recognise, describe (simple descriptions only).
+- PREFERRED VERBS for Skills: draw, colour, paint, cut, paste, collect, sort, group, observe, point, touch, feel, smell, taste, sing, clap, jump, move, play, model (with clay/plasticine), arrange, measure, pour, plant, water, feed, clean.
+- PREFERRED VERBS for Attitudes: enjoy, care for, share, help, take turns, show love, show respect, be kind, keep safe, be responsible, be thankful, appreciate.
+- PREFERRED VERBS for Learning Experiences: observe, explore, touch, feel, collect, sort, group, discuss (orally), sing, role-play, visit, walk around, draw, colour, play, share, take care of, demonstrate, point to, name, show.
+- Activities must be HANDS-ON, CONCRETE, and OBSERVABLE — no desk-based literacy tasks unless the subject specifically requires it.
+`;
+    verbRestrictionSw = `
+MUHIMU SANA — VIZUIZI VYA VITENZI KWA GREDI 1-3 (MASOMO YASIYO YA LUGHA):
+Hii ni ${grade} ${subject} (SI somo la lugha), kwa hivyo LAZIMA ufuate kanuni hizi:
+- USITUMIE "kuandika", "kusoma", "kufupisha", "kuunda maandishi", "kutunga" — hizi ni vitenzi vya lugha ambavyo havifai kwa ${subject}.
+- USITUMIE vitenzi vigumu kama "kuchambua", "kutathmini", "kukosoa", "kuchanganya mawazo" — ni vigumu sana kwa wanafunzi wa Gredi 1-3.
+- VITENZI BORA kwa Maarifa: kutaja, kuonyesha, kusema, kulinganisha, kupanga, kuhesabu, kuchagua, kutambua, kueleza (maelezo sahili tu).
+- VITENZI BORA kwa Ujuzi: kuchora, kupaka rangi, kukata, kubandika, kukusanya, kupanga, kuangalia, kugusa, kunusa, kuonja, kuimba, kupiga makofi, kuruka, kucheza, kutengeneza (kwa udongo), kupima, kumwagilia, kulisha, kusafisha.
+- VITENZI BORA kwa Mitazamo: kufurahia, kutunza, kushiriki, kusaidia, kubadilishana, kuonyesha upendo, kuheshimu, kuwa na huruma, kulinda, kuwajibika, kushukuru.
+- Shughuli lazima ziwe za VITENDO, ZINAZOONEKANA, na ZINAZOSHIKIKA — si kazi za kuandika.
+`;
+  }
+
   const systemPrompt = isSw
     ? `Wewe ni mtaalamu wa mtaala wa CBC Kenya (KICD). Unatengeneza Mpango wa Kazi rasmi ambao unafuata viwango vya KICD kwa usahihi.
 
@@ -562,7 +636,7 @@ KANUNI MUHIMU:
 7. **TATHMINI** — Njia za kutathmini: "Kuuliza na kujibu maswali, uchunguzi" au ongeza "zoezi la kuandika, evaluation ya kazi, tathmini ya wenzao".
 8. **MAONI** — Daima "".
 9. Nambari za wiki zianze kutoka ${weekStart}. Wiki moja = masomo ${lessonsPerWeek}. Nambari za somo ZIANZIE UPYA kila wiki: 1, 2, 3... mpaka ${lessonsPerWeek}, kisha rudi 1 kwa wiki inayofuata.
-10. Masomo ${totalLessons} yote yawe na mwelekeo wa kuendelea: TAMBULISHA dhana → ZOEZA ujuzi → TUMIA katika muktadha → KAGUA na tathmini.${officialContext}
+10. Masomo ${totalLessons} yote yawe na mwelekeo wa kuendelea: TAMBULISHA dhana → ZOEZA ujuzi → TUMIA katika muktadha → KAGUA na tathmini.${verbRestrictionSw}${officialContext}
 
 Rudisha JSON array pekee ya vitu ${batchLessons}. Hakuna maandishi mengine.`
     : `You are an expert educational consultant specializing in the Kenyan Competency-Based Curriculum (CBC), aligned with the Ministry of Education and KICD (Kenya Institute of Curriculum Development) standards.
@@ -616,7 +690,7 @@ RULES:
 7. **Assessment**: Methods to evaluate learning — "oral questions, observation" or add "written exercise, portfolio, peer assessment" as appropriate. Must match the learning outcome.
 8. **Reflection**: always "".
 9. Week numbering starts from ${weekStart}. Fit exactly ${lessonsPerWeek} lessons per week. Lesson numbers RESET each week: 1, 2, 3... up to ${lessonsPerWeek}, then back to 1 for the next week. Example: Week 1 has lessons 1,2,3,4,5; Week 2 has lessons 1,2,3,4,5 — NOT lesson 6,7,8.
-10. Progress gradually across ${totalLessons} total lessons: INTRODUCE concepts → PRACTISE skills → APPLY in context → REVIEW and assess. Each lesson should build on the previous one.${officialContext}
+10. Progress gradually across ${totalLessons} total lessons: INTRODUCE concepts → PRACTISE skills → APPLY in context → REVIEW and assess. Each lesson should build on the previous one.${verbRestrictionEn}${officialContext}
 
 Return ONLY a valid JSON array of ${batchLessons} objects. No other text.`;
 
