@@ -210,7 +210,7 @@ function ensureNoEmptyFields(row: SchemeRow, grade: string, subject: string): Sc
     specificLearningOutcome: row.specificLearningOutcome || "",
     keyInquiryQuestion: row.keyInquiryQuestion || "What have we learned today?",
     learningExperiences: row.learningExperiences || "",
-    learningResources: row.learningResources || `${subject} Curriculum Design ${grade.toLowerCase()}`,
+    learningResources: row.learningResources || getKLBBookTitle(subject, grade),
     assessmentMethods: row.assessmentMethods || "Oral questions, observation",
     reflection: "",
   };
