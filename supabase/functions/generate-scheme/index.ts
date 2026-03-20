@@ -521,6 +521,38 @@ All content MUST be contextualized for the ${indigenousLanguage} language. This 
 - While the scheme structure follows KICD standards, the CONTENT must feel authentically ${indigenousLanguage}\n`;
   }
 
+  // GUARDRAIL: Grade 1-3 non-language subjects need simpler, age-appropriate verbs
+  const gradeNum = parseInt(grade.replace("Grade ", ""));
+  const languageSubjects = ["Kiswahili", "English Activities", "English", "Indigenous Language", "Arabic", "French", "German", "Mandarin"];
+  const isLanguageSubject = languageSubjects.includes(subject);
+  const isLowerPrimary = gradeNum >= 1 && gradeNum <= 3;
+
+  let verbRestrictionEn = "";
+  let verbRestrictionSw = "";
+  if (isLowerPrimary && !isLanguageSubject) {
+    verbRestrictionEn = `
+CRITICAL — GRADE 1-3 NON-LANGUAGE VERB RESTRICTIONS:
+Since this is ${grade} ${subject} (NOT a language subject), you MUST follow these rules:
+- NEVER use "write", "read", "summarize", "create", "construct", "compose", "author", "draft", "compile", "formulate", "journal", "record in writing" — these are language-specific verbs inappropriate for ${subject}.
+- NEVER use complex/abstract verbs like "analyse", "evaluate", "critique", "synthesize", "hypothesize", "infer", "deduce" — these are too advanced for Grade 1-3 learners.
+- PREFERRED VERBS for Knowledge: name, point to, tell, say, show, match, sort, group, count, pick, list, identify, recognise, describe (simple descriptions only).
+- PREFERRED VERBS for Skills: draw, colour, paint, cut, paste, collect, sort, group, observe, point, touch, feel, smell, taste, sing, clap, jump, move, play, model (with clay/plasticine), arrange, measure, pour, plant, water, feed, clean.
+- PREFERRED VERBS for Attitudes: enjoy, care for, share, help, take turns, show love, show respect, be kind, keep safe, be responsible, be thankful, appreciate.
+- PREFERRED VERBS for Learning Experiences: observe, explore, touch, feel, collect, sort, group, discuss (orally), sing, role-play, visit, walk around, draw, colour, play, share, take care of, demonstrate, point to, name, show.
+- Activities must be HANDS-ON, CONCRETE, and OBSERVABLE — no desk-based literacy tasks unless the subject specifically requires it.
+`;
+    verbRestrictionSw = `
+MUHIMU SANA — VIZUIZI VYA VITENZI KWA GREDI 1-3 (MASOMO YASIYO YA LUGHA):
+Hii ni ${grade} ${subject} (SI somo la lugha), kwa hivyo LAZIMA ufuate kanuni hizi:
+- USITUMIE "kuandika", "kusoma", "kufupisha", "kuunda maandishi", "kutunga" — hizi ni vitenzi vya lugha ambavyo havifai kwa ${subject}.
+- USITUMIE vitenzi vigumu kama "kuchambua", "kutathmini", "kukosoa", "kuchanganya mawazo" — ni vigumu sana kwa wanafunzi wa Gredi 1-3.
+- VITENZI BORA kwa Maarifa: kutaja, kuonyesha, kusema, kulinganisha, kupanga, kuhesabu, kuchagua, kutambua, kueleza (maelezo sahili tu).
+- VITENZI BORA kwa Ujuzi: kuchora, kupaka rangi, kukata, kubandika, kukusanya, kupanga, kuangalia, kugusa, kunusa, kuonja, kuimba, kupiga makofi, kuruka, kucheza, kutengeneza (kwa udongo), kupima, kumwagilia, kulisha, kusafisha.
+- VITENZI BORA kwa Mitazamo: kufurahia, kutunza, kushiriki, kusaidia, kubadilishana, kuonyesha upendo, kuheshimu, kuwa na huruma, kulinda, kuwajibika, kushukuru.
+- Shughuli lazima ziwe za VITENDO, ZINAZOONEKANA, na ZINAZOSHIKIKA — si kazi za kuandika.
+`;
+  }
+
   const systemPrompt = isSw
     ? `Wewe ni mtaalamu wa mtaala wa CBC Kenya (KICD). Unatengeneza Mpango wa Kazi rasmi ambao unafuata viwango vya KICD kwa usahihi.
 
