@@ -428,7 +428,49 @@ function validateAndSanitizeRows(
   rows = validateSLOAlignment(rows, officialOutcomes, isSw);
   // GUARDRAIL 11: Validate KSA structure and verb usage
   rows = validateKSAStructure(rows, isSw);
-
+  // GUARDRAIL 12: Replace inappropriate verbs for lower-primary non-language subjects
+  const gradeNum = parseInt(grade.replace("Grade ", ""));
+  const langSubjects = ["Kiswahili", "English Activities", "English", "Indigenous Language", "Arabic", "French", "German", "Mandarin"];
+  if (gradeNum >= 1 && gradeNum <= 3 && !langSubjects.includes(subject)) {
+    rows = rows.map((row, idx) => {
+      let slo = row.specificLearningOutcome;
+      let exp = row.learningExperiences;
+      const replacements: [RegExp, string][] = isSw
+        ? [
+            [/\bkuandika\b/gi, "kuchora"],
+            [/\bkusoma\b/gi, "kutazama"],
+            [/\bkufupisha\b/gi, "kutaja"],
+            [/\bkutunga\b/gi, "kuonyesha"],
+          ]
+        : [
+            [/\bwrite\b/gi, "draw"],
+            [/\bwriting\b/gi, "drawing"],
+            [/\bread\b/gi, "observe"],
+            [/\breading\b/gi, "observing"],
+            [/\bsummarize\b/gi, "name"],
+            [/\bsummarise\b/gi, "name"],
+            [/\bcreate\b/gi, "make"],
+            [/\bcreating\b/gi, "making"],
+            [/\bcompose\b/gi, "show"],
+            [/\banalyse\b/gi, "sort"],
+            [/\banalyze\b/gi, "sort"],
+            [/\bevaluate\b/gi, "show"],
+            [/\bsynthesize\b/gi, "group"],
+            [/\bhypothesize\b/gi, "guess"],
+            [/\bformulate\b/gi, "say"],
+            [/\bcompile\b/gi, "collect"],
+          ];
+      let changed = false;
+      for (const [pattern, replacement] of replacements) {
+        if (pattern.test(slo)) { slo = slo.replace(pattern, replacement); changed = true; }
+        if (pattern.test(exp)) { exp = exp.replace(pattern, replacement); changed = true; }
+      }
+      if (changed) {
+        console.warn(`Guardrail 12: Lesson ${idx + 1} — replaced inappropriate verbs for ${grade} ${subject}`);
+      }
+      return { ...row, specificLearningOutcome: slo, learningExperiences: exp };
+    });
+  }
   // Guardrail: deduplicate by SLO content but only if we'd still have enough rows
   const seen = new Set<string>();
   const deduped = rows.filter((row) => {
