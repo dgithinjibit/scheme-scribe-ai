@@ -77,6 +77,11 @@ const STRAND_TERM_RULES: Record<string, StrandTermRule> = {
     "Term 2": ["Performing"],
     "Term 3": ["Appreciation"],
   },
+  "English Activities": {
+    "Term 1": ["Listening and Speaking"],
+    "Term 2": ["Reading"],
+    "Term 3": ["Language Use", "Writing"],
+  },
 };
 
 const MATH_SUBJECT = "Mathematics";
