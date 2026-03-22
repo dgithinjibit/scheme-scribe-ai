@@ -636,24 +636,22 @@ Heshima, Uwajibikaji, Upendo, Umoja, Amani, Uadilifu, Uzalendo, Haki ya Kijamii.
 KANUNI MUHIMU:
 1. Tengeneza HASA somo ${batchLessons} kwa wanafunzi wa ${grade}.
 2. Kila somo liwe FUPI, sahili, na linalofaa umri wa watoto.
-3. **MATOKEA MAALUM YANAYOTARAJIWA** — Lazima ianze na "**Kufikia mwisho wa somo mwanafunzi aweze:**" kisha orodhesha matokeo 3-5 kwa kutumia alama ya dashi (-).
+3. **MATOKEO MAALUM YANAYOTARAJIWA** — Lazima ianze na "**Kufikia mwisho wa somo mwanafunzi aweze:**" kisha orodhesha matokeo 3-5 kwa kutumia alama ya dashi (-).
    - Tumia VITENZI VYA VITENDO ambavyo vinaweza kupimika tu. Usiwe na maneno kama "kuelewa" au "kujua" — badala yake tumia:
      * MAARIFA (Knowledge): kutambua, kutaja, kuorodhesha, kueleza, kufafanua, kulinganisha, kutofautisha
      * UJUZI (Skills): kutekeleza, kutumia, kujenga, kuonyesha, kusoma, kuandika, kuchora, kuhesabu, kupima, kutatua
      * MITAZAMO (Attitudes): kufurahia, kuheshimu, kuthamini, kushirikiana, kuzingatia, kuendeleza, kutetea
    - Kila tokeo liwe MAHUSUSI sana na linatokana na data rasmi ya KICD ikiwa imetolewa hapa chini.
-   
-4. **MAPENDEKEZO YA SHUGHULI ZA UFUNZAJI** — Lazima ianze na "**Mwanafunzi aweze:-**" kisha orodhesha shughuli 3-5 kwa kutumia alama ya dashi (-).
+   - USIBUNI au UTENGENEZE matokeo ambayo hayapo katika mfumo rasmi wa KICD.
+    
+4. **MAPENDEKEZO YA SHUGHULI ZA UJIFUNZAJI** — Lazima ianze na "**Mwanafunzi aweze:-**" kisha orodhesha shughuli 3-5 kwa kutumia alama ya dashi (-).
    - Shughuli ziwe MAHUSUSI na ZENYE VITENDO: kutathmini, kujadili, kutazama, kuchora, kuimba, kucheza, kuandika, kusoma, kutatua, kuorodhesha
    - Usiwe na maneno kama "kujifunza" — badala yake tumia shughuli zinazoonekana
-   - Tumia mapendekezo rasmi ya KICD yaliyo hapa chini kama chanzo
+   - Tumia mapendekezo rasmi ya KICD yaliyo hapa chini kama chanzo. USIBUNI shughuli mpya zinazozidi mfumo wa KICD.
    - Zingatia mazingira mbalimbali ya kujifunza (shuleni, nje, nyumbani)
-   
+    
 5. **SWALI DADISI** — Tumia swali rasmi la KICD lililotolewa, au unda swali linalofanana. Swali liwe sahili kwa umri wa mtoto.
-6. **MAREJELEO** — Lazima yawe MAHUSUSI na YENYE MAELEZO — si majina ya jumla tu. Kila rasilimali lazima ieleze NINI inajumuisha kuhusu somo hilo. Mfano:
-   - Badala ya "video" → "video ya matamshi sahihi ya maneno" au "video ya hadithi yenye maswali ya ufahamu"
-   - Badala ya "chati" → "chati ya ukutani yenye picha za vitu vinavyohusiana na mada"
-    - Badala ya "vitabu" → "${getKLBBookTitle(subject, grade)}, Kitabu cha Mwanafunzi"
+6. **MAREJELEO** — Lazima yawe MAHUSUSI na YENYE MAELEZO — si majina ya jumla tu.
     Daima anza na "${getKLBBookTitle(subject, grade)}" kisha ongeza rasilimali 2-4 mahususi zinazohusiana na matokeo ya somo.
 7. **TATHMINI** — Njia za kutathmini: "Kuuliza na kujibu maswali, uchunguzi" au ongeza "zoezi la kuandika, evaluation ya kazi, tathmini ya wenzao".
 8. **MAONI** — Daima "".
