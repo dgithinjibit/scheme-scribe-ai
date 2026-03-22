@@ -137,7 +137,7 @@ export function getSubStrandsForStrand(grade: string, subject: string, strandNam
 export const columnHeaders = {
   en: [
     "WK", "LSN", "Strand", "Sub-Strand",
-    "Specific Learning Outcomes", "Learning Experiences",
+    "Lesson Learning Outcomes", "Lesson Learning Experiences",
     "Key Inquiry Question", "Learning Resources",
     "Assessment", "Refl",
   ],
