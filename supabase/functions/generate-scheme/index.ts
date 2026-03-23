@@ -595,25 +595,46 @@ All content MUST be contextualized for the ${indigenousLanguage} language. This 
   let verbRestrictionSw = "";
   if (isLowerPrimary && !isLanguageSubject) {
     verbRestrictionEn = `
-CRITICAL — GRADE 1-3 NON-LANGUAGE VERB RESTRICTIONS:
-Since this is ${grade} ${subject} (NOT a language subject), you MUST follow these rules:
-- NEVER use "write", "read", "summarize", "create", "construct", "compose", "author", "draft", "compile", "formulate", "journal", "record in writing" — these are language-specific verbs inappropriate for ${subject}.
-- NEVER use complex/abstract verbs like "analyse", "evaluate", "critique", "synthesize", "hypothesize", "infer", "deduce" — these are too advanced for Grade 1-3 learners.
-- PREFERRED VERBS for Knowledge: name, point to, tell, say, show, match, sort, group, count, pick, list, identify, recognise, describe (simple descriptions only).
-- PREFERRED VERBS for Skills: draw, colour, paint, cut, paste, collect, sort, group, observe, point, touch, feel, smell, taste, sing, clap, jump, move, play, model (with clay/plasticine), arrange, measure, pour, plant, water, feed, clean.
-- PREFERRED VERBS for Attitudes: enjoy, care for, share, help, take turns, show love, show respect, be kind, keep safe, be responsible, be thankful, appreciate.
-- PREFERRED VERBS for Learning Experiences: observe, explore, touch, feel, collect, sort, group, discuss (orally), sing, role-play, visit, walk around, draw, colour, play, share, take care of, demonstrate, point to, name, show.
-- Activities must be HANDS-ON, CONCRETE, and OBSERVABLE — no desk-based literacy tasks unless the subject specifically requires it.
+CRITICAL — KSA VERB FRAMEWORK FOR ${grade} ${subject}:
+Since this is a non-language subject for lower primary, Lesson Learning Outcomes MUST use verbs from the official CBE Knowledge-Skills-Attitudes (KSA) framework. DO NOT invent informal phrases like "carry out" or "find out about".
+
+KNOWLEDGE (Cognitive) verbs — use for understanding/information outcomes:
+  identify, explain, describe, recognize, compare, classify, define, list, name, state, outline, summarize
+
+SKILLS (Psychomotor) verbs — use for practical/hands-on outcomes:
+  observe, record, differentiate, use, interpret, suggest, role-play, practice, conduct, demonstrate, participate, sort, measure, express, create, construct
+
+ATTITUDES (Affective) verbs — use for values/dispositions outcomes:
+  appreciate, value, show (curiosity/respect/responsibility), commit, prioritize, develop, care, respect, empathize
+
+RULES:
+- Each Lesson Learning Outcome MUST start with a proper KSA verb from the lists above.
+- NEVER use informal/vague phrases: "carry out", "find out", "look at", "do", "make", "get to know", "learn about", "talk about", "go through".
+- NEVER use literacy verbs for non-language subjects: "write", "read", "compose", "draft", "author", "journal".
+- NEVER use overly advanced verbs for Grade 1-3: "analyse", "evaluate", "critique", "synthesize", "hypothesize", "infer", "deduce".
+- For Grade 1-2, prefer simpler KSA verbs: identify, name, describe, observe, sort, demonstrate, appreciate, show, participate, practice.
+- For Grade 3, you may also use: explain, compare, classify, suggest, interpret, value, commit, recognize.
+- Lesson Learning Experiences should use activity verbs: observe, explore, collect, sort, group, discuss (orally), sing, role-play, visit, draw, colour, play, share, demonstrate, point to, name, show, participate, practice, measure.
+- All activities must be HANDS-ON, CONCRETE, and OBSERVABLE.
 `;
     verbRestrictionSw = `
-MUHIMU SANA — VIZUIZI VYA VITENZI KWA GREDI 1-3 (MASOMO YASIYO YA LUGHA):
-Hii ni ${grade} ${subject} (SI somo la lugha), kwa hivyo LAZIMA ufuate kanuni hizi:
-- USITUMIE "kuandika", "kusoma", "kufupisha", "kuunda maandishi", "kutunga" — hizi ni vitenzi vya lugha ambavyo havifai kwa ${subject}.
-- USITUMIE vitenzi vigumu kama "kuchambua", "kutathmini", "kukosoa", "kuchanganya mawazo" — ni vigumu sana kwa wanafunzi wa Gredi 1-3.
-- VITENZI BORA kwa Maarifa: kutaja, kuonyesha, kusema, kulinganisha, kupanga, kuhesabu, kuchagua, kutambua, kueleza (maelezo sahili tu).
-- VITENZI BORA kwa Ujuzi: kuchora, kupaka rangi, kukata, kubandika, kukusanya, kupanga, kuangalia, kugusa, kunusa, kuonja, kuimba, kupiga makofi, kuruka, kucheza, kutengeneza (kwa udongo), kupima, kumwagilia, kulisha, kusafisha.
-- VITENZI BORA kwa Mitazamo: kufurahia, kutunza, kushiriki, kusaidia, kubadilishana, kuonyesha upendo, kuheshimu, kuwa na huruma, kulinda, kuwajibika, kushukuru.
-- Shughuli lazima ziwe za VITENDO, ZINAZOONEKANA, na ZINAZOSHIKIKA — si kazi za kuandika.
+MUHIMU SANA — MFUMO WA VITENZI VYA KSA KWA ${grade} ${subject}:
+Hii ni somo lisilo la lugha kwa shule ya chini, kwa hivyo Matokeo ya Ujifunzaji LAZIMA yatumie vitenzi kutoka mfumo rasmi wa CBE wa Maarifa-Ujuzi-Mitazamo (KSA). USITUMIE maneno yasiyo rasmi kama "fanya", "jua kuhusu".
+
+MAARIFA (vitenzi vya kufahamu):
+  kutambua, kueleza, kuelezea, kutambua tofauti, kulinganisha, kupanga, kufafanua, kuorodhesha, kutaja, kusema, kufupisha
+
+UJUZI (vitenzi vya vitendo):
+  kuangalia, kurekodi, kutofautisha, kutumia, kufasiri, kupendekeza, kucheza jukumu, kufanya mazoezi, kuendesha, kuonyesha, kushiriki, kupanga, kupima, kueleza hisia, kuunda, kujenga
+
+MITAZAMO (vitenzi vya thamani):
+  kuthamini, kuthamini thamani, kuonyesha (udadisi/heshima/uwajibikaji), kujitolea, kuweka kipaumbele, kukuza, kutunza, kuheshimu, kuonyesha huruma
+
+KANUNI:
+- Kila Tokeo la Ujifunzaji LAZIMA lianze na kitenzi sahihi cha KSA.
+- USITUMIE maneno yasiyo rasmi: "fanya shughuli", "jua kuhusu", "angalia tu", "pita".
+- USITUMIE vitenzi vya lugha: "kuandika", "kusoma", "kutunga".
+- Shughuli lazima ziwe za VITENDO, ZINAZOONEKANA, na ZINAZOSHIKIKA.
 `;
   }
 
