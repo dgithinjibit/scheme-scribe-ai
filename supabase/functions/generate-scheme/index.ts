@@ -738,11 +738,14 @@ Heshima, Uwajibikaji, Upendo, Umoja, Amani, Uadilifu, Uzalendo, Haki ya Kijamii.
 KANUNI MUHIMU:
 1. Tengeneza HASA somo ${batchLessons} kwa wanafunzi wa ${grade}.
 2. Kila somo liwe FUPI, sahili, na linalofaa umri wa watoto.
-3. **MATOKEO MAALUM YANAYOTARAJIWA** — Lazima ianze na "**Kufikia mwisho wa somo mwanafunzi aweze:**" kisha orodhesha matokeo 3-5 kwa kutumia alama ya dashi (-).
-   - Tumia VITENZI VYA VITENDO ambavyo vinaweza kupimika tu. Usiwe na maneno kama "kuelewa" au "kujua" — badala yake tumia:
-     * MAARIFA (Knowledge): kutambua, kutaja, kuorodhesha, kueleza, kufafanua, kulinganisha, kutofautisha
-     * UJUZI (Skills): kutekeleza, kutumia, kujenga, kuonyesha, kusoma, kuandika, kuchora, kuhesabu, kupima, kutatua
-     * MITAZAMO (Attitudes): kufurahia, kuheshimu, kuthamini, kushirikiana, kuzingatia, kuendeleza, kutetea
+3. **MATOKEO MAALUM YANAYOTARAJIWA** — Lazima ianze na "**Kufikia mwisho wa somo mwanafunzi aweze:**" kisha orodhesha matokeo HASA 3 kwa kutumia alama ya dashi (-), kila moja kutoka eneo moja la KSA KWA MPANGILIO HUU:
+   - Tokeo la 1 = MAARIFA TU. Lazima lianze na kitenzi cha maarifa: kutambua, kutaja, kuorodhesha, kueleza, kufafanua, kulinganisha, kutofautisha, kuelezea, kubainisha.
+     MARUFUKU kwa tokeo la 1: kutekeleza, kutumia, kuonyesha, kufurahia, kuthamini, kuheshimu.
+   - Tokeo la 2 = UJUZI TU. Lazima lianze na kitenzi cha ujuzi: kutekeleza, kutumia, kujenga, kuonyesha, kuchora, kuhesabu, kupima, kutatua, kuimba, kushiriki, kufanya mazoezi, kupanga, kucheza jukumu, kuunda.
+     MARUFUKU kwa tokeo la 2: kutambua, kutaja, kueleza, kufurahia, kuthamini.
+   - Tokeo la 3 = MITAZAMO TU. Lazima lianze na kitenzi cha mitazamo: kufurahia, kuheshimu, kuthamini, kushirikiana, kuzingatia, kuendeleza, kutetea, kujali, kujitolea.
+     MARUFUKU kwa tokeo la 3: kutambua, kutaja, kueleza, kutekeleza, kutumia, kuonyesha.
+   - HILI HALIWEZI KUBADILISHWA. Kila tokeo LAZIMA liwe katika mpangilio huu.
    - Kila tokeo liwe MAHUSUSI sana na linatokana na data rasmi ya KICD ikiwa imetolewa hapa chini.
    - USIBUNI au UTENGENEZE matokeo ambayo hayapo katika mfumo rasmi wa KICD.
     

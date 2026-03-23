@@ -1,6 +1,3 @@
-# Memory: index.md
-Updated: now
-
 CBC Kenyan scheme of work generator - design constraints and key decisions
 
 ## Column Headers
@@ -27,6 +24,7 @@ CBC Kenyan scheme of work generator - design constraints and key decisions
 - Attitudes verbs: appreciate, value, show, commit, prioritize, develop, care, respect, empathize
 - Grade 1-2 prefer simpler: identify, name, describe, observe, sort, demonstrate, appreciate, show, participate, practice
 - Grade 3 may also use: explain, compare, classify, suggest, interpret, value, commit, recognize
+- RIGID KSA ordering: a)=Knowledge verb ONLY, b)=Skills verb ONLY, c)=Attitudes verb ONLY. Non-negotiable.
 
 ## Key Rules
 - English: Each lesson = ONE letter sound. Never lump multiple letter sounds.
@@ -36,3 +34,6 @@ CBC Kenyan scheme of work generator - design constraints and key decisions
 
 ## Feedback System
 - Rate (thumbs up/down) + regenerate with feedback text stored in scheme_feedback table
+
+## Removed
+- Firecrawl connector disconnected and scrape-schemes edge function deleted (not needed)
