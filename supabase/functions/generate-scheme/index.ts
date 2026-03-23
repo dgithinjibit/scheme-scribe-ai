@@ -349,77 +349,141 @@ function validateSLOAlignment(
   });
 }
 
-/** GUARDRAIL 11: Validate KSA (Knowledge, Skills, Attitudes) structure in SLOs.
- *  Each SLO MUST contain all three domains with proper CBC verbs.
- *  If any domain is missing or uses weak verbs, fix it. */
+/** GUARDRAIL 11: RIGID KSA enforcement — a)=Knowledge verb, b)=Skills verb, c)=Attitudes verb.
+ *  If any slot uses the wrong domain verb, swap it to the correct slot or rewrite. */
 function validateKSAStructure(rows: SchemeRow[], isSw: boolean): SchemeRow[] {
-  // Official CBC verb lists
-  const knowledgeVerbs = isSw
-    ? ["kutambua", "kutaja", "kuorodhesha", "kueleza", "kufafanua", "kulinganisha", "kutofautisha", "kuelezea", "kubainisha"]
-    : ["identify", "define", "describe", "name", "outline", "state", "recognize", "explain", "list", "label", "recall", "summarize", "distinguish", "illustrate"];
-  
-  const skillsVerbs = isSw
-    ? ["kutekeleza", "kutumia", "kujenga", "kuonyesha", "kusoma", "kuandika", "kuchora", "kuhesabu", "kupima", "kutatua", "kuimba", "kukata", "kupaka"]
-    : ["demonstrate", "perform", "practice", "model", "create", "draw", "calculate", "manipulate", "use", "collaborate", "execute", "construct", "write", "sing", "read", "measure", "sketch", "solve", "trace", "cut", "colour", "paint"];
-  
-  const attitudeVerbs = isSw
-    ? ["kufurahia", "kuheshimu", "kuthamini", "kushirikiana", "kuzingatia", "kuendeleza", "kutetea", "kujali"]
-    : ["appreciate", "value", "respect", "care", "demonstrate responsibility", "acknowledge", "enjoy", "uphold", "collaborate", "persist", "commit", "adhere", "advocate"];
+  const knowledgeVerbsEn = ["identify", "define", "describe", "name", "outline", "state", "recognize", "explain", "list", "label", "recall", "summarize", "distinguish", "illustrate", "compare", "classify"];
+  const skillsVerbsEn = ["demonstrate", "perform", "practice", "practise", "model", "draw", "calculate", "manipulate", "use", "collaborate", "execute", "construct", "sing", "measure", "sketch", "solve", "trace", "cut", "colour", "paint", "observe", "record", "differentiate", "interpret", "suggest", "role-play", "conduct", "participate", "sort", "express", "create", "conserve"];
+  const attitudeVerbsEn = ["appreciate", "value", "show", "care", "demonstrate responsibility", "acknowledge", "enjoy", "uphold", "persist", "commit", "adhere", "advocate", "respect", "empathize", "prioritize", "develop"];
 
-  // Weak/banned verbs that should never appear as primary SLO verbs
+  const knowledgeVerbsSw = ["kutambua", "kutaja", "kuorodhesha", "kueleza", "kufafanua", "kulinganisha", "kutofautisha", "kuelezea", "kubainisha", "kufafanua"];
+  const skillsVerbsSw = ["kutekeleza", "kutumia", "kujenga", "kuonyesha", "kuchora", "kuhesabu", "kupima", "kutatua", "kuimba", "kukata", "kupaka", "kushiriki", "kufanya mazoezi", "kupanga", "kurekodi", "kucheza jukumu", "kuunda"];
+  const attitudeVerbsSw = ["kufurahia", "kuheshimu", "kuthamini", "kushirikiana", "kuzingatia", "kuendeleza", "kutetea", "kujali", "kujitolea", "kuweka kipaumbele"];
+
   const bannedVerbs = isSw
     ? ["kujua", "kuelewa"]
-    : ["know", "understand", "be aware", "learn to", "have a positive attitude"];
+    : ["know", "understand", "be aware", "learn to", "have a positive attitude", "carry out", "find out", "look at", "get to know", "learn about", "talk about", "go through"];
 
-  function hasVerb(text: string, verbs: string[]): boolean {
-    const lower = text.toLowerCase();
-    return verbs.some(v => lower.includes(v));
+  const kVerbs = isSw ? knowledgeVerbsSw : knowledgeVerbsEn;
+  const sVerbs = isSw ? skillsVerbsSw : skillsVerbsEn;
+  const aVerbs = isSw ? attitudeVerbsSw : attitudeVerbsEn;
+
+  function startsWithVerb(text: string, verbs: string[]): boolean {
+    const lower = text.toLowerCase().trim();
+    return verbs.some(v => lower.startsWith(v));
   }
 
-  function hasBannedVerb(text: string): boolean {
+  function containsBannedVerb(text: string): string | null {
     const lower = text.toLowerCase();
-    return bannedVerbs.some(v => lower.includes(v));
+    for (const v of bannedVerbs) {
+      if (lower.includes(v)) return v;
+    }
+    return null;
+  }
+
+  function replaceBannedVerb(text: string): string {
+    let fixed = text;
+    if (!isSw) {
+      fixed = fixed.replace(/\bknow\b/gi, "identify");
+      fixed = fixed.replace(/\bunderstand\b/gi, "describe");
+      fixed = fixed.replace(/\bbe aware of\b/gi, "recognize");
+      fixed = fixed.replace(/\blearn to\b/gi, "");
+      fixed = fixed.replace(/\bhave a positive attitude\b/gi, "appreciate");
+      fixed = fixed.replace(/\bcarry out\b/gi, "practice");
+      fixed = fixed.replace(/\bfind out\b/gi, "identify");
+      fixed = fixed.replace(/\blook at\b/gi, "observe");
+      fixed = fixed.replace(/\bget to know\b/gi, "recognize");
+      fixed = fixed.replace(/\blearn about\b/gi, "identify");
+      fixed = fixed.replace(/\btalk about\b/gi, "describe");
+      fixed = fixed.replace(/\bgo through\b/gi, "explore");
+    } else {
+      fixed = fixed.replace(/\bkujua\b/gi, "kutambua");
+      fixed = fixed.replace(/\bkuelewa\b/gi, "kueleza");
+    }
+    return fixed;
   }
 
   return rows.map((row, idx) => {
     const slo = row.specificLearningOutcome;
     if (!slo || slo.trim().length < 20) return row;
 
-    // Check for banned verbs and replace them
-    if (hasBannedVerb(slo)) {
-      console.warn(`Guardrail 11: Lesson ${idx + 1} SLO contains banned verbs (know/understand). Flagged.`);
-      let fixed = slo;
-      if (!isSw) {
-        fixed = fixed.replace(/\bknow\b/gi, "identify");
-        fixed = fixed.replace(/\bunderstand\b/gi, "describe");
-        fixed = fixed.replace(/\bbe aware of\b/gi, "recognize");
-        fixed = fixed.replace(/\blearn to\b/gi, "");
-        fixed = fixed.replace(/\bhave a positive attitude\b/gi, "appreciate");
-      } else {
-        fixed = fixed.replace(/\bkujua\b/gi, "kutambua");
-        fixed = fixed.replace(/\bkuelewa\b/gi, "kueleza");
+    // Extract the 3 parts (a, b, c for English; dashes for Kiswahili)
+    let parts: string[] = [];
+    if (isSw) {
+      const lines = slo.split("\n").filter(l => l.trim().startsWith("-"));
+      parts = lines.map(l => l.replace(/^-\s*/, "").trim());
+    } else {
+      const aMatch = slo.match(/a\)\s*(.+?)(?=\nb\)|$)/s);
+      const bMatch = slo.match(/b\)\s*(.+?)(?=\nc\)|$)/s);
+      const cMatch = slo.match(/c\)\s*(.+)/s);
+      if (aMatch) parts.push(aMatch[1].trim());
+      if (bMatch) parts.push(bMatch[1].trim());
+      if (cMatch) parts.push(cMatch[1].trim());
+    }
+
+    if (parts.length < 3) return row; // Can't validate incomplete SLOs
+
+    // Replace banned verbs in each part first
+    parts = parts.map(p => {
+      const banned = containsBannedVerb(p);
+      if (banned) {
+        console.warn(`Guardrail 11: Lesson ${idx + 1} — banned verb "${banned}" found, replacing.`);
+        return replaceBannedVerb(p);
       }
-      return { ...row, specificLearningOutcome: fixed };
+      return p;
+    });
+
+    // Now validate KSA ordering: a=Knowledge, b=Skills, c=Attitudes
+    const aIsK = startsWithVerb(parts[0], kVerbs);
+    const aIsS = startsWithVerb(parts[0], sVerbs);
+    const aIsA = startsWithVerb(parts[0], aVerbs);
+    const bIsK = startsWithVerb(parts[1], kVerbs);
+    const bIsS = startsWithVerb(parts[1], sVerbs);
+    const bIsA = startsWithVerb(parts[1], aVerbs);
+    const cIsK = startsWithVerb(parts[2], kVerbs);
+    const cIsS = startsWithVerb(parts[2], sVerbs);
+    const cIsA = startsWithVerb(parts[2], aVerbs);
+
+    // If all in correct slots, keep as-is
+    if (aIsK && bIsS && cIsA) {
+      // Reassemble with cleaned parts
+      return { ...row, specificLearningOutcome: reassembleSLO(slo, parts, isSw) };
     }
 
-    // Check all three KSA domains are present
-    const hasK = hasVerb(slo, knowledgeVerbs);
-    const hasS = hasVerb(slo, skillsVerbs);
-    const hasA = hasVerb(slo, attitudeVerbs);
+    // Try to rearrange: find the Knowledge part, Skills part, Attitudes part
+    let kPart = "", sPart = "", aPart = "";
+    const allParts = [...parts];
 
-    if (hasK && hasS && hasA) return row; // All three domains present
-
-    // If missing domains, log a warning (the format guardrail already enforces a/b/c structure)
-    if (!hasK || !hasS || !hasA) {
-      const missing = [];
-      if (!hasK) missing.push("Knowledge");
-      if (!hasS) missing.push("Skills");
-      if (!hasA) missing.push("Attitudes");
-      console.warn(`Guardrail 11: Lesson ${idx + 1} SLO may be missing ${missing.join(", ")} domain verbs.`);
+    // Find each domain
+    for (const p of allParts) {
+      if (!kPart && startsWithVerb(p, kVerbs)) kPart = p;
+      else if (!sPart && startsWithVerb(p, sVerbs)) sPart = p;
+      else if (!aPart && startsWithVerb(p, aVerbs)) aPart = p;
     }
 
-    return row;
+    // Assign unmatched parts to empty slots
+    const unmatched = allParts.filter(p => p !== kPart && p !== sPart && p !== aPart);
+    if (!kPart && unmatched.length > 0) kPart = unmatched.shift()!;
+    if (!sPart && unmatched.length > 0) sPart = unmatched.shift()!;
+    if (!aPart && unmatched.length > 0) aPart = unmatched.shift()!;
+
+    if (kPart !== parts[0] || sPart !== parts[1] || aPart !== parts[2]) {
+      console.warn(`Guardrail 11: Lesson ${idx + 1} — KSA order was wrong. Rearranged: K="${kPart.substring(0, 30)}", S="${sPart.substring(0, 30)}", A="${aPart.substring(0, 30)}"`);
+    }
+
+    const newSLO = reassembleSLO(slo, [kPart || parts[0], sPart || parts[1], aPart || parts[2]], isSw);
+    return { ...row, specificLearningOutcome: newSLO };
   });
+}
+
+function reassembleSLO(originalSLO: string, parts: string[], isSw: boolean): string {
+  if (isSw) {
+    const header = originalSLO.split("\n")[0];
+    return `${header}\n-${parts[0]}\n-${parts[1]}\n-${parts[2]}`;
+  }
+  const headerMatch = originalSLO.match(/^(.*?)\n\s*a\)/s);
+  const header = headerMatch ? headerMatch[1].trim() : "By the end of the lesson, the learner should be able to:";
+  return `${header}\na) ${parts[0]}\nb) ${parts[1]}\nc) ${parts[2]}`;
 }
 
 /**
@@ -674,11 +738,14 @@ Heshima, Uwajibikaji, Upendo, Umoja, Amani, Uadilifu, Uzalendo, Haki ya Kijamii.
 KANUNI MUHIMU:
 1. Tengeneza HASA somo ${batchLessons} kwa wanafunzi wa ${grade}.
 2. Kila somo liwe FUPI, sahili, na linalofaa umri wa watoto.
-3. **MATOKEO MAALUM YANAYOTARAJIWA** — Lazima ianze na "**Kufikia mwisho wa somo mwanafunzi aweze:**" kisha orodhesha matokeo 3-5 kwa kutumia alama ya dashi (-).
-   - Tumia VITENZI VYA VITENDO ambavyo vinaweza kupimika tu. Usiwe na maneno kama "kuelewa" au "kujua" — badala yake tumia:
-     * MAARIFA (Knowledge): kutambua, kutaja, kuorodhesha, kueleza, kufafanua, kulinganisha, kutofautisha
-     * UJUZI (Skills): kutekeleza, kutumia, kujenga, kuonyesha, kusoma, kuandika, kuchora, kuhesabu, kupima, kutatua
-     * MITAZAMO (Attitudes): kufurahia, kuheshimu, kuthamini, kushirikiana, kuzingatia, kuendeleza, kutetea
+3. **MATOKEO MAALUM YANAYOTARAJIWA** — Lazima ianze na "**Kufikia mwisho wa somo mwanafunzi aweze:**" kisha orodhesha matokeo HASA 3 kwa kutumia alama ya dashi (-), kila moja kutoka eneo moja la KSA KWA MPANGILIO HUU:
+   - Tokeo la 1 = MAARIFA TU. Lazima lianze na kitenzi cha maarifa: kutambua, kutaja, kuorodhesha, kueleza, kufafanua, kulinganisha, kutofautisha, kuelezea, kubainisha.
+     MARUFUKU kwa tokeo la 1: kutekeleza, kutumia, kuonyesha, kufurahia, kuthamini, kuheshimu.
+   - Tokeo la 2 = UJUZI TU. Lazima lianze na kitenzi cha ujuzi: kutekeleza, kutumia, kujenga, kuonyesha, kuchora, kuhesabu, kupima, kutatua, kuimba, kushiriki, kufanya mazoezi, kupanga, kucheza jukumu, kuunda.
+     MARUFUKU kwa tokeo la 2: kutambua, kutaja, kueleza, kufurahia, kuthamini.
+   - Tokeo la 3 = MITAZAMO TU. Lazima lianze na kitenzi cha mitazamo: kufurahia, kuheshimu, kuthamini, kushirikiana, kuzingatia, kuendeleza, kutetea, kujali, kujitolea.
+     MARUFUKU kwa tokeo la 3: kutambua, kutaja, kueleza, kutekeleza, kutumia, kuonyesha.
+   - HILI HALIWEZI KUBADILISHWA. Kila tokeo LAZIMA liwe katika mpangilio huu.
    - Kila tokeo liwe MAHUSUSI sana na linatokana na data rasmi ya KICD ikiwa imetolewa hapa chini.
    - USIBUNI au UTENGENEZE matokeo ambayo hayapo katika mfumo rasmi wa KICD.
     
@@ -733,12 +800,20 @@ Life Skills, Health, Environmental Conservation, Safety, Human Rights, Citizensh
 RULES:
 1. Generate EXACTLY ${batchLessons} lesson rows for ${grade} learners.
 2. Keep everything SIMPLE, age-appropriate, and inclusive of diverse learning needs and environments.
-3. **Lesson Learning Outcomes** — EXACTLY 3 outcomes per lesson, one from each KSA domain. Use the official KICD outcomes below as source material — do NOT invent new ones.
+3. **Lesson Learning Outcomes** — EXACTLY 3 outcomes per lesson, strictly one from each KSA domain IN THIS EXACT ORDER. Use the official KICD outcomes below as source material — do NOT invent new ones.
    MANDATORY FORMAT — no other format is acceptable:
-   "By the end of the lesson, the learner should be able to:\\na) [Knowledge outcome]\\nb) [Skills outcome]\\nc) [Attitudes/Values outcome]"
-   - a) Knowledge (The "What" — facts, concepts, information): Use MEASURABLE verbs ONLY — Identify, Define, Describe, Name, Outline, State, Recognize, Explain, List, Label, Recall, Distinguish, Illustrate. NEVER use "know", "understand", or "be aware of".
-   - b) Skills (The "How" — practical application): Use verbs requiring a TANGIBLE output — Demonstrate, Perform, Practice, Model, Draw, Calculate, Manipulate, Use, Collaborate, Execute, Construct, Sing, Measure, Sketch, Solve, Trace, Cut, Colour, Paint. NEVER use "learn to...".
-   - c) Attitudes/Values (The "Value/Belief" — values and viewpoints): Link to OBSERVABLE behaviour — Appreciate, Value, Show respect, Care for, Demonstrate responsibility, Acknowledge, Enjoy, Display integrity, Uphold, Persist, Commit, Adhere, Advocate. Reference core values: respect, responsibility, love, unity, peace, integrity, patriotism. NEVER use "have a positive attitude".
+   "By the end of the lesson, the learner should be able to:\\na) [Knowledge outcome — MUST start with a Knowledge verb]\\nb) [Skills outcome — MUST start with a Skills verb]\\nc) [Attitudes/Values outcome — MUST start with an Attitudes verb]"
+
+   a) = KNOWLEDGE ONLY (The "What"). The FIRST WORD must be one of these verbs: identify, define, describe, name, outline, state, recognize, explain, list, label, recall, compare, classify, distinguish, illustrate, summarize.
+      BANNED from a): practice, demonstrate, draw, create, observe, appreciate, value, show, enjoy, carry out, find out, learn about.
+
+   b) = SKILLS ONLY (The "How"). The FIRST WORD must be one of these verbs: demonstrate, perform, practice, practise, draw, calculate, manipulate, use, construct, sing, measure, sketch, solve, trace, cut, colour, paint, observe, record, sort, conduct, participate, role-play, conserve, create, model, explore.
+      BANNED from b): identify, define, describe, name, state, explain, list, appreciate, value, enjoy, know, understand.
+
+   c) = ATTITUDES/VALUES ONLY (The "Value/Belief"). The FIRST WORD must be one of these verbs: appreciate, value, show, care, enjoy, uphold, persist, commit, respect, empathize, prioritize, develop, acknowledge.
+      BANNED from c): identify, describe, name, explain, list, practice, demonstrate, draw, create, observe, carry out.
+
+   THIS IS NON-NEGOTIABLE. If a) starts with "practice" or "observe" — THAT IS WRONG. If c) starts with "identify" or "describe" — THAT IS WRONG.
    Every lesson MUST have exactly a), b), c) — one knowledge, one skill, one attitude. No more, no less.
 4. **Lesson Learning Experiences**: MUST begin with "Learner is guided to:" followed by EXACTLY 4 lettered activities, one for each domain plus application.
    - a) must relate to the KNOWLEDGE outcome (a) — e.g. if SLO a) says "identify locally available materials used as beddings", then experience a) should be "discuss locally available materials used as beddings"
