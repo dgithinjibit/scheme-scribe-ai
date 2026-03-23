@@ -349,77 +349,141 @@ function validateSLOAlignment(
   });
 }
 
-/** GUARDRAIL 11: Validate KSA (Knowledge, Skills, Attitudes) structure in SLOs.
- *  Each SLO MUST contain all three domains with proper CBC verbs.
- *  If any domain is missing or uses weak verbs, fix it. */
+/** GUARDRAIL 11: RIGID KSA enforcement — a)=Knowledge verb, b)=Skills verb, c)=Attitudes verb.
+ *  If any slot uses the wrong domain verb, swap it to the correct slot or rewrite. */
 function validateKSAStructure(rows: SchemeRow[], isSw: boolean): SchemeRow[] {
-  // Official CBC verb lists
-  const knowledgeVerbs = isSw
-    ? ["kutambua", "kutaja", "kuorodhesha", "kueleza", "kufafanua", "kulinganisha", "kutofautisha", "kuelezea", "kubainisha"]
-    : ["identify", "define", "describe", "name", "outline", "state", "recognize", "explain", "list", "label", "recall", "summarize", "distinguish", "illustrate"];
-  
-  const skillsVerbs = isSw
-    ? ["kutekeleza", "kutumia", "kujenga", "kuonyesha", "kusoma", "kuandika", "kuchora", "kuhesabu", "kupima", "kutatua", "kuimba", "kukata", "kupaka"]
-    : ["demonstrate", "perform", "practice", "model", "create", "draw", "calculate", "manipulate", "use", "collaborate", "execute", "construct", "write", "sing", "read", "measure", "sketch", "solve", "trace", "cut", "colour", "paint"];
-  
-  const attitudeVerbs = isSw
-    ? ["kufurahia", "kuheshimu", "kuthamini", "kushirikiana", "kuzingatia", "kuendeleza", "kutetea", "kujali"]
-    : ["appreciate", "value", "respect", "care", "demonstrate responsibility", "acknowledge", "enjoy", "uphold", "collaborate", "persist", "commit", "adhere", "advocate"];
+  const knowledgeVerbsEn = ["identify", "define", "describe", "name", "outline", "state", "recognize", "explain", "list", "label", "recall", "summarize", "distinguish", "illustrate", "compare", "classify"];
+  const skillsVerbsEn = ["demonstrate", "perform", "practice", "practise", "model", "draw", "calculate", "manipulate", "use", "collaborate", "execute", "construct", "sing", "measure", "sketch", "solve", "trace", "cut", "colour", "paint", "observe", "record", "differentiate", "interpret", "suggest", "role-play", "conduct", "participate", "sort", "express", "create", "conserve"];
+  const attitudeVerbsEn = ["appreciate", "value", "show", "care", "demonstrate responsibility", "acknowledge", "enjoy", "uphold", "persist", "commit", "adhere", "advocate", "respect", "empathize", "prioritize", "develop"];
 
-  // Weak/banned verbs that should never appear as primary SLO verbs
+  const knowledgeVerbsSw = ["kutambua", "kutaja", "kuorodhesha", "kueleza", "kufafanua", "kulinganisha", "kutofautisha", "kuelezea", "kubainisha", "kufafanua"];
+  const skillsVerbsSw = ["kutekeleza", "kutumia", "kujenga", "kuonyesha", "kuchora", "kuhesabu", "kupima", "kutatua", "kuimba", "kukata", "kupaka", "kushiriki", "kufanya mazoezi", "kupanga", "kurekodi", "kucheza jukumu", "kuunda"];
+  const attitudeVerbsSw = ["kufurahia", "kuheshimu", "kuthamini", "kushirikiana", "kuzingatia", "kuendeleza", "kutetea", "kujali", "kujitolea", "kuweka kipaumbele"];
+
   const bannedVerbs = isSw
     ? ["kujua", "kuelewa"]
-    : ["know", "understand", "be aware", "learn to", "have a positive attitude"];
+    : ["know", "understand", "be aware", "learn to", "have a positive attitude", "carry out", "find out", "look at", "get to know", "learn about", "talk about", "go through"];
 
-  function hasVerb(text: string, verbs: string[]): boolean {
-    const lower = text.toLowerCase();
-    return verbs.some(v => lower.includes(v));
+  const kVerbs = isSw ? knowledgeVerbsSw : knowledgeVerbsEn;
+  const sVerbs = isSw ? skillsVerbsSw : skillsVerbsEn;
+  const aVerbs = isSw ? attitudeVerbsSw : attitudeVerbsEn;
+
+  function startsWithVerb(text: string, verbs: string[]): boolean {
+    const lower = text.toLowerCase().trim();
+    return verbs.some(v => lower.startsWith(v));
   }
 
-  function hasBannedVerb(text: string): boolean {
+  function containsBannedVerb(text: string): string | null {
     const lower = text.toLowerCase();
-    return bannedVerbs.some(v => lower.includes(v));
+    for (const v of bannedVerbs) {
+      if (lower.includes(v)) return v;
+    }
+    return null;
+  }
+
+  function replaceBannedVerb(text: string): string {
+    let fixed = text;
+    if (!isSw) {
+      fixed = fixed.replace(/\bknow\b/gi, "identify");
+      fixed = fixed.replace(/\bunderstand\b/gi, "describe");
+      fixed = fixed.replace(/\bbe aware of\b/gi, "recognize");
+      fixed = fixed.replace(/\blearn to\b/gi, "");
+      fixed = fixed.replace(/\bhave a positive attitude\b/gi, "appreciate");
+      fixed = fixed.replace(/\bcarry out\b/gi, "practice");
+      fixed = fixed.replace(/\bfind out\b/gi, "identify");
+      fixed = fixed.replace(/\blook at\b/gi, "observe");
+      fixed = fixed.replace(/\bget to know\b/gi, "recognize");
+      fixed = fixed.replace(/\blearn about\b/gi, "identify");
+      fixed = fixed.replace(/\btalk about\b/gi, "describe");
+      fixed = fixed.replace(/\bgo through\b/gi, "explore");
+    } else {
+      fixed = fixed.replace(/\bkujua\b/gi, "kutambua");
+      fixed = fixed.replace(/\bkuelewa\b/gi, "kueleza");
+    }
+    return fixed;
   }
 
   return rows.map((row, idx) => {
     const slo = row.specificLearningOutcome;
     if (!slo || slo.trim().length < 20) return row;
 
-    // Check for banned verbs and replace them
-    if (hasBannedVerb(slo)) {
-      console.warn(`Guardrail 11: Lesson ${idx + 1} SLO contains banned verbs (know/understand). Flagged.`);
-      let fixed = slo;
-      if (!isSw) {
-        fixed = fixed.replace(/\bknow\b/gi, "identify");
-        fixed = fixed.replace(/\bunderstand\b/gi, "describe");
-        fixed = fixed.replace(/\bbe aware of\b/gi, "recognize");
-        fixed = fixed.replace(/\blearn to\b/gi, "");
-        fixed = fixed.replace(/\bhave a positive attitude\b/gi, "appreciate");
-      } else {
-        fixed = fixed.replace(/\bkujua\b/gi, "kutambua");
-        fixed = fixed.replace(/\bkuelewa\b/gi, "kueleza");
+    // Extract the 3 parts (a, b, c for English; dashes for Kiswahili)
+    let parts: string[] = [];
+    if (isSw) {
+      const lines = slo.split("\n").filter(l => l.trim().startsWith("-"));
+      parts = lines.map(l => l.replace(/^-\s*/, "").trim());
+    } else {
+      const aMatch = slo.match(/a\)\s*(.+?)(?=\nb\)|$)/s);
+      const bMatch = slo.match(/b\)\s*(.+?)(?=\nc\)|$)/s);
+      const cMatch = slo.match(/c\)\s*(.+)/s);
+      if (aMatch) parts.push(aMatch[1].trim());
+      if (bMatch) parts.push(bMatch[1].trim());
+      if (cMatch) parts.push(cMatch[1].trim());
+    }
+
+    if (parts.length < 3) return row; // Can't validate incomplete SLOs
+
+    // Replace banned verbs in each part first
+    parts = parts.map(p => {
+      const banned = containsBannedVerb(p);
+      if (banned) {
+        console.warn(`Guardrail 11: Lesson ${idx + 1} — banned verb "${banned}" found, replacing.`);
+        return replaceBannedVerb(p);
       }
-      return { ...row, specificLearningOutcome: fixed };
+      return p;
+    });
+
+    // Now validate KSA ordering: a=Knowledge, b=Skills, c=Attitudes
+    const aIsK = startsWithVerb(parts[0], kVerbs);
+    const aIsS = startsWithVerb(parts[0], sVerbs);
+    const aIsA = startsWithVerb(parts[0], aVerbs);
+    const bIsK = startsWithVerb(parts[1], kVerbs);
+    const bIsS = startsWithVerb(parts[1], sVerbs);
+    const bIsA = startsWithVerb(parts[1], aVerbs);
+    const cIsK = startsWithVerb(parts[2], kVerbs);
+    const cIsS = startsWithVerb(parts[2], sVerbs);
+    const cIsA = startsWithVerb(parts[2], aVerbs);
+
+    // If all in correct slots, keep as-is
+    if (aIsK && bIsS && cIsA) {
+      // Reassemble with cleaned parts
+      return { ...row, specificLearningOutcome: reassembleSLO(slo, parts, isSw) };
     }
 
-    // Check all three KSA domains are present
-    const hasK = hasVerb(slo, knowledgeVerbs);
-    const hasS = hasVerb(slo, skillsVerbs);
-    const hasA = hasVerb(slo, attitudeVerbs);
+    // Try to rearrange: find the Knowledge part, Skills part, Attitudes part
+    let kPart = "", sPart = "", aPart = "";
+    const allParts = [...parts];
 
-    if (hasK && hasS && hasA) return row; // All three domains present
-
-    // If missing domains, log a warning (the format guardrail already enforces a/b/c structure)
-    if (!hasK || !hasS || !hasA) {
-      const missing = [];
-      if (!hasK) missing.push("Knowledge");
-      if (!hasS) missing.push("Skills");
-      if (!hasA) missing.push("Attitudes");
-      console.warn(`Guardrail 11: Lesson ${idx + 1} SLO may be missing ${missing.join(", ")} domain verbs.`);
+    // Find each domain
+    for (const p of allParts) {
+      if (!kPart && startsWithVerb(p, kVerbs)) kPart = p;
+      else if (!sPart && startsWithVerb(p, sVerbs)) sPart = p;
+      else if (!aPart && startsWithVerb(p, aVerbs)) aPart = p;
     }
 
-    return row;
+    // Assign unmatched parts to empty slots
+    const unmatched = allParts.filter(p => p !== kPart && p !== sPart && p !== aPart);
+    if (!kPart && unmatched.length > 0) kPart = unmatched.shift()!;
+    if (!sPart && unmatched.length > 0) sPart = unmatched.shift()!;
+    if (!aPart && unmatched.length > 0) aPart = unmatched.shift()!;
+
+    if (kPart !== parts[0] || sPart !== parts[1] || aPart !== parts[2]) {
+      console.warn(`Guardrail 11: Lesson ${idx + 1} — KSA order was wrong. Rearranged: K="${kPart.substring(0, 30)}", S="${sPart.substring(0, 30)}", A="${aPart.substring(0, 30)}"`);
+    }
+
+    const newSLO = reassembleSLO(slo, [kPart || parts[0], sPart || parts[1], aPart || parts[2]], isSw);
+    return { ...row, specificLearningOutcome: newSLO };
   });
+}
+
+function reassembleSLO(originalSLO: string, parts: string[], isSw: boolean): string {
+  if (isSw) {
+    const header = originalSLO.split("\n")[0];
+    return `${header}\n-${parts[0]}\n-${parts[1]}\n-${parts[2]}`;
+  }
+  const headerMatch = originalSLO.match(/^(.*?)\n\s*a\)/s);
+  const header = headerMatch ? headerMatch[1].trim() : "By the end of the lesson, the learner should be able to:";
+  return `${header}\na) ${parts[0]}\nb) ${parts[1]}\nc) ${parts[2]}`;
 }
 
 /**
