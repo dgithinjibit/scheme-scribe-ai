@@ -458,30 +458,47 @@ function validateAndSanitizeRows(
       let slo = row.specificLearningOutcome;
       let exp = row.learningExperiences;
       const replacements: [RegExp, string][] = isSw
-        ? [
-            [/\bkuandika\b/gi, "kuchora"],
-            [/\bkusoma\b/gi, "kutazama"],
-            [/\bkufupisha\b/gi, "kutaja"],
-            [/\bkutunga\b/gi, "kuonyesha"],
-          ]
-        : [
-            [/\bwrite\b/gi, "draw"],
-            [/\bwriting\b/gi, "drawing"],
-            [/\bread\b/gi, "observe"],
-            [/\breading\b/gi, "observing"],
-            [/\bsummarize\b/gi, "name"],
-            [/\bsummarise\b/gi, "name"],
-            [/\bcreate\b/gi, "make"],
-            [/\bcreating\b/gi, "making"],
-            [/\bcompose\b/gi, "show"],
-            [/\banalyse\b/gi, "sort"],
-            [/\banalyze\b/gi, "sort"],
-            [/\bevaluate\b/gi, "show"],
-            [/\bsynthesize\b/gi, "group"],
-            [/\bhypothesize\b/gi, "guess"],
-            [/\bformulate\b/gi, "say"],
-            [/\bcompile\b/gi, "collect"],
-          ];
+461:         ? [
+462:             [/\bkuandika\b/gi, "kuchora"],
+463:             [/\bkusoma\b/gi, "kutazama"],
+464:             [/\bkufupisha\b/gi, "kutaja"],
+465:             [/\bkutunga\b/gi, "kuonyesha"],
+466:             [/\bkufanya shughuli\b/gi, "kushiriki"],
+467:             [/\bkujua kuhusu\b/gi, "kutambua"],
+468:             [/\bkuangalia tu\b/gi, "kuangalia"],
+469:             [/\bkupitia\b/gi, "kuchunguza"],
+470:           ]
+471:         : [
+472:             [/\bwrite\b/gi, "draw"],
+473:             [/\bwriting\b/gi, "drawing"],
+474:             [/\bread\b/gi, "observe"],
+475:             [/\breading\b/gi, "observing"],
+476:             [/\bsummarize\b/gi, "describe"],
+477:             [/\bsummarise\b/gi, "describe"],
+478:             [/\bcompose\b/gi, "show"],
+479:             [/\banalyse\b/gi, "sort"],
+480:             [/\banalyze\b/gi, "sort"],
+481:             [/\bevaluate\b/gi, "show"],
+482:             [/\bsynthesize\b/gi, "group"],
+483:             [/\bhypothesize\b/gi, "suggest"],
+484:             [/\bformulate\b/gi, "suggest"],
+485:             [/\bcompile\b/gi, "collect"],
+486:             [/\bcarry out\b/gi, "practice"],
+487:             [/\bcarrying out\b/gi, "practicing"],
+488:             [/\bfind out\b/gi, "identify"],
+489:             [/\bfinding out\b/gi, "identifying"],
+490:             [/\blearn about\b/gi, "identify"],
+491:             [/\blearning about\b/gi, "identifying"],
+492:             [/\btalk about\b/gi, "describe"],
+493:             [/\btalking about\b/gi, "describing"],
+494:             [/\blook at\b/gi, "observe"],
+495:             [/\blooking at\b/gi, "observing"],
+496:             [/\bgo through\b/gi, "explore"],
+497:             [/\bgoing through\b/gi, "exploring"],
+498:             [/\bget to know\b/gi, "recognize"],
+499:             [/\bgetting to know\b/gi, "recognizing"],
+500:             [/\bdo\b(?=\s+(?:a|an|the|some|simple))/gi, "conduct"],
+501:           ];
       let changed = false;
       for (const [pattern, replacement] of replacements) {
         if (pattern.test(slo)) { slo = slo.replace(pattern, replacement); changed = true; }
