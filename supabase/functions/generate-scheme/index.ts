@@ -797,12 +797,20 @@ Life Skills, Health, Environmental Conservation, Safety, Human Rights, Citizensh
 RULES:
 1. Generate EXACTLY ${batchLessons} lesson rows for ${grade} learners.
 2. Keep everything SIMPLE, age-appropriate, and inclusive of diverse learning needs and environments.
-3. **Lesson Learning Outcomes** — EXACTLY 3 outcomes per lesson, one from each KSA domain. Use the official KICD outcomes below as source material — do NOT invent new ones.
+3. **Lesson Learning Outcomes** — EXACTLY 3 outcomes per lesson, strictly one from each KSA domain IN THIS EXACT ORDER. Use the official KICD outcomes below as source material — do NOT invent new ones.
    MANDATORY FORMAT — no other format is acceptable:
-   "By the end of the lesson, the learner should be able to:\\na) [Knowledge outcome]\\nb) [Skills outcome]\\nc) [Attitudes/Values outcome]"
-   - a) Knowledge (The "What" — facts, concepts, information): Use MEASURABLE verbs ONLY — Identify, Define, Describe, Name, Outline, State, Recognize, Explain, List, Label, Recall, Distinguish, Illustrate. NEVER use "know", "understand", or "be aware of".
-   - b) Skills (The "How" — practical application): Use verbs requiring a TANGIBLE output — Demonstrate, Perform, Practice, Model, Draw, Calculate, Manipulate, Use, Collaborate, Execute, Construct, Sing, Measure, Sketch, Solve, Trace, Cut, Colour, Paint. NEVER use "learn to...".
-   - c) Attitudes/Values (The "Value/Belief" — values and viewpoints): Link to OBSERVABLE behaviour — Appreciate, Value, Show respect, Care for, Demonstrate responsibility, Acknowledge, Enjoy, Display integrity, Uphold, Persist, Commit, Adhere, Advocate. Reference core values: respect, responsibility, love, unity, peace, integrity, patriotism. NEVER use "have a positive attitude".
+   "By the end of the lesson, the learner should be able to:\\na) [Knowledge outcome — MUST start with a Knowledge verb]\\nb) [Skills outcome — MUST start with a Skills verb]\\nc) [Attitudes/Values outcome — MUST start with an Attitudes verb]"
+
+   a) = KNOWLEDGE ONLY (The "What"). The FIRST WORD must be one of these verbs: identify, define, describe, name, outline, state, recognize, explain, list, label, recall, compare, classify, distinguish, illustrate, summarize.
+      BANNED from a): practice, demonstrate, draw, create, observe, appreciate, value, show, enjoy, carry out, find out, learn about.
+
+   b) = SKILLS ONLY (The "How"). The FIRST WORD must be one of these verbs: demonstrate, perform, practice, practise, draw, calculate, manipulate, use, construct, sing, measure, sketch, solve, trace, cut, colour, paint, observe, record, sort, conduct, participate, role-play, conserve, create, model, explore.
+      BANNED from b): identify, define, describe, name, state, explain, list, appreciate, value, enjoy, know, understand.
+
+   c) = ATTITUDES/VALUES ONLY (The "Value/Belief"). The FIRST WORD must be one of these verbs: appreciate, value, show, care, enjoy, uphold, persist, commit, respect, empathize, prioritize, develop, acknowledge.
+      BANNED from c): identify, describe, name, explain, list, practice, demonstrate, draw, create, observe, carry out.
+
+   THIS IS NON-NEGOTIABLE. If a) starts with "practice" or "observe" — THAT IS WRONG. If c) starts with "identify" or "describe" — THAT IS WRONG.
    Every lesson MUST have exactly a), b), c) — one knowledge, one skill, one attitude. No more, no less.
 4. **Lesson Learning Experiences**: MUST begin with "Learner is guided to:" followed by EXACTLY 4 lettered activities, one for each domain plus application.
    - a) must relate to the KNOWLEDGE outcome (a) — e.g. if SLO a) says "identify locally available materials used as beddings", then experience a) should be "discuss locally available materials used as beddings"
