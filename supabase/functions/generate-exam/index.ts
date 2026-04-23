@@ -106,6 +106,11 @@ ${scopeBlock}
 - Short: provide the model expectedAnswer AND a list of acceptableKeywords a learner could use
 - Long: provide a clear rubric (what earns full marks, what earns partial)
 
+═══ STRAND/SUB-STRAND LABELS (EXACT) ═══
+- The "strand" field MUST be copied EXACTLY as listed above (including leading numbering like "1.0 Numbers").
+- The "subStrand" field MUST be copied EXACTLY as listed above (including numbering like "1.4 Subtraction").
+- Do NOT shorten, rename, translate or invent labels.
+
 Return ONLY via the submit_exam tool. No prose, no markdown.`;
 }
 
