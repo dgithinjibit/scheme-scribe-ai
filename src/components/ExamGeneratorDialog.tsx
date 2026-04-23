@@ -94,7 +94,7 @@ const ExamGeneratorDialog = () => {
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {questions ? `${SUPPORTED_GRADE} ${subject} — ${term} Exam` : "Generate Term Exam (Grade 2)"}
+            {questions ? `${grade} ${subject} — ${term} Exam` : "Generate Term Exam"}
           </DialogTitle>
         </DialogHeader>
 
@@ -107,24 +107,31 @@ const ExamGeneratorDialog = () => {
 
             <div className="space-y-2">
               <Label>Grade</Label>
-              <Select value={SUPPORTED_GRADE} disabled>
+              <Select
+                value={grade}
+                onValueChange={(g) => {
+                  setGrade(g);
+                  setSubject("");
+                }}
+              >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Pick grade" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={SUPPORTED_GRADE}>{SUPPORTED_GRADE}</SelectItem>
+                  {grades.map((g) => (
+                    <SelectItem key={g} value={g}>
+                      {g}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                Currently available for Grade 2 only.
-              </p>
             </div>
 
             <div className="space-y-2">
               <Label>Subject</Label>
-              <Select value={subject} onValueChange={setSubject}>
+              <Select value={subject} onValueChange={setSubject} disabled={!grade}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pick subject" />
+                  <SelectValue placeholder={grade ? "Pick subject" : "Pick grade first"} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableSubjects.map((s) => (
@@ -152,7 +159,7 @@ const ExamGeneratorDialog = () => {
 
             <Button
               onClick={handleGenerate}
-              disabled={loading || !subject || !term}
+              disabled={loading || !grade || !subject || !term}
               className="w-full"
               size="lg"
             >
@@ -179,7 +186,7 @@ const ExamGeneratorDialog = () => {
             </div>
             <ExamRunner
               questions={questions}
-              grade={SUPPORTED_GRADE}
+              grade={grade}
               subject={subject}
               term={term}
             />
