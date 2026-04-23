@@ -144,17 +144,59 @@ const QUESTION_TOOL = {
   },
 } as const;
 
+function normalize(s: string): string {
+  return (s || "")
+    .toLowerCase()
+    .replace(/^[\d.\s]+/, "") // strip leading "1.2 " numbering
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 function validateScope(
   questions: ExamQuestion[],
   allocation: StrandAllocation[]
 ): ExamQuestion[] {
-  const validStrands = new Set(allocation.map((a) => a.strandName));
-  const validSubStrands = new Set(
-    allocation.flatMap((a) => a.subStrands.map((s) => s.name))
-  );
-  return questions.filter(
-    (q) => validStrands.has(q.strand) && validSubStrands.has(q.subStrand)
-  );
+  const strandMap = new Map<string, string>();
+  const subStrandMap = new Map<string, string>();
+  for (const a of allocation) {
+    strandMap.set(normalize(a.strandName), a.strandName);
+    for (const ss of a.subStrands) {
+      subStrandMap.set(normalize(ss.name), ss.name);
+    }
+  }
+
+  const result: ExamQuestion[] = [];
+  for (const q of questions) {
+    const strandKey = normalize(q.strand);
+    const subKey = normalize(q.subStrand);
+    // Allow substring match in either direction so "Subtraction" matches "1.4 Subtraction"
+    let matchedStrand: string | undefined = strandMap.get(strandKey);
+    if (!matchedStrand) {
+      for (const [k, v] of strandMap) {
+        if (k.includes(strandKey) || strandKey.includes(k)) {
+          matchedStrand = v;
+          break;
+        }
+      }
+    }
+    let matchedSub: string | undefined = subStrandMap.get(subKey);
+    if (!matchedSub) {
+      for (const [k, v] of subStrandMap) {
+        if (k.includes(subKey) || subKey.includes(k)) {
+          matchedSub = v;
+          break;
+        }
+      }
+    }
+    if (matchedStrand && matchedSub) {
+      result.push({ ...q, strand: matchedStrand, subStrand: matchedSub });
+    } else {
+      console.warn(
+        `Dropped Q — strand="${q.strand}" sub="${q.subStrand}" (no match)`
+      );
+    }
+  }
+  return result;
 }
 
 Deno.serve(async (req) => {
