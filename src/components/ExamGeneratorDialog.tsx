@@ -18,41 +18,33 @@ import {
 import { Loader2, FileQuestion } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { getSubjectsForGrade } from "@/data/curriculum";
+import { getSubjectsForGrade, grades } from "@/data/curriculum";
 import { getTermAllocation } from "@/data/curriculum/term-mappings";
 import ExamRunner, { type ExamQuestion } from "./ExamRunner";
 
-const SUPPORTED_GRADE = "Grade 2";
-const CORE_SUBJECTS = [
-  "Mathematics",
-  "English Activities",
-  "Kiswahili",
-  "Environmental Activities",
-];
-
 const ExamGeneratorDialog = () => {
   const [open, setOpen] = useState(false);
+  const [grade, setGrade] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
   const [term, setTerm] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<ExamQuestion[] | null>(null);
 
-  const availableSubjects = getSubjectsForGrade(SUPPORTED_GRADE).filter((s) =>
-    CORE_SUBJECTS.includes(s)
-  );
+  const availableSubjects = grade ? getSubjectsForGrade(grade) : [];
 
   const reset = () => {
+    setGrade("");
     setSubject("");
     setTerm("");
     setQuestions(null);
   };
 
   const handleGenerate = async () => {
-    if (!subject || !term) {
-      toast.error("Pick subject and term");
+    if (!grade || !subject || !term) {
+      toast.error("Pick grade, subject and term");
       return;
     }
-    const allocation = getTermAllocation(SUPPORTED_GRADE, subject, term);
+    const allocation = getTermAllocation(grade, subject, term);
     if (!allocation || allocation.length === 0) {
       toast.error("No curriculum allocation available for this selection.");
       return;
@@ -62,7 +54,7 @@ const ExamGeneratorDialog = () => {
     try {
       const { data, error } = await supabase.functions.invoke("generate-exam", {
         body: {
-          grade: SUPPORTED_GRADE,
+          grade,
           subject,
           term,
           allocation,
