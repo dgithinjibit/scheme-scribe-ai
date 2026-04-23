@@ -18,41 +18,33 @@ import {
 import { Loader2, FileQuestion } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { getSubjectsForGrade } from "@/data/curriculum";
+import { getSubjectsForGrade, grades } from "@/data/curriculum";
 import { getTermAllocation } from "@/data/curriculum/term-mappings";
 import ExamRunner, { type ExamQuestion } from "./ExamRunner";
 
-const SUPPORTED_GRADE = "Grade 2";
-const CORE_SUBJECTS = [
-  "Mathematics",
-  "English Activities",
-  "Kiswahili",
-  "Environmental Activities",
-];
-
 const ExamGeneratorDialog = () => {
   const [open, setOpen] = useState(false);
+  const [grade, setGrade] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
   const [term, setTerm] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<ExamQuestion[] | null>(null);
 
-  const availableSubjects = getSubjectsForGrade(SUPPORTED_GRADE).filter((s) =>
-    CORE_SUBJECTS.includes(s)
-  );
+  const availableSubjects = grade ? getSubjectsForGrade(grade) : [];
 
   const reset = () => {
+    setGrade("");
     setSubject("");
     setTerm("");
     setQuestions(null);
   };
 
   const handleGenerate = async () => {
-    if (!subject || !term) {
-      toast.error("Pick subject and term");
+    if (!grade || !subject || !term) {
+      toast.error("Pick grade, subject and term");
       return;
     }
-    const allocation = getTermAllocation(SUPPORTED_GRADE, subject, term);
+    const allocation = getTermAllocation(grade, subject, term);
     if (!allocation || allocation.length === 0) {
       toast.error("No curriculum allocation available for this selection.");
       return;
@@ -62,7 +54,7 @@ const ExamGeneratorDialog = () => {
     try {
       const { data, error } = await supabase.functions.invoke("generate-exam", {
         body: {
-          grade: SUPPORTED_GRADE,
+          grade,
           subject,
           term,
           allocation,
@@ -102,7 +94,7 @@ const ExamGeneratorDialog = () => {
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {questions ? `${SUPPORTED_GRADE} ${subject} — ${term} Exam` : "Generate Term Exam (Grade 2)"}
+            {questions ? `${grade} ${subject} — ${term} Exam` : "Generate Term Exam"}
           </DialogTitle>
         </DialogHeader>
 
@@ -115,24 +107,31 @@ const ExamGeneratorDialog = () => {
 
             <div className="space-y-2">
               <Label>Grade</Label>
-              <Select value={SUPPORTED_GRADE} disabled>
+              <Select
+                value={grade}
+                onValueChange={(g) => {
+                  setGrade(g);
+                  setSubject("");
+                }}
+              >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Pick grade" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={SUPPORTED_GRADE}>{SUPPORTED_GRADE}</SelectItem>
+                  {grades.map((g) => (
+                    <SelectItem key={g} value={g}>
+                      {g}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                Currently available for Grade 2 only.
-              </p>
             </div>
 
             <div className="space-y-2">
               <Label>Subject</Label>
-              <Select value={subject} onValueChange={setSubject}>
+              <Select value={subject} onValueChange={setSubject} disabled={!grade}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pick subject" />
+                  <SelectValue placeholder={grade ? "Pick subject" : "Pick grade first"} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableSubjects.map((s) => (
@@ -160,7 +159,7 @@ const ExamGeneratorDialog = () => {
 
             <Button
               onClick={handleGenerate}
-              disabled={loading || !subject || !term}
+              disabled={loading || !grade || !subject || !term}
               className="w-full"
               size="lg"
             >
@@ -187,7 +186,7 @@ const ExamGeneratorDialog = () => {
             </div>
             <ExamRunner
               questions={questions}
-              grade={SUPPORTED_GRADE}
+              grade={grade}
               subject={subject}
               term={term}
             />
