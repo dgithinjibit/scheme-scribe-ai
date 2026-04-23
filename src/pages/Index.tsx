@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import SchemeGeneratorDialog from "@/components/SchemeGeneratorDialog";
+import ExamGeneratorDialog from "@/components/ExamGeneratorDialog";
 import { BookOpen, CheckCircle, FileDown, Globe, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -72,8 +73,9 @@ const Index = () => {
         <p className="mt-4 text-lg text-muted-foreground max-w-xl">
           Generate professional, CBC-compliant Schemes of Work and Lesson Plans in seconds. Built for Kenyan teachers, by educators.
         </p>
-        <div className="mt-8">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <SchemeGeneratorDialog />
+          <ExamGeneratorDialog />
         </div>
       </header>
 
