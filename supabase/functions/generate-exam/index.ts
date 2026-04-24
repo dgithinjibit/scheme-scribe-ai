@@ -204,6 +204,8 @@ function validateScope(
   return result;
 }
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -217,12 +219,14 @@ Deno.serve(async (req) => {
       term,
       allocation,
       counts = { mcq: 15, short: 8, long: 2 },
+      forceRefresh = false,
     } = body as {
       grade: string;
       subject: string;
       term: string;
       allocation: StrandAllocation[];
       counts?: { mcq: number; short: number; long: number };
+      forceRefresh?: boolean;
     };
 
     if (!grade || !subject || !term || !allocation?.length) {
@@ -234,6 +238,41 @@ Deno.serve(async (req) => {
         }
       );
     }
+
+    // ── Cache lookup: reuse existing exam for (grade, subject, term) ──
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
+    if (!forceRefresh) {
+      const { data: cached } = await admin
+        .from("exams")
+        .select("id, questions")
+        .eq("grade", grade)
+        .eq("subject", subject)
+        .eq("term", term)
+        .maybeSingle();
+      if (cached?.questions?.length) {
+        console.log(`Cache hit for ${grade}/${subject}/${term}`);
+        return new Response(
+          JSON.stringify({
+            examId: cached.id,
+            questions: cached.questions,
+            cached: true,
+            meta: { grade, subject, term, total: cached.questions.length },
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Identify caller (teacher) for created_by
+    const authHeader = req.headers.get("Authorization") || "";
+    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData } = await userClient.auth.getUser();
+    const createdBy = userData?.user?.id;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
