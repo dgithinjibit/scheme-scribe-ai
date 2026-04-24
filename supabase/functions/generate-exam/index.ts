@@ -111,15 +111,25 @@ EVERY question MUST include its answer. Questions without answers will be REJECT
     • Do NOT leave answerIndex blank, null, or missing under any circumstance
 
 - Short (type="short"): MUST include
-    • expectedAnswer: the exact model answer (one short line)
-    • acceptableKeywords: array of 2-5 lowercase keywords a learner could use
+    • expectedAnswer: the REAL CONTENT a pupil should write — NOT a restatement of the question
+        ◦ The question asks WHAT to do; expectedAnswer is the ACTUAL THING that does it.
+        ◦ BAD examples (NEVER do this):
+            – Q: "Name four members of your family." → expectedAnswer: "Name four family members." ❌
+            – Q: "List three colours of the Kenyan flag." → expectedAnswer: "Three colours of the flag." ❌
+            – Q: "Write the number after 9." → expectedAnswer: "The number after 9." ❌
+        ◦ GOOD examples (DO THIS):
+            – Q: "Name four members of your family." → expectedAnswer: "Father, Mother, Brother, Sister" ✅
+            – Q: "List three colours of the Kenyan flag." → expectedAnswer: "Black, Red, Green" ✅
+            – Q: "Write the number after 9." → expectedAnswer: "10" ✅
+    • acceptableKeywords: 2-5 lowercase keywords from the actual answer content (not from the question)
 
 - Long (type="long"): MUST include
-    • rubric: clear marking guide stating what earns full marks vs partial marks
+    • rubric: concrete marking guide that names the SPECIFIC points/items/steps a pupil must mention to earn full marks. Do NOT write a vague rubric like "award marks if the answer is good".
 
-Self-check before submitting: for every MCQ confirm answerIndex is a number 0-3.
-For every short question confirm expectedAnswer is non-empty.
-For every long question confirm rubric is non-empty.
+Self-check before submitting:
+- For every MCQ confirm answerIndex is a number 0-3.
+- For every short question confirm expectedAnswer contains the ACTUAL ANSWER (names, numbers, facts) — NOT a paraphrase of the question.
+- For every long question confirm rubric lists specific expected content.
 
 ═══ NO REPETITION / NO VAGUENESS (CRITICAL) ═══
 - Do NOT repeat the same question, even with reworded phrasing.
@@ -237,8 +247,24 @@ function validateScope(
           continue;
         }
       } else if (q.type === "short") {
-        if (!(q as ShortQ).expectedAnswer?.trim()) {
+        const ans = (q as ShortQ).expectedAnswer?.trim() || "";
+        if (!ans) {
           console.warn(`Dropped short (no expectedAnswer): "${q.question}"`);
+          continue;
+        }
+        // Detect "echo" answers — where the answer just restates the question
+        const qNorm = normalize(q.question);
+        const aNorm = normalize(ans);
+        const qWords = new Set(qNorm.split(" ").filter((w) => w.length > 3));
+        const aWords = aNorm.split(" ").filter((w) => w.length > 3);
+        const overlap = aWords.filter((w) => qWords.has(w)).length;
+        const overlapRatio = aWords.length ? overlap / aWords.length : 0;
+        // If the answer is short AND >70% of its meaningful words come from the question,
+        // it's almost certainly an echo (e.g. Q "Name four members of your family" → A "Name four family members")
+        if (aWords.length <= 6 && overlapRatio >= 0.7) {
+          console.warn(
+            `Dropped echo answer — Q: "${q.question}" | A: "${ans}"`
+          );
           continue;
         }
       } else if (q.type === "long") {
