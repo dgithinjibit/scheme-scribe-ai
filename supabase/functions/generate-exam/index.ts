@@ -111,15 +111,25 @@ EVERY question MUST include its answer. Questions without answers will be REJECT
     • Do NOT leave answerIndex blank, null, or missing under any circumstance
 
 - Short (type="short"): MUST include
-    • expectedAnswer: the exact model answer (one short line)
-    • acceptableKeywords: array of 2-5 lowercase keywords a learner could use
+    • expectedAnswer: the REAL CONTENT a pupil should write — NOT a restatement of the question
+        ◦ The question asks WHAT to do; expectedAnswer is the ACTUAL THING that does it.
+        ◦ BAD examples (NEVER do this):
+            – Q: "Name four members of your family." → expectedAnswer: "Name four family members." ❌
+            – Q: "List three colours of the Kenyan flag." → expectedAnswer: "Three colours of the flag." ❌
+            – Q: "Write the number after 9." → expectedAnswer: "The number after 9." ❌
+        ◦ GOOD examples (DO THIS):
+            – Q: "Name four members of your family." → expectedAnswer: "Father, Mother, Brother, Sister" ✅
+            – Q: "List three colours of the Kenyan flag." → expectedAnswer: "Black, Red, Green" ✅
+            – Q: "Write the number after 9." → expectedAnswer: "10" ✅
+    • acceptableKeywords: 2-5 lowercase keywords from the actual answer content (not from the question)
 
 - Long (type="long"): MUST include
-    • rubric: clear marking guide stating what earns full marks vs partial marks
+    • rubric: concrete marking guide that names the SPECIFIC points/items/steps a pupil must mention to earn full marks. Do NOT write a vague rubric like "award marks if the answer is good".
 
-Self-check before submitting: for every MCQ confirm answerIndex is a number 0-3.
-For every short question confirm expectedAnswer is non-empty.
-For every long question confirm rubric is non-empty.
+Self-check before submitting:
+- For every MCQ confirm answerIndex is a number 0-3.
+- For every short question confirm expectedAnswer contains the ACTUAL ANSWER (names, numbers, facts) — NOT a paraphrase of the question.
+- For every long question confirm rubric lists specific expected content.
 
 ═══ NO REPETITION / NO VAGUENESS (CRITICAL) ═══
 - Do NOT repeat the same question, even with reworded phrasing.
