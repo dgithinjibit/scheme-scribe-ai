@@ -101,10 +101,25 @@ ${scopeBlock}
 - A sub-strand with 6 lessons gets ~2x the questions of one with 3 lessons
 - Every listed sub-strand MUST get at least one question if total questions allow
 
-═══ ANSWER QUALITY ═══
-- MCQ: provide answerIndex (0-3) of the ONE correct option
-- Short: provide the model expectedAnswer AND a list of acceptableKeywords a learner could use
-- Long: provide a clear rubric (what earns full marks, what earns partial)
+═══ ANSWER QUALITY (MANDATORY — NEVER OMIT) ═══
+EVERY question MUST include its answer. Questions without answers will be REJECTED.
+
+- MCQ (type="mcq"): MUST include
+    • options: array of EXACTLY 4 strings
+    • answerIndex: integer 0, 1, 2, or 3 — the index of the ONE correct option
+    • The correct option MUST actually be correct and present in options[]
+    • Do NOT leave answerIndex blank, null, or missing under any circumstance
+
+- Short (type="short"): MUST include
+    • expectedAnswer: the exact model answer (one short line)
+    • acceptableKeywords: array of 2-5 lowercase keywords a learner could use
+
+- Long (type="long"): MUST include
+    • rubric: clear marking guide stating what earns full marks vs partial marks
+
+Self-check before submitting: for every MCQ confirm answerIndex is a number 0-3.
+For every short question confirm expectedAnswer is non-empty.
+For every long question confirm rubric is non-empty.
 
 ═══ STRAND/SUB-STRAND LABELS (EXACT) ═══
 - The "strand" field MUST be copied EXACTLY as listed above (including leading numbering like "1.0 Numbers").
