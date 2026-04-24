@@ -209,6 +209,31 @@ function validateScope(
       }
     }
     if (matchedStrand && matchedSub) {
+      // Enforce answer completeness per type
+      if (q.type === "mcq") {
+        const opts = (q as MCQ).options;
+        const idx = (q as MCQ).answerIndex;
+        if (
+          !Array.isArray(opts) ||
+          opts.length !== 4 ||
+          typeof idx !== "number" ||
+          idx < 0 ||
+          idx > 3
+        ) {
+          console.warn(`Dropped MCQ (missing/invalid answerIndex): "${q.question}"`);
+          continue;
+        }
+      } else if (q.type === "short") {
+        if (!(q as ShortQ).expectedAnswer?.trim()) {
+          console.warn(`Dropped short (no expectedAnswer): "${q.question}"`);
+          continue;
+        }
+      } else if (q.type === "long") {
+        if (!(q as LongQ).rubric?.trim()) {
+          console.warn(`Dropped long (no rubric): "${q.question}"`);
+          continue;
+        }
+      }
       result.push({ ...q, strand: matchedStrand, subStrand: matchedSub });
     } else {
       console.warn(
