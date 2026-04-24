@@ -35,9 +35,18 @@ interface ExamRunnerProps {
   grade: string;
   subject: string;
   term: string;
+  pupilName?: string;
+  examId?: string | null;
 }
 
-const ExamRunner = ({ questions, grade, subject }: ExamRunnerProps) => {
+const ExamRunner = ({
+  questions,
+  grade,
+  subject,
+  term,
+  pupilName,
+  examId,
+}: ExamRunnerProps) => {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [results, setResults] = useState<Record<number, MarkResult> | null>(null);
   const [submitting, setSubmitting] = useState(false);
