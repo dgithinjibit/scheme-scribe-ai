@@ -121,6 +121,19 @@ Self-check before submitting: for every MCQ confirm answerIndex is a number 0-3.
 For every short question confirm expectedAnswer is non-empty.
 For every long question confirm rubric is non-empty.
 
+═══ NO REPETITION / NO VAGUENESS (CRITICAL) ═══
+- Do NOT repeat the same question, even with reworded phrasing.
+- Do NOT repeat the same numerical example, the same names, or the same scenario across questions.
+- Do NOT produce two MCQs that test the exact same fact (e.g. "What is 2+3?" and "Add 2 and 3").
+- Vary the numbers, names, contexts and verbs used across the paper.
+- Every question MUST be SPECIFIC and SELF-CONTAINED:
+    • BAD: "Write a number." / "Say something about animals." / "Give an example."
+    • GOOD: "Write the number that comes after 47." / "Name one domestic animal that gives us milk."
+- Avoid vague stems like "Discuss…", "Talk about…", "Explain something…" without a concrete focus.
+- Each question must have ONE clear, unambiguous correct answer (or for long answers, a clearly bounded expected response).
+- Do NOT duplicate options inside an MCQ. All 4 options must be distinct.
+- Spread questions across DIFFERENT sub-strands; do not cluster many questions on the same sub-strand unless its lesson count clearly demands it.
+
 ═══ STRAND/SUB-STRAND LABELS (EXACT) ═══
 - The "strand" field MUST be copied EXACTLY as listed above (including leading numbering like "1.0 Numbers").
 - The "subStrand" field MUST be copied EXACTLY as listed above (including numbering like "1.4 Subtraction").
