@@ -254,7 +254,19 @@ function validateScope(
       );
     }
   }
-  return result;
+  // De-duplicate near-identical questions
+  const seen = new Set<string>();
+  const deduped: ExamQuestion[] = [];
+  for (const q of result) {
+    const fingerprint = normalize(q.question).replace(/\s+/g, " ").slice(0, 80);
+    if (seen.has(fingerprint)) {
+      console.warn(`Dropped duplicate Q: "${q.question}"`);
+      continue;
+    }
+    seen.add(fingerprint);
+    deduped.push(q);
+  }
+  return deduped;
 }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
