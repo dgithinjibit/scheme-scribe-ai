@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import SchemeGeneratorDialog from "@/components/SchemeGeneratorDialog";
 import ExamGeneratorDialog from "@/components/ExamGeneratorDialog";
-import { BookOpen, CheckCircle, FileDown, Globe, LogIn, LogOut, User } from "lucide-react";
+import { BookOpen, CheckCircle, FileDown, Globe, LayoutDashboard, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const features = [
