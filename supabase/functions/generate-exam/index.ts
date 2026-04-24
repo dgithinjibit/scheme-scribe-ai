@@ -294,7 +294,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "google/gemini-2.5-flash-lite",
           messages: [
             { role: "system", content: systemPrompt },
             {
@@ -350,9 +350,34 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Persist to cache so future pupils on any device get the same paper
+    let examId: string | null = null;
+    if (createdBy && questions.length) {
+      const totalMarks = questions.reduce((s, q) => s + (q.marks || 0), 0);
+      const { data: upserted, error: upsertErr } = await admin
+        .from("exams")
+        .upsert(
+          {
+            created_by: createdBy,
+            grade,
+            subject,
+            term,
+            questions,
+            total_marks: totalMarks,
+          },
+          { onConflict: "grade,subject,term" }
+        )
+        .select("id")
+        .single();
+      if (upsertErr) console.error("Cache write failed:", upsertErr);
+      else examId = upserted?.id ?? null;
+    }
+
     return new Response(
       JSON.stringify({
+        examId,
         questions,
+        cached: false,
         meta: { grade, subject, term, total: questions.length },
       }),
       {
