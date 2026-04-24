@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -15,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, FileQuestion } from "lucide-react";
+import { Loader2, FileQuestion, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getSubjectsForGrade, grades } from "@/data/curriculum";
@@ -24,22 +25,32 @@ import ExamRunner, { type ExamQuestion } from "./ExamRunner";
 
 const ExamGeneratorDialog = () => {
   const [open, setOpen] = useState(false);
+  const [pupilName, setPupilName] = useState<string>("");
   const [grade, setGrade] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
   const [term, setTerm] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<ExamQuestion[] | null>(null);
+  const [examId, setExamId] = useState<string | null>(null);
+  const [cached, setCached] = useState(false);
 
   const availableSubjects = grade ? getSubjectsForGrade(grade) : [];
 
   const reset = () => {
+    setPupilName("");
     setGrade("");
     setSubject("");
     setTerm("");
     setQuestions(null);
+    setExamId(null);
+    setCached(false);
   };
 
   const handleGenerate = async () => {
+    if (!pupilName.trim()) {
+      toast.error("Enter the pupil's name first");
+      return;
+    }
     if (!grade || !subject || !term) {
       toast.error("Pick grade, subject and term");
       return;
@@ -69,7 +80,13 @@ const ExamGeneratorDialog = () => {
         return;
       }
       setQuestions(qs);
-      toast.success(`Generated ${qs.length} questions`);
+      setExamId(data?.examId ?? null);
+      setCached(!!data?.cached);
+      toast.success(
+        data?.cached
+          ? `Loaded saved exam (${qs.length} questions)`
+          : `Generated ${qs.length} questions`
+      );
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Failed to generate exam");
@@ -94,16 +111,30 @@ const ExamGeneratorDialog = () => {
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {questions ? `${grade} ${subject} — ${term} Exam` : "Generate Term Exam"}
+            {questions
+              ? `${pupilName} — ${grade} ${subject} ${term}`
+              : "Start Term Exam"}
           </DialogTitle>
         </DialogHeader>
 
         {!questions ? (
           <div className="space-y-4 py-4">
             <p className="text-sm text-muted-foreground">
-              The exam will be drawn ONLY from sub-strands taught in the selected
-              term. 15 MCQs + 8 short + 2 long answers, marked instantly in-app.
+              Each pupil enters their name, picks the exam, and gets a
+              personalised score saved to your dashboard.
             </p>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" /> Pupil name
+              </Label>
+              <Input
+                value={pupilName}
+                onChange={(e) => setPupilName(e.target.value)}
+                placeholder="e.g. Mary Wanjiku"
+                maxLength={60}
+              />
+            </div>
 
             <div className="space-y-2">
               <Label>Grade</Label>
@@ -131,7 +162,9 @@ const ExamGeneratorDialog = () => {
               <Label>Subject</Label>
               <Select value={subject} onValueChange={setSubject} disabled={!grade}>
                 <SelectTrigger>
-                  <SelectValue placeholder={grade ? "Pick subject" : "Pick grade first"} />
+                  <SelectValue
+                    placeholder={grade ? "Pick subject" : "Pick grade first"}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {availableSubjects.map((s) => (
@@ -159,16 +192,18 @@ const ExamGeneratorDialog = () => {
 
             <Button
               onClick={handleGenerate}
-              disabled={loading || !grade || !subject || !term}
+              disabled={
+                loading || !pupilName.trim() || !grade || !subject || !term
+              }
               className="w-full"
               size="lg"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating exam...
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading exam...
                 </>
               ) : (
-                "Generate Exam"
+                "Start Exam"
               )}
             </Button>
           </div>
@@ -176,9 +211,9 @@ const ExamGeneratorDialog = () => {
           <div className="py-2">
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-muted-foreground">
-                Total marks:{" "}
-                {questions.reduce((s, q) => s + q.marks, 0)} • {questions.length}{" "}
-                questions
+                Total marks: {questions.reduce((s, q) => s + q.marks, 0)} •{" "}
+                {questions.length} questions
+                {cached && " • shared exam"}
               </p>
               <Button variant="ghost" size="sm" onClick={reset}>
                 New exam
@@ -189,6 +224,8 @@ const ExamGeneratorDialog = () => {
               grade={grade}
               subject={subject}
               term={term}
+              pupilName={pupilName}
+              examId={examId}
             />
           </div>
         )}

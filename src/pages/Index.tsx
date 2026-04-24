@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import SchemeGeneratorDialog from "@/components/SchemeGeneratorDialog";
 import ExamGeneratorDialog from "@/components/ExamGeneratorDialog";
-import { BookOpen, CheckCircle, FileDown, Globe, LogIn, LogOut, User } from "lucide-react";
+import { BookOpen, CheckCircle, FileDown, Globe, LayoutDashboard, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const features = [
@@ -50,6 +50,9 @@ const Index = () => {
                 <User className="w-4 h-4" />
                 {user.user_metadata?.full_name || user.email}
               </span>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-1.5">
+                <LayoutDashboard className="w-4 h-4" /> Dashboard
+              </Button>
               <Button variant="ghost" size="sm" onClick={signOut} className="gap-1.5">
                 <LogOut className="w-4 h-4" /> Sign Out
               </Button>

@@ -14,6 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      exam_attempts: {
+        Row: {
+          awarded: number
+          created_at: string
+          details: Json | null
+          exam_id: string
+          grade: string
+          id: string
+          owner_id: string
+          percent: number
+          pupil_name: string
+          subject: string
+          term: string
+          total: number
+        }
+        Insert: {
+          awarded: number
+          created_at?: string
+          details?: Json | null
+          exam_id: string
+          grade: string
+          id?: string
+          owner_id: string
+          percent: number
+          pupil_name: string
+          subject: string
+          term: string
+          total: number
+        }
+        Update: {
+          awarded?: number
+          created_at?: string
+          details?: Json | null
+          exam_id?: string
+          grade?: string
+          id?: string
+          owner_id?: string
+          percent?: number
+          pupil_name?: string
+          subject?: string
+          term?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_attempts_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exams: {
+        Row: {
+          created_at: string
+          created_by: string
+          grade: string
+          id: string
+          questions: Json
+          subject: string
+          term: string
+          total_marks: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          grade: string
+          id?: string
+          questions: Json
+          subject: string
+          term: string
+          total_marks?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          grade?: string
+          id?: string
+          questions?: Json
+          subject?: string
+          term?: string
+          total_marks?: number
+        }
+        Relationships: []
+      }
       generated_resources: {
         Row: {
           additional_info: string | null
