@@ -247,8 +247,24 @@ function validateScope(
           continue;
         }
       } else if (q.type === "short") {
-        if (!(q as ShortQ).expectedAnswer?.trim()) {
+        const ans = (q as ShortQ).expectedAnswer?.trim() || "";
+        if (!ans) {
           console.warn(`Dropped short (no expectedAnswer): "${q.question}"`);
+          continue;
+        }
+        // Detect "echo" answers — where the answer just restates the question
+        const qNorm = normalize(q.question);
+        const aNorm = normalize(ans);
+        const qWords = new Set(qNorm.split(" ").filter((w) => w.length > 3));
+        const aWords = aNorm.split(" ").filter((w) => w.length > 3);
+        const overlap = aWords.filter((w) => qWords.has(w)).length;
+        const overlapRatio = aWords.length ? overlap / aWords.length : 0;
+        // If the answer is short AND >70% of its meaningful words come from the question,
+        // it's almost certainly an echo (e.g. Q "Name four members of your family" → A "Name four family members")
+        if (aWords.length <= 6 && overlapRatio >= 0.7) {
+          console.warn(
+            `Dropped echo answer — Q: "${q.question}" | A: "${ans}"`
+          );
           continue;
         }
       } else if (q.type === "long") {
