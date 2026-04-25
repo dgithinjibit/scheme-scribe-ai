@@ -4,10 +4,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-interface LongAnswerItem {
+interface AnswerItem {
   index: number;
+  type: "short" | "long";
   question: string;
-  rubric: string;
+  expectedAnswer?: string;
+  acceptableKeywords?: string[];
+  rubric?: string;
   marks: number;
   studentAnswer: string;
 }
@@ -16,7 +19,7 @@ const MARK_TOOL = {
   type: "function",
   function: {
     name: "submit_marks",
-    description: "Submit marks for the long-answer questions.",
+    description: "Submit marks for the answers.",
     parameters: {
       type: "object",
       properties: {
@@ -47,7 +50,7 @@ Deno.serve(async (req) => {
 
   try {
     const { items, grade, subject } = (await req.json()) as {
-      items: LongAnswerItem[];
+      items: AnswerItem[];
       grade: string;
       subject: string;
     };
@@ -61,19 +64,38 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const systemPrompt = `You are a fair, encouraging KICD CBC examiner marking ${grade} ${subject} long-answer questions.
+    const systemPrompt = `You are a fair, encouraging KICD CBC examiner marking ${grade} ${subject} answers.
+
+═══ MARKING PHILOSOPHY (CRITICAL) ═══
+You are marking 7-8 year-old pupils. Mark for UNDERSTANDING, not for exact wording.
+- ACCEPT any answer that demonstrates the correct concept, even if the words differ from the model answer.
+- ACCEPT synonyms and child-language equivalents:
+    • "Mum / Mummy / Mama" = "Mother"
+    • "Dad / Daddy / Baba" = "Father"
+    • "Cooking / Mopping / Fetching water / Washing clothes" all count as "chores at home"
+    • "Praying / Singing in church" both count as "worship"
+- ACCEPT minor spelling and grammar errors.
+- ACCEPT partial answers proportionally: if a question asks for TWO items and the pupil gives ONE correct item, award HALF the marks (rounded up).
+- For factual questions with ONE objectively correct answer (e.g. "How many books in the Old Testament?" → 39), only that number (or its written form "thirty-nine") is correct.
+- If the student answer is empty or completely off-topic, award 0 with kind feedback.
+
+═══ MARKING STEPS PER ITEM ═══
 For each item:
-- Award marks (0 to maxMarks, integers only) based STRICTLY on the rubric.
-- Be lenient with spelling/grammar for ${grade} (young learners).
-- Focus on whether the CONCEPT is correctly demonstrated.
-- Give one short encouraging feedback line (max 20 words).
+1. Read the question, the expectedAnswer (model answer) and any acceptableKeywords.
+2. Read the studentAnswer.
+3. Decide what CONCEPT(S) the question is testing.
+4. Check if the studentAnswer demonstrates that concept (using the lenient rules above).
+5. Award integer marks 0..maxMarks. For SHORT (2-mark) questions, award 0, 1 or 2.
+6. Give ONE short encouraging feedback line (max 20 words). If awarding less than full marks, briefly say what was missing.
+
 Return ONLY via the submit_marks tool.`;
 
     const userPayload = items
       .map(
-        (it) => `Q${it.index} (max ${it.marks} marks):
+        (it) => `Q${it.index} [${it.type}] (max ${it.marks} marks):
 Question: ${it.question}
-Rubric: ${it.rubric}
+${it.type === "short" ? `Model answer: ${it.expectedAnswer || "(none)"}` : `Rubric: ${it.rubric || "(none)"}`}
+${it.acceptableKeywords?.length ? `Acceptable keywords: ${it.acceptableKeywords.join(", ")}` : ""}
 Student answer: ${it.studentAnswer || "(no answer)"}
 `
       )
