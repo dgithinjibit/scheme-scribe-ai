@@ -278,14 +278,38 @@ const ExamRunner = ({
                 </RadioGroup>
               )}
 
-              {q.type === "short" && (
-                <Input
-                  value={answers[i] ?? ""}
-                  onChange={(e) => setAns(i, e.target.value)}
-                  placeholder="Your answer..."
-                  disabled={!!results}
-                />
-              )}
+              {q.type === "short" && (() => {
+                const expected = detectExpectedCount(q.question);
+                if (expected <= 1) {
+                  return (
+                    <Input
+                      value={answers[i] ?? ""}
+                      onChange={(e) => setAns(i, e.target.value)}
+                      placeholder="Your answer..."
+                      disabled={!!results}
+                    />
+                  );
+                }
+                return (
+                  <div className="space-y-2">
+                    {Array.from({ length: expected }).map((_, slot) => (
+                      <div key={slot} className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground w-6 shrink-0">
+                          {slot + 1}.
+                        </span>
+                        <Input
+                          value={getAnsAt(i, slot)}
+                          onChange={(e) =>
+                            setAnsAt(i, slot, e.target.value, expected)
+                          }
+                          placeholder={`Answer ${slot + 1}...`}
+                          disabled={!!results}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
 
               {q.type === "long" && (
                 <Textarea
