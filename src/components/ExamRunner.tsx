@@ -54,6 +54,35 @@ const ExamRunner = ({
   const setAns = (i: number, v: string) =>
     setAnswers((p) => ({ ...p, [i]: v }));
 
+  // Detect if a short-answer question asks for N items (e.g. "give two reasons",
+  // "name 3 chores", "list four colours"). Returns N, or 1 if no count is implied.
+  const detectExpectedCount = (question: string): number => {
+    const wordMap: Record<string, number> = {
+      one: 1, two: 2, three: 3, four: 4, five: 5, six: 6,
+      moja: 1, mbili: 2, tatu: 3, nne: 4, tano: 5, sita: 6,
+    };
+    const verbs =
+      "(?:name|list|give|state|mention|identify|write|provide|taja|andika|orodhesha|toa)";
+    // Match "<verb> <number/word> ..."
+    const re = new RegExp(`\\b${verbs}\\b[^.?!]*?\\b(\\d+|${Object.keys(wordMap).join("|")})\\b`, "i");
+    const m = question.match(re);
+    if (!m) return 1;
+    const token = m[1].toLowerCase();
+    const n = /^\d+$/.test(token) ? parseInt(token, 10) : wordMap[token];
+    return n >= 2 && n <= 6 ? n : 1;
+  };
+
+  const setAnsAt = (i: number, slot: number, v: string, total: number) => {
+    const current = (answers[i] ?? "").split("\n");
+    const arr = Array.from({ length: total }, (_, k) => current[k] ?? "");
+    arr[slot] = v;
+    setAns(i, arr.join("\n"));
+  };
+
+  const getAnsAt = (i: number, slot: number): string => {
+    return (answers[i] ?? "").split("\n")[slot] ?? "";
+  };
+
   const handleSubmit = async () => {
     setSubmitting(true);
     const out: Record<number, MarkResult> = {};
@@ -249,14 +278,38 @@ const ExamRunner = ({
                 </RadioGroup>
               )}
 
-              {q.type === "short" && (
-                <Input
-                  value={answers[i] ?? ""}
-                  onChange={(e) => setAns(i, e.target.value)}
-                  placeholder="Your answer..."
-                  disabled={!!results}
-                />
-              )}
+              {q.type === "short" && (() => {
+                const expected = detectExpectedCount(q.question);
+                if (expected <= 1) {
+                  return (
+                    <Input
+                      value={answers[i] ?? ""}
+                      onChange={(e) => setAns(i, e.target.value)}
+                      placeholder="Your answer..."
+                      disabled={!!results}
+                    />
+                  );
+                }
+                return (
+                  <div className="space-y-2">
+                    {Array.from({ length: expected }).map((_, slot) => (
+                      <div key={slot} className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground w-6 shrink-0">
+                          {slot + 1}.
+                        </span>
+                        <Input
+                          value={getAnsAt(i, slot)}
+                          onChange={(e) =>
+                            setAnsAt(i, slot, e.target.value, expected)
+                          }
+                          placeholder={`Answer ${slot + 1}...`}
+                          disabled={!!results}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
 
               {q.type === "long" && (
                 <Textarea
