@@ -113,6 +113,41 @@ const ExamRunner = ({
       }
     }
 
+    setResults(out);
+    setSubmitting(false);
+
+    // Save attempt to dashboard
+    const totalMaxNow = questions.reduce((s, q) => s + q.marks, 0);
+    const awardedNow = Object.values(out).reduce((s, r) => s + r.awarded, 0);
+    const percentNow = totalMaxNow
+      ? Math.round((awardedNow / totalMaxNow) * 100)
+      : 0;
+
+    if (examId && pupilName?.trim()) {
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        const ownerId = userData?.user?.id;
+        if (ownerId) {
+          await supabase.from("exam_attempts").insert({
+            exam_id: examId,
+            owner_id: ownerId,
+            pupil_name: pupilName.trim(),
+            grade,
+            subject,
+            term,
+            awarded: awardedNow,
+            total: totalMaxNow,
+            percent: percentNow,
+            details: out as never,
+          });
+          toast.success(`Saved ${pupilName}'s score to dashboard`);
+        }
+      } catch (err) {
+        console.error("Failed to save attempt:", err);
+      }
+    }
+  };
+
   const totalMax = questions.reduce((s, q) => s + q.marks, 0);
   const totalAwarded = results
     ? Object.values(results).reduce((s, r) => s + r.awarded, 0)
