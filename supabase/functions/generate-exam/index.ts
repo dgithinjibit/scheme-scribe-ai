@@ -257,8 +257,12 @@ function validateScope(
       }
     }
     if (matchedStrand && matchedSub) {
-      // Enforce answer completeness per type
-      if (q.type === "mcq") {
+      // Block practical/non-text tasks that cannot be auto-marked on screen
+      const practicalRegex = /\b(draw|sketch|colou?r in|colou?r the|shade|trace|cut out|paste|fold|model|sing|recite|act out|role[- ]?play|dance|point at|point to|touch the|match the picture|measure (?:the|your)|observe (?:the )?weather|use (?:a|your) ruler|use (?:an )?abacus|use counters?|use beads?|ask (?:your|a) (?:partner|friend|parent)|interview)\b/i;
+      if (practicalRegex.test(q.question)) {
+        console.warn(`Dropped practical Q: "${q.question}"`);
+        continue;
+      }
         const opts = (q as MCQ).options;
         const idx = (q as MCQ).answerIndex;
         if (
