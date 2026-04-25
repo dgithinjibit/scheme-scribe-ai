@@ -262,7 +262,8 @@ function validateScope(
       if (practicalRegex.test(q.question)) {
         console.warn(`Dropped practical Q: "${q.question}"`);
         continue;
-      }
+      // Enforce answer completeness per type
+      if (q.type === "mcq") {
         const opts = (q as MCQ).options;
         const idx = (q as MCQ).answerIndex;
         if (
