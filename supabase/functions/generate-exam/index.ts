@@ -144,6 +144,31 @@ Self-check before submitting:
 - Do NOT duplicate options inside an MCQ. All 4 options must be distinct.
 - Spread questions across DIFFERENT sub-strands; do not cluster many questions on the same sub-strand unless its lesson count clearly demands it.
 
+═══ TEXT-ONLY EXAM (CRITICAL — NO PRACTICAL TASKS) ═══
+This exam is delivered and auto-marked as TEXT on a screen. The pupil can ONLY type/select an answer.
+You MUST NOT generate any question that requires:
+  • Drawing, sketching, colouring, shading, or tracing ("Draw the sun…", "Colour the flag…", "Shade half of…")
+  • Cutting, pasting, folding, modelling, or any physical craft
+  • Singing, reciting aloud, role-play, dancing, or any performance
+  • Pointing at, touching, or matching pictures/objects on paper
+  • Measuring real objects, observing the weather outside, or any field activity
+  • Using a physical ruler, abacus, counters, beads, or any classroom material
+  • Group work, pair work, asking a partner, or interviewing someone
+  • Looking at a picture/diagram/map (you cannot include images)
+If the curriculum sub-strand is fundamentally practical (e.g. "Drawing", "Singing", "Modelling"), assess the
+underlying KNOWLEDGE in writing instead — e.g. "Name two colours used to draw the sun." NOT "Draw the sun."
+
+═══ UNAMBIGUOUS MCQs (CRITICAL) ═══
+Every MCQ must have EXACTLY ONE option that is correct and THREE options that are clearly, factually wrong.
+- Distractors must NOT be "also technically true" or "sometimes true" answers.
+- BAD (two valid answers): "What do you see in the sky at night?" → Sun / Clouds / Moon and stars / Birds
+   (Clouds CAN be seen at night, so this has two correct answers.)
+- GOOD: "Which of these gives light at night?" → Sun / Moon / Table / Chair  (only Moon is correct)
+- BAD (subjective): "Which is the best fruit?"  → no objective answer.
+- GOOD (objective): "Which of these is a fruit?" → Mango / Carrot / Onion / Cabbage
+- Before finalising each MCQ, mentally check each of the 4 options and confirm 3 of them are DEFINITELY wrong.
+- If you cannot make 3 clearly-wrong distractors, REWRITE the question — do not ship an ambiguous MCQ.
+
 ═══ STRAND/SUB-STRAND LABELS (EXACT) ═══
 - The "strand" field MUST be copied EXACTLY as listed above (including leading numbering like "1.0 Numbers").
 - The "subStrand" field MUST be copied EXACTLY as listed above (including numbering like "1.4 Subtraction").
@@ -232,6 +257,12 @@ function validateScope(
       }
     }
     if (matchedStrand && matchedSub) {
+      // Block practical/non-text tasks that cannot be auto-marked on screen
+      const practicalRegex = /\b(draw|sketch|colou?r in|colou?r the|shade|trace|cut out|paste|fold|model|sing|recite|act out|role[- ]?play|dance|point at|point to|touch the|match the picture|measure (?:the|your)|observe (?:the )?weather|use (?:a|your) ruler|use (?:an )?abacus|use counters?|use beads?|ask (?:your|a) (?:partner|friend|parent)|interview)\b/i;
+      if (practicalRegex.test(q.question)) {
+        console.warn(`Dropped practical Q: "${q.question}"`);
+        continue;
+      }
       // Enforce answer completeness per type
       if (q.type === "mcq") {
         const opts = (q as MCQ).options;
