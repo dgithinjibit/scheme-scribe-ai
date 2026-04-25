@@ -54,51 +54,38 @@ const ExamRunner = ({
   const setAns = (i: number, v: string) =>
     setAnswers((p) => ({ ...p, [i]: v }));
 
-  const markShort = (q: ExamQuestion, ans: string): MarkResult => {
-    const max = q.marks;
-    const a = (ans || "").toLowerCase().trim();
-    if (!a) return { awarded: 0, max, correct: false };
-    const expected = (q.expectedAnswer || "").toLowerCase().trim();
-    if (a === expected) return { awarded: max, max, correct: true };
-    const keys = (q.acceptableKeywords || []).map((k) => k.toLowerCase());
-    const hits = keys.filter((k) => a.includes(k)).length;
-    if (hits === 0) return { awarded: 0, max, correct: false };
-    if (hits >= Math.max(1, Math.ceil(keys.length / 2)))
-      return { awarded: max, max, correct: true };
-    return { awarded: Math.ceil(max / 2), max, correct: false };
-  };
-
   const handleSubmit = async () => {
     setSubmitting(true);
     const out: Record<number, MarkResult> = {};
 
-    // Instant marking
+    // Instant marking for MCQs only (objective)
     questions.forEach((q, i) => {
       if (q.type === "mcq") {
         const picked = parseInt(answers[i] ?? "-1");
         const correct = picked === q.answerIndex;
         out[i] = { awarded: correct ? q.marks : 0, max: q.marks, correct };
-      } else if (q.type === "short") {
-        out[i] = markShort(q, answers[i] ?? "");
       }
     });
 
-    // AI marking for long answers
-    const longItems = questions
+    // AI marking for both short AND long — judges meaning, not string equality
+    const aiItems = questions
       .map((q, i) => ({ q, i }))
-      .filter((x) => x.q.type === "long")
+      .filter((x) => x.q.type === "short" || x.q.type === "long")
       .map((x) => ({
         index: x.i,
+        type: x.q.type as "short" | "long",
         question: x.q.question,
+        expectedAnswer: x.q.expectedAnswer || "",
+        acceptableKeywords: x.q.acceptableKeywords || [],
         rubric: x.q.rubric || "",
         marks: x.q.marks,
         studentAnswer: answers[x.i] ?? "",
       }));
 
-    if (longItems.length) {
+    if (aiItems.length) {
       try {
         const { data, error } = await supabase.functions.invoke("mark-exam", {
-          body: { items: longItems, grade, subject },
+          body: { items: aiItems, grade, subject },
         });
         if (error) throw error;
         const list = (data?.results ?? []) as Array<{
@@ -108,57 +95,23 @@ const ExamRunner = ({
         }>;
         list.forEach((r) => {
           const q = questions[r.index];
+          const awarded = Math.max(0, Math.min(q.marks, Math.round(r.awarded)));
           out[r.index] = {
-            awarded: r.awarded,
+            awarded,
             max: q.marks,
-            correct: r.awarded >= q.marks * 0.7,
+            correct: awarded >= q.marks * 0.7,
             feedback: r.feedback,
           };
         });
       } catch (e) {
         console.error(e);
-        toast.error("AI marking failed for long answers — showing partial results.");
-        longItems.forEach((it) => {
+        toast.error("AI marking failed — showing partial results.");
+        aiItems.forEach((it) => {
           if (!out[it.index])
             out[it.index] = { awarded: 0, max: it.marks, correct: false };
         });
       }
     }
-
-    setResults(out);
-    setSubmitting(false);
-
-    // Save attempt to dashboard
-    const totalMaxNow = questions.reduce((s, q) => s + q.marks, 0);
-    const awardedNow = Object.values(out).reduce((s, r) => s + r.awarded, 0);
-    const percentNow = totalMaxNow
-      ? Math.round((awardedNow / totalMaxNow) * 100)
-      : 0;
-
-    if (examId && pupilName?.trim()) {
-      try {
-        const { data: userData } = await supabase.auth.getUser();
-        const ownerId = userData?.user?.id;
-        if (ownerId) {
-          await supabase.from("exam_attempts").insert({
-            exam_id: examId,
-            owner_id: ownerId,
-            pupil_name: pupilName.trim(),
-            grade,
-            subject,
-            term,
-            awarded: awardedNow,
-            total: totalMaxNow,
-            percent: percentNow,
-            details: out as never,
-          });
-          toast.success(`Saved ${pupilName}'s score to dashboard`);
-        }
-      } catch (err) {
-        console.error("Failed to save attempt:", err);
-      }
-    }
-  };
 
   const totalMax = questions.reduce((s, q) => s + q.marks, 0);
   const totalAwarded = results
