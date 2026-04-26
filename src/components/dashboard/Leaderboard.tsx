@@ -70,7 +70,7 @@ const Leaderboard = ({ attempts }: Props) => {
   const trophyFor = (rank: number) => {
     if (rank === 0) return <Trophy className="w-5 h-5 text-kenya-gold" />;
     if (rank === 1) return <Medal className="w-5 h-5 text-muted-foreground" />;
-    if (rank === 2) return <Award className="w-5 h-5 text-amber-700" />;
+    if (rank === 2) return <Award className="w-5 h-5 text-accent" />;
     return (
       <span className="w-5 inline-block text-center text-xs text-muted-foreground tabular-nums">
         {rank + 1}
