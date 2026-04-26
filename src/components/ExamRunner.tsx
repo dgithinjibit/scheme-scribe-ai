@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,9 +6,12 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Loader2, Trophy } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, XCircle, Loader2, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useExamAutosave } from "@/hooks/useExamAutosave";
+import ResultsSummary from "./exam/ResultsSummary";
 
 export interface ExamQuestion {
   type: "mcq" | "short" | "long";
@@ -51,8 +54,29 @@ const ExamRunner = ({
   const [results, setResults] = useState<Record<number, MarkResult> | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Auto-save & restore — keyed by examId (cached/shared exam) or a per-pupil fallback.
+  const autosaveKey = useMemo(() => {
+    if (examId) return `${examId}:${(pupilName || "anon").trim().toLowerCase()}`;
+    return `local:${grade}:${subject}:${term}:${(pupilName || "anon").trim().toLowerCase()}`;
+  }, [examId, pupilName, grade, subject, term]);
+
+  const { restored, dismissRestored, clearSaved } = useExamAutosave(
+    autosaveKey,
+    answers,
+    !!results,
+  );
+
   const setAns = (i: number, v: string) =>
     setAnswers((p) => ({ ...p, [i]: v }));
+
+  const handleResume = () => {
+    if (restored?.answers) setAnswers(restored.answers);
+    dismissRestored();
+  };
+
+  const handleDiscardSaved = () => {
+    clearSaved();
+  };
 
   // Detect if a short-answer question asks for N items (e.g. "give two reasons",
   // "name 3 chores", "list four colours"). Returns N, or 1 if no count is implied.
@@ -177,11 +201,20 @@ const ExamRunner = ({
     }
   };
 
-  const totalMax = questions.reduce((s, q) => s + q.marks, 0);
-  const totalAwarded = results
-    ? Object.values(results).reduce((s, r) => s + r.awarded, 0)
+
+
+  // Progress = answered out of total (treats any non-empty answer as answered).
+  const answeredCount = useMemo(
+    () =>
+      questions.reduce((n, _q, i) => {
+        const v = answers[i];
+        return n + (v !== undefined && String(v).trim().length > 0 ? 1 : 0);
+      }, 0),
+    [answers, questions],
+  );
+  const progressPct = questions.length
+    ? Math.round((answeredCount / questions.length) * 100)
     : 0;
-  const percent = results ? Math.round((totalAwarded / totalMax) * 100) : 0;
 
   const sectionLabel = (t: ExamQuestion["type"]) =>
     t === "mcq"
@@ -194,25 +227,38 @@ const ExamRunner = ({
 
   return (
     <div className="space-y-6">
-      {results && (
-        <Card className="p-6 bg-primary/5 border-primary">
-          <div className="flex items-center gap-4">
-            <Trophy className="w-12 h-12 text-primary" />
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold">
-                {totalAwarded} / {totalMax} ({percent}%)
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {percent >= 80
-                  ? "Excellent work! 🎉"
-                  : percent >= 50
-                  ? "Good effort — keep practicing!"
-                  : "Keep trying — review the topics and retake."}
-              </p>
-            </div>
+      {restored && !results && (
+        <Card className="p-4 bg-accent/40 border-accent flex items-center gap-3 animate-fade-in">
+          <RotateCcw className="w-5 h-5 text-primary shrink-0" />
+          <div className="flex-1 text-sm">
+            <p className="font-medium">Welcome back!</p>
+            <p className="text-muted-foreground">
+              We saved your answers from{" "}
+              {new Date(restored.savedAt).toLocaleString()}. Continue where you left off?
+            </p>
           </div>
+          <Button size="sm" variant="outline" onClick={handleDiscardSaved}>
+            Start fresh
+          </Button>
+          <Button size="sm" onClick={handleResume}>
+            Resume
+          </Button>
         </Card>
       )}
+
+      {!results && questions.length > 0 && (
+        <div className="sticky top-0 z-10 -mx-1 px-1 py-2 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+            <span className="font-medium">
+              {answeredCount} of {questions.length} answered
+            </span>
+            <span className="tabular-nums">{progressPct}%</span>
+          </div>
+          <Progress value={progressPct} className="h-1.5" />
+        </div>
+      )}
+
+      {results && <ResultsSummary questions={questions} results={results} />}
 
       {questions.map((q, i) => {
         const showHeader = q.type !== lastSection;
