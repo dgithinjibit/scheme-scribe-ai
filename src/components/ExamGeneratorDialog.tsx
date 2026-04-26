@@ -83,7 +83,7 @@ const ExamGeneratorDialog = () => {
             ? { mcq: 8, short: 4, long: 1 }
             : { mcq: 15, short: 8, long: 2 },
           // Skip cache when targeting weak strands so pupil gets fresh practice
-          skipCache: !!opts?.weakStrandsFilter?.length,
+          forceRefresh: !!opts?.weakStrandsFilter?.length,
         },
       });
       if (error) throw error;
