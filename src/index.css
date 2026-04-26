@@ -42,6 +42,11 @@
     --kenya-green: 152 55% 28%;
     --kenya-gold: 38 90% 52%;
 
+    /* Section accent gradients (subtle wash behind question groups) */
+    --section-mcq: 210 80% 50%;
+    --section-short: 152 55% 35%;
+    --section-long: 30 70% 50%;
+
     --sidebar-background: 152 30% 12%;
     --sidebar-foreground: 45 30% 92%;
     --sidebar-primary: 38 90% 52%;
@@ -50,6 +55,46 @@
     --sidebar-accent-foreground: 45 30% 92%;
     --sidebar-border: 152 20% 22%;
     --sidebar-ring: 38 90% 52%;
+  }
+
+  .dark {
+    --background: 160 25% 7%;
+    --foreground: 45 25% 94%;
+
+    --card: 160 22% 10%;
+    --card-foreground: 45 25% 94%;
+
+    --popover: 160 22% 10%;
+    --popover-foreground: 45 25% 94%;
+
+    --primary: 152 55% 55%;
+    --primary-foreground: 160 30% 8%;
+
+    --secondary: 160 18% 16%;
+    --secondary-foreground: 45 25% 94%;
+
+    --muted: 160 18% 14%;
+    --muted-foreground: 45 8% 65%;
+
+    --accent: 30 75% 55%;
+    --accent-foreground: 160 30% 8%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 160 15% 22%;
+    --input: 160 15% 22%;
+    --ring: 152 55% 55%;
+
+    --success: 152 55% 55%;
+    --success-foreground: 160 30% 8%;
+    --kenya-red: 0 65% 60%;
+    --kenya-green: 152 55% 55%;
+    --kenya-gold: 38 90% 60%;
+
+    --section-mcq: 210 75% 60%;
+    --section-short: 152 50% 55%;
+    --section-long: 30 75% 60%;
   }
 }
 
