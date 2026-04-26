@@ -54,8 +54,29 @@ const ExamRunner = ({
   const [results, setResults] = useState<Record<number, MarkResult> | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Auto-save & restore — keyed by examId (cached/shared exam) or a per-pupil fallback.
+  const autosaveKey = useMemo(() => {
+    if (examId) return `${examId}:${(pupilName || "anon").trim().toLowerCase()}`;
+    return `local:${grade}:${subject}:${term}:${(pupilName || "anon").trim().toLowerCase()}`;
+  }, [examId, pupilName, grade, subject, term]);
+
+  const { restored, dismissRestored, clearSaved } = useExamAutosave(
+    autosaveKey,
+    answers,
+    !!results,
+  );
+
   const setAns = (i: number, v: string) =>
     setAnswers((p) => ({ ...p, [i]: v }));
+
+  const handleResume = () => {
+    if (restored?.answers) setAnswers(restored.answers);
+    dismissRestored();
+  };
+
+  const handleDiscardSaved = () => {
+    clearSaved();
+  };
 
   // Detect if a short-answer question asks for N items (e.g. "give two reasons",
   // "name 3 chores", "list four colours"). Returns N, or 1 if no count is implied.
