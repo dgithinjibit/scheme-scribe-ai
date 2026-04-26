@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,9 +6,12 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Loader2, Trophy } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, XCircle, Loader2, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useExamAutosave } from "@/hooks/useExamAutosave";
+import ResultsSummary from "./exam/ResultsSummary";
 
 export interface ExamQuestion {
   type: "mcq" | "short" | "long";
