@@ -6,14 +6,22 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft,
   GraduationCap,
   Loader2,
   Trophy,
   TrendingUp,
-  BookOpen,
+  Download,
+  Clock,
 } from "lucide-react";
+import { toast } from "sonner";
+import ThemeToggle from "@/components/ThemeToggle";
+import DashboardEmptyState from "@/components/dashboard/DashboardEmptyState";
+import Leaderboard from "@/components/dashboard/Leaderboard";
+import { downloadAttemptsCsv } from "@/utils/exportAttempts";
+import { formatDuration } from "@/hooks/useExamTimer";
 
 interface Attempt {
   id: string;
@@ -25,6 +33,7 @@ interface Attempt {
   total: number;
   percent: number;
   created_at: string;
+  details: { durationSeconds?: number } | null;
 }
 
 const Dashboard = () => {
@@ -44,16 +53,15 @@ const Dashboard = () => {
       const { data, error } = await supabase
         .from("exam_attempts")
         .select(
-          "id, pupil_name, grade, subject, term, awarded, total, percent, created_at"
+          "id, pupil_name, grade, subject, term, awarded, total, percent, created_at, details",
         )
         .order("created_at", { ascending: false });
       if (error) console.error(error);
-      else setAttempts((data ?? []) as Attempt[]);
+      else setAttempts((data ?? []) as unknown as Attempt[]);
       setLoading(false);
     })();
   }, [user]);
 
-  // Group by pupil
   const pupils = useMemo(() => {
     const map = new Map<string, Attempt[]>();
     for (const a of attempts) {
@@ -74,7 +82,6 @@ const Dashboard = () => {
     ? pupils.find((p) => p.name === selectedPupil)
     : null;
 
-  // Per-subject summary for selected pupil
   const bySubject = useMemo(() => {
     if (!selected) return [];
     const map = new Map<string, Attempt[]>();
@@ -87,11 +94,29 @@ const Dashboard = () => {
       const best = Math.max(...list.map((a) => a.percent));
       const latest = list[0];
       const avg = Math.round(
-        list.reduce((s, a) => s + a.percent, 0) / list.length
+        list.reduce((s, a) => s + a.percent, 0) / list.length,
       );
       return { subject, best, latest, avg, attempts: list.length };
     });
   }, [selected]);
+
+  const handleExportAll = () => {
+    if (attempts.length === 0) {
+      toast.info("Nothing to export yet.");
+      return;
+    }
+    downloadAttemptsCsv(attempts, `schemer-attempts-${Date.now()}.csv`);
+    toast.success(`Exported ${attempts.length} attempts`);
+  };
+
+  const handleExportPupil = () => {
+    if (!selected) return;
+    downloadAttemptsCsv(
+      selected.attempts,
+      `${selected.name.replace(/\s+/g, "-").toLowerCase()}-attempts.csv`,
+    );
+    toast.success(`Exported ${selected.attempts.length} attempts`);
+  };
 
   if (authLoading || loading) {
     return (
@@ -103,8 +128,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b sticky top-0 z-10 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -119,62 +144,81 @@ const Dashboard = () => {
               <h1 className="text-xl font-bold">Pupil Dashboard</h1>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground hidden sm:block">
-            {user?.email}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              {user?.email}
+            </p>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
       <main className="container max-w-6xl mx-auto px-4 py-8">
         {pupils.length === 0 ? (
-          <Card className="p-12 text-center">
-            <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-lg font-semibold mb-1">No exam attempts yet</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Once a pupil takes an exam, their score will appear here.
-            </p>
-            <Button onClick={() => navigate("/")}>Start an exam</Button>
-          </Card>
+          <DashboardEmptyState onStart={() => navigate("/")} />
         ) : !selected ? (
-          <>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-1">Your pupils</h2>
-              <p className="text-sm text-muted-foreground">
-                {pupils.length} pupil{pupils.length === 1 ? "" : "s"} •{" "}
-                {attempts.length} total attempt
-                {attempts.length === 1 ? "" : "s"}
-              </p>
+          <Tabs defaultValue="pupils" className="space-y-6">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <TabsList>
+                <TabsTrigger value="pupils">Your pupils</TabsTrigger>
+                <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+              </TabsList>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportAll}
+                className="gap-1.5"
+              >
+                <Download className="w-4 h-4" />
+                Export CSV
+              </Button>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {pupils.map((p) => (
-                <Card
-                  key={p.name}
-                  className="p-5 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => setSelectedPupil(p.name)}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-semibold text-lg">{p.name}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        {p.attempts.length} exam
-                        {p.attempts.length === 1 ? "" : "s"} taken
-                      </p>
+
+            <TabsContent value="pupils" className="space-y-6 mt-0">
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  {pupils.length} pupil{pupils.length === 1 ? "" : "s"} •{" "}
+                  {attempts.length} total attempt
+                  {attempts.length === 1 ? "" : "s"}
+                </p>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pupils.map((p) => (
+                  <Card
+                    key={p.name}
+                    className="p-5 cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40"
+                    onClick={() => setSelectedPupil(p.name)}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-lg">{p.name}</h3>
+                        <p className="text-xs text-muted-foreground">
+                          {p.attempts.length} exam
+                          {p.attempts.length === 1 ? "" : "s"} taken
+                        </p>
+                      </div>
+                      {p.avg >= 80 && (
+                        <Trophy className="w-5 h-5 text-kenya-green" />
+                      )}
                     </div>
-                    {p.avg >= 80 && (
-                      <Trophy className="w-5 h-5 text-kenya-green" />
-                    )}
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Average</span>
-                      <span className="font-semibold">{p.avg}%</span>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Average</span>
+                        <span className="font-semibold tabular-nums">
+                          {p.avg}%
+                        </span>
+                      </div>
+                      <Progress value={p.avg} className="h-2" />
                     </div>
-                    <Progress value={p.avg} className="h-2" />
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="leaderboard" className="mt-0">
+              <Leaderboard attempts={attempts} />
+            </TabsContent>
+          </Tabs>
         ) : (
           <>
             <Button
@@ -191,18 +235,28 @@ const Dashboard = () => {
                 <h2 className="text-3xl font-bold">{selected.name}</h2>
                 <p className="text-sm text-muted-foreground">
                   Overall average:{" "}
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-foreground tabular-nums">
                     {selected.avg}%
                   </span>{" "}
                   • {selected.attempts.length} attempt
                   {selected.attempts.length === 1 ? "" : "s"}
                 </p>
               </div>
-              {selected.avg >= 80 && (
-                <Badge className="bg-kenya-green/10 text-kenya-green border-kenya-green gap-1">
-                  <Trophy className="w-3 h-3" /> Top performer
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {selected.avg >= 80 && (
+                  <Badge className="bg-kenya-green/10 text-kenya-green border-kenya-green gap-1">
+                    <Trophy className="w-3 h-3" /> Top performer
+                  </Badge>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportPupil}
+                  className="gap-1.5"
+                >
+                  <Download className="w-4 h-4" /> Export
+                </Button>
+              </div>
             </div>
 
             <h3 className="font-semibold mb-3 flex items-center gap-1.5">
@@ -210,7 +264,10 @@ const Dashboard = () => {
             </h3>
             <div className="grid sm:grid-cols-2 gap-4 mb-8">
               {bySubject.map((s) => (
-                <Card key={s.subject} className="p-4">
+                <Card
+                  key={s.subject}
+                  className="p-4 transition-all hover:shadow-md"
+                >
                   <div className="flex justify-between mb-2">
                     <h4 className="font-semibold">{s.subject}</h4>
                     <Badge variant="outline">
@@ -220,17 +277,19 @@ const Dashboard = () => {
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div>
                       <p className="text-xs text-muted-foreground">Latest</p>
-                      <p className="font-semibold">{s.latest.percent}%</p>
+                      <p className="font-semibold tabular-nums">
+                        {s.latest.percent}%
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Best</p>
-                      <p className="font-semibold text-kenya-green">
+                      <p className="font-semibold text-kenya-green tabular-nums">
                         {s.best}%
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Average</p>
-                      <p className="font-semibold">{s.avg}%</p>
+                      <p className="font-semibold tabular-nums">{s.avg}%</p>
                     </div>
                   </div>
                   <Progress value={s.avg} className="h-1.5 mt-3" />
@@ -243,30 +302,36 @@ const Dashboard = () => {
               {selected.attempts.map((a) => (
                 <div
                   key={a.id}
-                  className="p-4 flex items-center justify-between gap-3"
+                  className="p-4 flex items-center justify-between gap-3 hover:bg-muted/40 transition-colors"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium">
                       {a.subject}{" "}
                       <span className="text-muted-foreground font-normal">
                         — {a.grade}, {a.term}
                       </span>
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(a.created_at).toLocaleString()}
+                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span>{new Date(a.created_at).toLocaleString()}</span>
+                      {a.details?.durationSeconds ? (
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {formatDuration(a.details.durationSeconds)}
+                        </span>
+                      ) : null}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">
+                  <div className="text-right shrink-0">
+                    <p className="font-semibold tabular-nums">
                       {a.awarded}/{a.total}
                     </p>
                     <p
-                      className={`text-xs ${
+                      className={`text-xs tabular-nums ${
                         a.percent >= 80
                           ? "text-kenya-green"
                           : a.percent >= 50
-                          ? "text-foreground"
-                          : "text-kenya-red"
+                            ? "text-foreground"
+                            : "text-kenya-red"
                       }`}
                     >
                       {a.percent}%

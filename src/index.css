@@ -42,6 +42,11 @@
     --kenya-green: 152 55% 28%;
     --kenya-gold: 38 90% 52%;
 
+    /* Section accent gradients (subtle wash behind question groups) */
+    --section-mcq: 210 80% 50%;
+    --section-short: 152 55% 35%;
+    --section-long: 30 70% 50%;
+
     --sidebar-background: 152 30% 12%;
     --sidebar-foreground: 45 30% 92%;
     --sidebar-primary: 38 90% 52%;
@@ -50,6 +55,46 @@
     --sidebar-accent-foreground: 45 30% 92%;
     --sidebar-border: 152 20% 22%;
     --sidebar-ring: 38 90% 52%;
+  }
+
+  .dark {
+    --background: 160 25% 7%;
+    --foreground: 45 25% 94%;
+
+    --card: 160 22% 10%;
+    --card-foreground: 45 25% 94%;
+
+    --popover: 160 22% 10%;
+    --popover-foreground: 45 25% 94%;
+
+    --primary: 152 55% 55%;
+    --primary-foreground: 160 30% 8%;
+
+    --secondary: 160 18% 16%;
+    --secondary-foreground: 45 25% 94%;
+
+    --muted: 160 18% 14%;
+    --muted-foreground: 45 8% 65%;
+
+    --accent: 30 75% 55%;
+    --accent-foreground: 160 30% 8%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 160 15% 22%;
+    --input: 160 15% 22%;
+    --ring: 152 55% 55%;
+
+    --success: 152 55% 55%;
+    --success-foreground: 160 30% 8%;
+    --kenya-red: 0 65% 60%;
+    --kenya-green: 152 55% 55%;
+    --kenya-gold: 38 90% 60%;
+
+    --section-mcq: 210 75% 60%;
+    --section-short: 152 50% 55%;
+    --section-long: 30 75% 60%;
   }
 }
 
@@ -123,4 +168,58 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+}
+
+/* Print styles for the EXAM PAPER (a separate, photocopy-ready layout) */
+@media print {
+  .exam-paper-print, .exam-paper-print * {
+    visibility: visible !important;
+  }
+  body:has(.exam-paper-print) * {
+    visibility: hidden;
+  }
+  .exam-paper-print {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 0;
+    color: #000;
+    background: #fff;
+  }
+  .exam-paper-print .answer-line {
+    display: block;
+    border-bottom: 1px solid #444;
+    height: 22px;
+    margin-bottom: 6px;
+  }
+  .exam-paper-print .answer-box {
+    border: 1px solid #444;
+    min-height: 90px;
+    margin-bottom: 8px;
+  }
+  .exam-paper-print h1, .exam-paper-print h2, .exam-paper-print h3 {
+    color: #000;
+  }
+  @page {
+    size: A4;
+    margin: 18mm;
+  }
+}
+
+/* Section accent — subtle gradient wash behind the section header strip */
+.section-strip {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+.section-strip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--section-color) / 0.15),
+    hsl(var(--section-color) / 0.02)
+  );
+  pointer-events: none;
 }

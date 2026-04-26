@@ -4,6 +4,7 @@ import SchemeGeneratorDialog from "@/components/SchemeGeneratorDialog";
 import ExamGeneratorDialog from "@/components/ExamGeneratorDialog";
 import { BookOpen, CheckCircle, FileDown, Globe, LayoutDashboard, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const features = [
   {
@@ -42,7 +43,7 @@ const Index = () => {
       </div>
 
       {/* Top nav */}
-      <nav className="flex items-center justify-end px-6 py-3 border-b border-border">
+      <nav className="flex items-center justify-end gap-2 px-6 py-3 border-b border-border">
         {!loading && (
           user ? (
             <div className="flex items-center gap-3">
@@ -63,6 +64,7 @@ const Index = () => {
             </Button>
           )
         )}
+        <ThemeToggle />
       </nav>
 
       {/* Hero */}

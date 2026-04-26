@@ -46,7 +46,7 @@ const ExamGeneratorDialog = () => {
     setCached(false);
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (opts?: { weakStrandsFilter?: string[] }) => {
     if (!pupilName.trim()) {
       toast.error("Enter the pupil's name first");
       return;
@@ -55,13 +55,23 @@ const ExamGeneratorDialog = () => {
       toast.error("Pick grade, subject and term");
       return;
     }
-    const allocation = getTermAllocation(grade, subject, term);
+    let allocation = getTermAllocation(grade, subject, term);
     if (!allocation || allocation.length === 0) {
       toast.error("No curriculum allocation available for this selection.");
       return;
     }
 
+    // For "practice weak areas": narrow allocation to only the weak strands.
+    if (opts?.weakStrandsFilter?.length) {
+      const weak = new Set(opts.weakStrandsFilter.map((s) => s.toLowerCase()));
+      const filtered = allocation.filter((a) =>
+        weak.has((a.strandName || "").toLowerCase()),
+      );
+      if (filtered.length > 0) allocation = filtered;
+    }
+
     setLoading(true);
+    setQuestions(null);
     try {
       const { data, error } = await supabase.functions.invoke("generate-exam", {
         body: {
@@ -69,7 +79,11 @@ const ExamGeneratorDialog = () => {
           subject,
           term,
           allocation,
-          counts: { mcq: 15, short: 8, long: 2 },
+          counts: opts?.weakStrandsFilter?.length
+            ? { mcq: 8, short: 4, long: 1 }
+            : { mcq: 15, short: 8, long: 2 },
+          // Skip cache when targeting weak strands so pupil gets fresh practice
+          forceRefresh: !!opts?.weakStrandsFilter?.length,
         },
       });
       if (error) throw error;
@@ -83,9 +97,11 @@ const ExamGeneratorDialog = () => {
       setExamId(data?.examId ?? null);
       setCached(!!data?.cached);
       toast.success(
-        data?.cached
-          ? `Loaded saved exam (${qs.length} questions)`
-          : `Generated ${qs.length} questions`
+        opts?.weakStrandsFilter?.length
+          ? `Practice set ready (${qs.length} questions)`
+          : data?.cached
+            ? `Loaded saved exam (${qs.length} questions)`
+            : `Generated ${qs.length} questions`,
       );
     } catch (e) {
       console.error(e);
@@ -93,6 +109,19 @@ const ExamGeneratorDialog = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetake = () => {
+    // Keep the same questions, just reset answers in ExamRunner (it already does).
+    // Nothing to do at this layer.
+  };
+
+  const handlePracticeWeak = (weakStrands: string[]) => {
+    if (!weakStrands.length) {
+      toast.info("No weak strands detected — well done!");
+      return;
+    }
+    handleGenerate({ weakStrandsFilter: weakStrands });
   };
 
   return (
@@ -191,7 +220,7 @@ const ExamGeneratorDialog = () => {
             </div>
 
             <Button
-              onClick={handleGenerate}
+              onClick={() => handleGenerate()}
               disabled={
                 loading || !pupilName.trim() || !grade || !subject || !term
               }
@@ -226,6 +255,8 @@ const ExamGeneratorDialog = () => {
               term={term}
               pupilName={pupilName}
               examId={examId}
+              onRetake={handleRetake}
+              onPracticeWeak={handlePracticeWeak}
             />
           </div>
         )}
