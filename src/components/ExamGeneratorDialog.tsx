@@ -220,7 +220,7 @@ const ExamGeneratorDialog = () => {
             </div>
 
             <Button
-              onClick={handleGenerate}
+              onClick={() => handleGenerate()}
               disabled={
                 loading || !pupilName.trim() || !grade || !subject || !term
               }
@@ -255,6 +255,8 @@ const ExamGeneratorDialog = () => {
               term={term}
               pupilName={pupilName}
               examId={examId}
+              onRetake={handleRetake}
+              onPracticeWeak={handlePracticeWeak}
             />
           </div>
         )}
