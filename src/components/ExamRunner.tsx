@@ -201,7 +201,7 @@ const ExamRunner = ({
     }
   };
 
-  const totalMax = questions.reduce((s, q) => s + q.marks, 0);
+
 
   // Progress = answered out of total (treats any non-empty answer as answered).
   const answeredCount = useMemo(
