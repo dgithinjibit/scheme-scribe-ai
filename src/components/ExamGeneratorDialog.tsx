@@ -65,7 +65,7 @@ const ExamGeneratorDialog = () => {
     if (opts?.weakStrandsFilter?.length) {
       const weak = new Set(opts.weakStrandsFilter.map((s) => s.toLowerCase()));
       const filtered = allocation.filter((a) =>
-        weak.has((a.strand || "").toLowerCase()),
+        weak.has((a.strandName || "").toLowerCase()),
       );
       if (filtered.length > 0) allocation = filtered;
     }
