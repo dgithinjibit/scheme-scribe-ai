@@ -204,6 +204,11 @@ const juniorSecondaryLessons: Record<string, number> = {
   "CRE": 3, "HRE": 3, "IRE": 3,
   "Arabic": 2, "French": 2, "German": 2, "Mandarin": 2,
   "Indigenous Language": 2,
+  "AGI": 3,
+};
+
+const seniorSchoolLessons: Record<string, number> = {
+  "AGI": 4,
 };
 
 export function getLessonsPerWeek(grade: string, subject: string): number {
@@ -211,7 +216,8 @@ export function getLessonsPerWeek(grade: string, subject: string): number {
   let map: Record<string, number>;
   if (num >= 1 && num <= 3) map = lowerPrimaryLessons;
   else if (num >= 4 && num <= 6) map = upperPrimaryLessons;
-  else map = juniorSecondaryLessons;
+  else if (num >= 7 && num <= 9) map = juniorSecondaryLessons;
+  else map = seniorSchoolLessons;
   return map[subject] || 5;
 }
 
@@ -219,6 +225,7 @@ export const grades = [
   "Grade 1", "Grade 2", "Grade 3",
   "Grade 4", "Grade 5", "Grade 6",
   "Grade 7", "Grade 8", "Grade 9",
+  "Grade 10", "Grade 11", "Grade 12",
 ];
 
 const lowerPrimarySubjects = [
