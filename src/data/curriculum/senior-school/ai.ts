@@ -40,477 +40,146 @@ function build(subs: SubStrandInfo[][]): StrandInfo[] {
 }
 
 // ─────────────────────────────────────────────────────────────
-// UPPER PRIMARY (Grades 4-6) — 3 lessons/week, 99 lessons
-// Emphasis: recognising AI around us, data basics, safe and honest use
+// UPPER PRIMARY (Grade 6 only) — 2 lessons/week, 66 lessons
+// Introductory level: recognising AI around us, simple data ideas,
+// safe and honest use. No programming, no model building.
 // ─────────────────────────────────────────────────────────────
-
-export const grade4AI: StrandInfo[] = build([
-  [
-    ss("1.1 What is Intelligence?", 5, "How do we know that something is intelligent?", [
-      "identify examples of intelligent behaviour in people, animals and machines",
-      "sort everyday objects into those that are intelligent and those that are not",
-      "appreciate the intelligence found in living things and in machines",
-    ], [
-      "Learners name intelligent things they see at home and in school",
-      "Learners sort picture cards of objects into intelligent and not intelligent",
-      "Learners discuss in groups why they placed each card where they did",
-    ]),
-    ss("1.2 Machines that Help Us", 5, "Which machines around us behave as if they can think?", [
-      "name machines in the home and community that appear to think",
-      "demonstrate how a simple smart device responds to an instruction",
-      "appreciate the help machines give to people in daily life",
-    ], [
-      "Learners name smart devices such as phones, calculators and remote controls",
-      "Learners give voice instructions to a phone assistant and observe the reply",
-      "Learners draw and label a machine that helps their family",
-    ]),
-    ss("1.3 People and Machines", 5, "What can people do that machines cannot?", [
-      "state things that people can do but machines cannot do",
-      "compare a task done by a person with the same task done by a machine",
-      "value the special abilities that people have",
-    ], [
-      "Learners list tasks such as caring, feeling and imagining",
-      "Learners race a calculator against mental arithmetic and record results",
-      "Learners role-play a person and a machine doing the same job",
-    ]),
-  ],
-  [
-    ss("2.1 Meaning of Data", 6, "What is data and where do we find it?", [
-      "define data in simple terms",
-      "collect simple data about the class such as age, height or favourite fruit",
-      "appreciate the usefulness of data in making decisions",
-    ], [
-      "Learners name types of data found in school records",
-      "Learners collect data from classmates using a tally sheet",
-      "Learners present their tally sheets to the class",
-    ]),
-    ss("2.2 Sorting and Grouping Data", 6, "Why do we group things that are alike?", [
-      "explain why data is grouped",
-      "sort collected data into groups using a chosen rule",
-      "show care when handling information about other people",
-    ], [
-      "Learners sort bottle tops, leaves or cards by colour, size and shape",
-      "Learners group class data into tables",
-      "Learners discuss why we do not share other people's personal details",
-    ]),
-    ss("2.3 Pictures and Labels", 6, "How do machines learn to tell pictures apart?", [
-      "describe how labels help a machine recognise a picture",
-      "label a set of pictures correctly for a machine to use",
-      "value accuracy when labelling information",
-    ], [
-      "Learners label printed pictures of animals and objects",
-      "Learners feed labelled pictures into a free image-training tool and test it",
-      "Learners discuss what happens when a label is wrong",
-    ]),
-  ],
-  [
-    ss("3.1 Giving Clear Instructions", 6, "Why must instructions to a machine be clear?", [
-      "explain why machines need clear and ordered instructions",
-      "practice writing a step-by-step instruction for a simple task",
-      "appreciate the value of clear communication",
-    ], [
-      "Learners guide a blindfolded partner across the room using words only",
-      "Learners write steps for washing hands and test them on a classmate",
-      "Learners correct instructions that gave a wrong result",
-    ]),
-    ss("3.2 Block-based Programming", 6, "How can we make a computer follow our plan?", [
-      "identify the parts of a block-based programming screen",
-      "construct a simple animation or quiz using blocks",
-      "show patience when a program does not work at first",
-    ], [
-      "Learners explore Scratch or a similar offline block tool",
-      "Learners build a short animation of a Kenyan story",
-      "Learners fix errors in each other's projects",
-    ]),
-    ss("3.3 Teaching a Machine", 6, "Can a machine learn from examples we give it?", [
-      "describe how a machine learns from examples",
-      "practice training a simple image or sound model using examples",
-      "appreciate the effort needed to teach a machine well",
-    ], [
-      "Learners train a Teachable Machine model with two picture classes",
-      "Learners test the model with new pictures and record the results",
-      "Learners add more examples and observe the improvement",
-    ]),
-  ],
-  [
-    ss("4.1 Finding a Problem to Solve", 5, "Which problem in our school could a smart tool help with?", [
-      "identify a problem in the school or home that a smart tool could help solve",
-      "suggest a simple smart solution to the chosen problem",
-      "value teamwork in solving problems",
-    ], [
-      "Learners walk around the school and list problems they notice",
-      "Learners choose one problem in groups and suggest a solution",
-      "Learners present their chosen problem to the class",
-    ]),
-    ss("4.2 Building a Simple Project", 5, "How do we turn an idea into a working project?", [
-      "outline the steps of making a simple digital project",
-      "construct a simple project using blocks or a training tool",
-      "show persistence while building a project",
-    ], [
-      "Learners plan their project on paper first",
-      "Learners build the project using a block tool",
-      "Learners keep a simple record of changes they make",
-    ]),
-    ss("4.3 Testing and Sharing", 5, "How do we know our project works well?", [
-      "describe how a project is tested",
-      "demonstrate their finished project to an audience",
-      "appreciate feedback from others",
-    ], [
-      "Learners test each other's projects and note problems",
-      "Learners improve their project using the feedback",
-      "Learners display projects at a class exhibition",
-    ]),
-  ],
-  [
-    ss("5.1 Safe Use of Smart Tools", 8, "How do we stay safe when using smart tools?", [
-      "state rules for using smart devices safely",
-      "demonstrate safe behaviour when using a digital device",
-      "show responsibility when using smart tools",
-    ], [
-      "Learners make a class charter for safe device use",
-      "Learners role-play safe and unsafe online situations",
-      "Learners share the charter with other classes",
-    ]),
-    ss("5.2 Privacy and Personal Information", 8, "Why should we protect our personal information?", [
-      "identify information that should be kept private",
-      "sort information into private and public",
-      "value the privacy of themselves and others",
-    ], [
-      "Learners sort cards showing names, photos, passwords and hobbies",
-      "Learners discuss what a stranger could do with private details",
-      "Learners create posters about protecting personal information",
-    ]),
-    ss("5.3 Honesty when Using AI", 8, "Is it fair to say that work done by a machine is ours?", [
-      "explain what honesty means when a smart tool helps with schoolwork",
-      "demonstrate how to state where help came from",
-      "commit to honesty in their own work",
-    ], [
-      "Learners discuss cases where a tool did the work for a learner",
-      "Learners practice writing a short note showing what help they used",
-      "Learners agree on a class honesty pledge",
-    ]),
-    ss("5.4 Class AI Project Showcase", 9, "How can our smart project help our community?", [
-      "describe how their project helps the community",
-      "demonstrate the completed project to parents or other classes",
-      "appreciate the contribution of every group member",
-    ], [
-      "Learners refine their project for display",
-      "Learners prepare a short spoken presentation",
-      "Learners hold a showcase and collect visitor comments",
-    ]),
-  ],
-]);
-
-export const grade5AI: StrandInfo[] = build([
-  [
-    ss("1.1 History of Thinking Machines", 5, "How did thinking machines begin?", [
-      "outline key milestones in the growth of thinking machines",
-      "arrange milestones of AI development in order of time",
-      "appreciate the work of people who built early machines",
-    ], [
-      "Learners study a picture timeline of computing and AI",
-      "Learners arrange milestone cards on a class timeline",
-      "Learners discuss which milestone changed life the most",
-    ]),
-    ss("1.2 AI in Kenyan Daily Life", 5, "Where is AI already working in Kenya?", [
-      "identify uses of AI in Kenyan farming, banking, health and transport",
-      "record examples of AI they meet in their community",
-      "value the role of AI in national development",
-    ], [
-      "Learners list AI uses such as mobile money fraud checks and crop apps",
-      "Learners interview a family member about smart services they use",
-      "Learners report their findings in groups",
-    ]),
-    ss("1.3 Kinds of Intelligent Systems", 5, "Are all intelligent machines the same?", [
-      "classify intelligent systems as rule-following or example-learning",
-      "sort examples of systems into the two kinds",
-      "appreciate the variety of intelligent systems",
-    ], [
-      "Learners study a calculator and a photo-tagging app",
-      "Learners sort system cards into rule-based and learning",
-      "Learners explain their sorting to another group",
-    ]),
-  ],
-  [
-    ss("2.1 Collecting Good Data", 6, "What makes data good enough to use?", [
-      "explain the qualities of good data",
-      "collect data using an agreed method and record it neatly",
-      "value accuracy in collecting information",
-    ], [
-      "Learners design a simple survey form",
-      "Learners collect weather or attendance data for a week",
-      "Learners check each other's records for mistakes",
-    ]),
-    ss("2.2 Cleaning Data", 6, "What do we do with data that has errors?", [
-      "describe common errors found in data",
-      "practice removing errors and repeated entries from a data set",
-      "show care and patience when working with data",
-    ], [
-      "Learners receive a messy data table and mark the errors",
-      "Learners correct the table in a spreadsheet",
-      "Learners compare the messy and clean tables",
-    ]),
-    ss("2.3 Reading Data in Charts", 6, "What story does our data tell?", [
-      "explain what a chart shows about a set of data",
-      "construct a bar chart or picture chart from collected data",
-      "appreciate the power of data in telling a true story",
-    ], [
-      "Learners draw bar charts of class data by hand",
-      "Learners create the same chart in a spreadsheet",
-      "Learners write one sentence describing what the chart shows",
-    ]),
-  ],
-  [
-    ss("3.1 Rules and Decisions", 6, "How can a machine make a decision?", [
-      "explain how a rule leads a machine to a decision",
-      "construct a decision tree for a familiar choice",
-      "appreciate logical thinking in daily decisions",
-    ], [
-      "Learners build a decision tree for choosing what to wear",
-      "Learners test the tree on classmates",
-      "Learners improve rules that gave a wrong answer",
-    ]),
-    ss("3.2 Programming with Conditions", 6, "How does a program choose between two paths?", [
-      "identify conditional blocks in a programming tool",
-      "construct a program that uses a condition to choose an action",
-      "show determination when correcting program errors",
-    ], [
-      "Learners build a quiz that responds differently to right and wrong answers",
-      "Learners add a score counter to the quiz",
-      "Learners test and debug the quiz in pairs",
-    ]),
-    ss("3.3 Training and Testing a Model", 6, "Why must we test a model with new examples?", [
-      "explain why a model is tested with examples it has not seen",
-      "practice training and testing a simple classifier",
-      "value fairness in judging how well a model works",
-    ], [
-      "Learners train a sound or image classifier with three classes",
-      "Learners set aside test examples before training",
-      "Learners record how many test examples were classified correctly",
-    ]),
-  ],
-  [
-    ss("4.1 Planning an AI Solution", 5, "Who is our project for and what do they need?", [
-      "identify the user and the need that a project will serve",
-      "suggest a design for a project that meets the identified need",
-      "value listening to the people a project is meant to help",
-    ], [
-      "Learners interview a potential user about their need",
-      "Learners write a short plan naming the user, need and idea",
-      "Learners present plans for peer comment",
-    ]),
-    ss("4.2 Building and Improving", 5, "How do we make our project better each time?", [
-      "describe the cycle of building, testing and improving",
-      "construct a working version of the planned project",
-      "show openness to changing their work after testing",
-    ], [
-      "Learners build a first version of the project",
-      "Learners test it with a real user and note problems",
-      "Learners make one improvement and test again",
-    ]),
-    ss("4.3 Presenting the Solution", 5, "How do we explain our project to others?", [
-      "outline the parts of a clear project presentation",
-      "demonstrate the project and explain how it works",
-      "appreciate the ideas of other groups",
-    ], [
-      "Learners prepare a short poster about the project",
-      "Learners present to the class within a time limit",
-      "Learners give positive comments on other projects",
-    ]),
-  ],
-  [
-    ss("5.1 Fairness in AI", 8, "Can a machine treat people unfairly?", [
-      "explain how a machine can treat some people unfairly",
-      "identify unfair results in a simple model they have trained",
-      "value fair treatment of all people",
-    ], [
-      "Learners train a model using examples from only one group",
-      "Learners test it on a different group and record the results",
-      "Learners discuss how to make the examples fairer",
-    ]),
-    ss("5.2 AI and Our Jobs", 8, "How will smart machines change work in Kenya?", [
-      "identify jobs that smart machines are changing in Kenya",
-      "interpret information about changing jobs in their community",
-      "appreciate the need to keep learning new skills",
-    ], [
-      "Learners interview workers about changes brought by technology",
-      "Learners group jobs into changing, growing and reducing",
-      "Learners discuss skills they will need in future",
-    ]),
-    ss("5.3 Protecting Our Information", 8, "Who should be allowed to keep our information?", [
-      "state basic rights people have over their own information",
-      "demonstrate how to set a strong password and privacy setting",
-      "commit to protecting their own and other people's information",
-    ], [
-      "Learners study simplified rights from the Kenyan data protection law",
-      "Learners practice creating strong passwords",
-      "Learners create a class guide on protecting information",
-    ]),
-    ss("5.4 Community AI Challenge", 9, "How can our class use AI to serve our community?", [
-      "describe a community problem their project addresses",
-      "construct and present a project that responds to the problem",
-      "show commitment to serving their community",
-    ], [
-      "Learners select a community problem in groups",
-      "Learners build and test their solution over several lessons",
-      "Learners present the project to the school community",
-    ]),
-  ],
-]);
 
 export const grade6AI: StrandInfo[] = build([
   [
-    ss("1.1 How Machines Sense the World", 5, "How does a machine take in information?", [
-      "identify sensors used by intelligent machines",
-      "demonstrate how a sensor input changes a machine's response",
-      "appreciate the link between sensing and intelligent action",
+    ss("1.1 What is Intelligence?", 4, "How do we know that something is intelligent?", [
+      "identify examples of intelligent behaviour in people, animals and machines",
+      "sort everyday objects into those that behave intelligently and those that do not",
+      "appreciate intelligence found in living things and in machines",
     ], [
-      "Learners examine cameras, microphones and light sensors",
-      "Learners use a phone sensor app and record readings",
-      "Learners match sensors to intelligent devices that use them",
+      "Learners name intelligent things they see at home and in school",
+      "Learners sort picture cards into intelligent and not intelligent",
+      "Learners discuss in groups why they placed each card where they did",
     ]),
-    ss("1.2 Narrow and General Intelligence", 5, "Can one machine do everything a person can do?", [
-      "explain the difference between narrow AI and general intelligence",
-      "classify given systems as narrow or general",
-      "appreciate the limits of present-day machines",
+    ss("1.2 Meaning of Artificial Intelligence", 4, "What does it mean to say a machine is intelligent?", [
+      "state the meaning of artificial intelligence in simple terms",
+      "describe simple examples of artificial intelligence in daily life",
+      "show interest in learning about artificial intelligence",
     ], [
-      "Learners test a chatbot on tasks outside its purpose",
-      "Learners sort system cards into narrow and general",
-      "Learners debate whether a general machine is possible",
+      "Learners listen to a simple explanation of artificial intelligence",
+      "Learners describe an intelligent machine they have seen or used",
+      "Learners draw a chart of intelligent machines in their community",
     ]),
-    ss("1.3 AI and Other Learning Areas", 5, "How does AI connect with our other subjects?", [
-      "identify links between AI and mathematics, science and languages",
-      "use an AI tool to support learning in another subject",
-      "value the usefulness of AI across learning areas",
+    ss("1.3 Artificial Intelligence Around Us in Kenya", 4, "Where do we meet artificial intelligence in our community?", [
+      "identify uses of artificial intelligence in Kenyan homes, farms, hospitals and phones",
+      "match everyday services to the intelligent technology used in them",
+      "appreciate the usefulness of artificial intelligence in daily Kenyan life",
     ], [
-      "Learners use a translation tool in a Kiswahili lesson",
-      "Learners use a graphing tool in a mathematics task",
-      "Learners record which tool helped most and why",
-    ]),
-  ],
-  [
-    ss("2.1 Structured and Unstructured Data", 6, "Is all data stored in the same way?", [
-      "classify data as structured or unstructured",
-      "sort samples of data into the two types",
-      "appreciate the variety of data used by machines",
-    ], [
-      "Learners examine tables, photographs, sound clips and messages",
-      "Learners sort data samples into two groups",
-      "Learners explain the difference in their own words",
-    ]),
-    ss("2.2 Bias in Data", 6, "Whose voices are missing from our data?", [
-      "explain how missing groups create bias in data",
-      "examine a data set and identify groups that are missing",
-      "value the inclusion of all groups in data",
-    ], [
-      "Learners study a class data set that excludes some learners",
-      "Learners predict the effect of the missing group",
-      "Learners collect extra data to fix the gap",
-    ]),
-    ss("2.3 Representing Knowledge", 6, "How can facts be written so a machine can use them?", [
-      "describe how facts and relationships can be written for a machine",
-      "construct a simple knowledge map of a familiar topic",
-      "appreciate orderly thinking in organising knowledge",
-    ], [
-      "Learners draw concept maps linking facts about a topic",
-      "Learners write facts as simple statements such as 'a cow is an animal'",
-      "Learners use their statements to answer questions",
+      "Learners list phone and mobile-money features that suggest answers to users",
+      "Learners match pictures of services to the intelligent tools used",
+      "Learners share stories of intelligent technology used by their families",
     ]),
   ],
   [
-    ss("3.1 Pattern Recognition", 6, "How does a machine notice a pattern?", [
-      "explain how patterns help a machine make predictions",
-      "identify patterns in a set of numbers, pictures or sounds",
-      "appreciate patterns found in the world around them",
+    ss("2.1 Meaning and Sources of Data", 5, "What is data and where does it come from?", [
+      "state the meaning of data and name common sources of data",
+      "collect simple data from classmates using a prepared form",
+      "value accuracy when collecting data",
     ], [
-      "Learners complete pattern puzzles in groups",
-      "Learners feed patterned data into a training tool",
-      "Learners predict what the tool will answer before testing",
+      "Learners name types of data such as numbers, words, pictures and sounds",
+      "Learners collect class data such as favourite fruits or shoe sizes",
+      "Learners record their findings neatly in a table",
     ]),
-    ss("3.2 Programming with Loops and Lists", 6, "How can a program handle many items at once?", [
-      "identify loops and lists in a programming tool",
-      "construct a program that processes a list of items using a loop",
-      "show persistence in debugging their programs",
+    ss("2.2 Sorting and Grouping Data", 5, "Why do we group information before using it?", [
+      "explain why data is sorted and grouped before use",
+      "sort picture or number cards into labelled groups",
+      "show care and orderliness when organising data",
     ], [
-      "Learners build a program that reads a list of class names",
-      "Learners add a loop to repeat an action for each name",
-      "Learners test the program with a longer list",
-    ]),
-    ss("3.3 Chatbots and Language Tools", 6, "How does a machine understand what we type?", [
-      "describe how a chatbot responds to typed words",
-      "construct a simple rule-based chatbot",
-      "value careful and respectful communication with AI tools",
-    ], [
-      "Learners plan chatbot questions and answers on paper",
-      "Learners build the chatbot in a block tool",
-      "Learners test the chatbot with unexpected questions",
+      "Learners sort picture cards of animals, fruits or vehicles into groups",
+      "Learners label each group and count the items in it",
+      "Learners present their grouped data to the class",
     ]),
   ],
   [
-    ss("4.1 Defining the Problem", 5, "What exactly are we trying to solve?", [
-      "state a project problem clearly in one sentence",
-      "interpret user needs into a clear project goal",
-      "value clarity before starting work",
+    ss("3.1 Machines Follow Instructions", 4, "How does a machine know what to do?", [
+      "explain that machines follow step-by-step instructions given by people",
+      "arrange picture steps into the correct order for a simple task",
+      "appreciate the importance of clear and correct instructions",
     ], [
-      "Learners write and rewrite their problem statement",
-      "Learners test the statement with another group",
-      "Learners agree on a final goal for the project",
+      "Learners give a classmate spoken step-by-step instructions for a task",
+      "Learners arrange instruction cards in order for a daily activity",
+      "Learners discuss what happens when a step is missing",
     ]),
-    ss("4.2 Designing and Building", 5, "How do we build what we planned?", [
-      "outline the design of their intended solution",
-      "construct the solution using an AI or programming tool",
-      "show teamwork while building the solution",
+    ss("3.2 Teaching a Machine by Example", 4, "How can a machine learn from examples?", [
+      "describe how machines learn from many examples shown to them",
+      "demonstrate teaching a machine by grouping example pictures",
+      "appreciate the role of good examples in machine learning",
     ], [
-      "Learners draw a design sketch before building",
-      "Learners share building roles within the group",
-      "Learners keep a build log of each session",
+      "Learners play a guided game where the teacher guesses using examples",
+      "Learners group example pictures into two classes and test the guessing",
+      "Learners discuss why more examples give better guesses",
     ]),
-    ss("4.3 Evaluating the Solution", 5, "Did our solution actually solve the problem?", [
-      "explain criteria for judging whether a solution works",
-      "interpret test results against the project goal",
-      "appreciate honest judgement of their own work",
+    ss("3.3 Talking and Listening Machines", 4, "How do machines understand what we say?", [
+      "identify machines that respond to speech and to typed questions",
+      "demonstrate use of a voice or text assistant to ask a simple question",
+      "value polite and responsible use of talking machines",
     ], [
-      "Learners write success criteria before testing",
-      "Learners test the solution with real users",
-      "Learners write an honest evaluation of the results",
+      "Learners observe a demonstration of a voice assistant answering a question",
+      "Learners take turns asking clear questions and record the answers",
+      "Learners discuss when the machine answered wrongly and why",
     ]),
   ],
   [
-    ss("5.1 Truth and False Information", 8, "How can we tell if something online is real?", [
-      "explain how AI can create false pictures, voices and text",
-      "examine online items and identify signs that they are false",
-      "commit to sharing only information they have checked",
+    ss("4.1 Spotting Problems Artificial Intelligence Can Help Solve", 5, "Which everyday problems could an intelligent machine help with?", [
+      "identify problems in the school or community that intelligent tools could help solve",
+      "describe a simple idea for using an intelligent tool to solve one problem",
+      "appreciate teamwork when looking for solutions to problems",
     ], [
-      "Learners compare real and AI-generated images",
-      "Learners list clues that reveal generated content",
-      "Learners create a checking checklist for the class",
+      "Learners list problems they notice in school such as lost items or litter",
+      "Learners choose one problem and describe an intelligent helper for it",
+      "Learners share their ideas in groups and give feedback to one another",
     ]),
-    ss("5.2 Human-Centred AI", 8, "Should a machine ever decide for a person?", [
-      "explain what it means to keep people at the centre of AI use",
-      "examine cases where a machine decision affects a person",
-      "value human dignity in the use of technology",
+    ss("4.2 Simple Class Project", 5, "How can we show our idea to others?", [
+      "describe the parts of their chosen artificial intelligence idea",
+      "prepare a drawing, poster or role-play showing how the idea would work",
+      "show confidence in presenting their own ideas to others",
     ], [
-      "Learners study cases such as automated school admission",
-      "Learners role-play affected people and decision makers",
-      "Learners agree on when a human must decide",
+      "Learners prepare posters or role-plays of their intelligent helper",
+      "Learners present the idea to the class and answer questions",
+      "Learners display the best posters in the classroom or school notice board",
     ]),
-    ss("5.3 AI and the Environment", 8, "What does running AI cost our planet?", [
-      "describe the energy and material costs of running AI systems",
-      "interpret simple data on energy used by digital devices",
-      "value responsible use of energy and devices",
+  ],
+  [
+    ss("5.1 Safe Use of Intelligent Tools", 6, "How do we stay safe when using intelligent tools?", [
+      "identify safe and unsafe behaviour when using online intelligent tools",
+      "demonstrate safe use of an intelligent tool under supervision",
+      "value personal safety when using digital tools",
     ], [
-      "Learners read simplified figures on data centre energy use",
-      "Learners audit device use in their own school",
-      "Learners suggest ways to reduce waste",
+      "Learners list safety rules for using phones and computers",
+      "Learners role-play safe and unsafe situations online",
+      "Learners prepare a class safety chart and display it",
     ]),
-    ss("5.4 Transition Capstone Project", 9, "What have we learnt that we can now build alone?", [
-      "outline all the stages of their capstone project",
-      "construct and evaluate a complete AI project",
-      "show pride and responsibility in completed work",
+    ss("5.2 Honesty When Using Artificial Intelligence", 6, "Is it honest to present a machine's work as our own?", [
+      "explain why work produced by a machine must be acknowledged",
+      "demonstrate acknowledging help received from an intelligent tool",
+      "commit to honesty in schoolwork",
     ], [
-      "Learners choose a capstone theme independently",
-      "Learners build, test and document the project",
-      "Learners present the project portfolio for assessment",
+      "Learners discuss a story about a learner who copied a machine's answer",
+      "Learners practise writing a short note stating where help came from",
+      "Learners agree on a class rule on honest use of intelligent tools",
+    ]),
+    ss("5.3 Keeping Personal Information Private", 5, "Which information should we never share with a machine?", [
+      "identify personal information that should not be shared online",
+      "sort information cards into private and shareable",
+      "show respect for the privacy of self and others",
+    ], [
+      "Learners name items of personal information such as names and locations",
+      "Learners sort information cards into private and shareable groups",
+      "Learners discuss how to respond when asked for private information",
+    ]),
+    ss("5.4 Artificial Intelligence and Our Future Work", 5, "How will intelligent machines change the work we do?", [
+      "identify jobs in Kenya that intelligent machines are changing",
+      "describe skills people will need to work alongside intelligent machines",
+      "appreciate the value of learning new skills for the future",
+    ], [
+      "Learners interview an adult about changes in their work",
+      "Learners list skills that machines cannot easily replace",
+      "Learners discuss careers they would like in a world with intelligent machines",
     ]),
   ],
 ]);
