@@ -1,7 +1,7 @@
 import type { StrandInfo, SubStrandInfo } from "../types";
 
 /**
- * AGI (Artificial General Intelligence) Learning Area
+ * AI (Artificial General Intelligence) Learning Area
  * Kenyan CBE-aligned design, Grades 4-12.
  *
  * Sources blended into this design:
@@ -44,7 +44,7 @@ function build(subs: SubStrandInfo[][]): StrandInfo[] {
 // Emphasis: recognising AI around us, data basics, safe and honest use
 // ─────────────────────────────────────────────────────────────
 
-export const grade4AGI: StrandInfo[] = build([
+export const grade4AI: StrandInfo[] = build([
   [
     ss("1.1 What is Intelligence?", 5, "How do we know that something is intelligent?", [
       "identify examples of intelligent behaviour in people, animals and machines",
@@ -201,7 +201,7 @@ export const grade4AGI: StrandInfo[] = build([
   ],
 ]);
 
-export const grade5AGI: StrandInfo[] = build([
+export const grade5AI: StrandInfo[] = build([
   [
     ss("1.1 History of Thinking Machines", 5, "How did thinking machines begin?", [
       "outline key milestones in the growth of thinking machines",
@@ -358,7 +358,7 @@ export const grade5AGI: StrandInfo[] = build([
   ],
 ]);
 
-export const grade6AGI: StrandInfo[] = build([
+export const grade6AI: StrandInfo[] = build([
   [
     ss("1.1 How Machines Sense the World", 5, "How does a machine take in information?", [
       "identify sensors used by intelligent machines",
@@ -520,7 +520,7 @@ export const grade6AGI: StrandInfo[] = build([
 // Emphasis: how machines learn, data handling, project work, bias and ethics
 // ─────────────────────────────────────────────────────────────
 
-export const grade7AGI: StrandInfo[] = build([
+export const grade7AI: StrandInfo[] = build([
   [
     ss("1.1 Defining Artificial Intelligence", 5, "What makes a system artificially intelligent?", [
       "define artificial intelligence and its main branches",
@@ -545,8 +545,8 @@ export const grade7AGI: StrandInfo[] = build([
       "compare current systems against the requirements of general intelligence",
       "value realistic thinking about technology claims",
     ], [
-      "Learners read a short article on AGI research",
-      "Learners build a comparison table of current AI against AGI goals",
+      "Learners read a short article on AI research",
+      "Learners build a comparison table of current AI against AI goals",
       "Learners debate timelines claimed in the media",
     ]),
   ],
@@ -677,7 +677,7 @@ export const grade7AGI: StrandInfo[] = build([
   ],
 ]);
 
-export const grade8AGI: StrandInfo[] = build([
+export const grade8AI: StrandInfo[] = build([
   [
     ss("1.1 Search and Problem Solving", 5, "How does a machine find a path to a goal?", [
       "explain how a machine searches for a solution",
@@ -834,7 +834,7 @@ export const grade8AGI: StrandInfo[] = build([
   ],
 ]);
 
-export const grade9AGI: StrandInfo[] = build([
+export const grade9AI: StrandInfo[] = build([
   [
     ss("1.1 Cognitive Architectures", 5, "How might a machine combine many abilities at once?", [
       "describe how a cognitive architecture combines memory, reasoning and learning",
@@ -997,7 +997,7 @@ export const grade9AGI: StrandInfo[] = build([
 // model building, agents, AI policy and enterprise
 // ─────────────────────────────────────────────────────────────
 
-export const grade10AGI: StrandInfo[] = build([
+export const grade10AI: StrandInfo[] = build([
   [
     ss("1.1 Theories of Intelligence", 7, "What theories explain intelligence in humans and machines?", [
       "explain the main theories that describe intelligence",
@@ -1154,7 +1154,7 @@ export const grade10AGI: StrandInfo[] = build([
   ],
 ]);
 
-export const grade11AGI: StrandInfo[] = build([
+export const grade11AI: StrandInfo[] = build([
   [
     ss("1.1 Learning Theory", 7, "What does it mean, mathematically, for a machine to learn?", [
       "explain the formal idea of learning from data",
@@ -1311,14 +1311,14 @@ export const grade11AGI: StrandInfo[] = build([
   ],
 ]);
 
-export const grade12AGI: StrandInfo[] = build([
+export const grade12AI: StrandInfo[] = build([
   [
     ss("1.1 Pathways to Artificial General Intelligence", 7, "What would it take to build a genuinely general mind?", [
       "outline the leading research pathways towards general intelligence",
       "compare the assumptions behind each pathway",
       "appreciate open scientific questions in the field",
     ], [
-      "Learners review research summaries on AGI approaches",
+      "Learners review research summaries on AI approaches",
       "Learners map assumptions and open problems per pathway",
       "Learners present a critique of one pathway",
     ]),
@@ -1456,7 +1456,7 @@ export const grade12AGI: StrandInfo[] = build([
       "Learners separate evidenced claims from speculation",
       "Learners write a balanced risk assessment",
     ]),
-    ss("5.4 Exit Capstone: AGI Research Project", 17, "What original contribution can we make to AI in Kenya?", [
+    ss("5.4 Exit Capstone: AI Research Project", 17, "What original contribution can we make to AI in Kenya?", [
       "describe an original research question and its method",
       "conduct, evaluate and defend a complete research project",
       "show integrity, independence and scholarly discipline",

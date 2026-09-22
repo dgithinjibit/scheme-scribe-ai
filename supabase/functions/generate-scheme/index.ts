@@ -89,8 +89,8 @@ function extractJsonArray(raw: string): SchemeRow[] {
 function getKLBBookTitle(subject: string, grade: string): string {
   const gradeNum = parseInt(grade.replace("Grade ", ""));
   const isSw = kiswahiliSubjects.includes(subject);
-  if (subject === "AGI") {
-    return `KICD AGI (Artificial General Intelligence) Learning Area Design ${grade}`;
+  if (subject === "AI") {
+    return `KICD AI (Artificial Intelligence) Learning Area Design ${grade}`;
   }
   if (gradeNum >= 1 && gradeNum <= 3) {
     const titles: Record<string, string> = {
