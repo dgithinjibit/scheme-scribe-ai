@@ -32,6 +32,10 @@ export { grade6Mathematics } from "./upper-primary/mathematics-grade6";
 export { grade4Kiswahili } from "./upper-primary/kiswahili";
 export { grade6Kiswahili } from "./upper-primary/kiswahili-grade6";
 export { grade1IRE, grade2IRE, grade3IRE } from "./lower-primary/ire";
+export {
+  grade4AGI, grade5AGI, grade6AGI, grade7AGI, grade8AGI,
+  grade9AGI, grade10AGI, grade11AGI, grade12AGI,
+} from "./senior-school/agi";
 
 import type { StrandInfo } from "./types";
 import { grade1CreativeActivities, grade2CreativeActivities, grade3CreativeActivities } from "./lower-primary/creative-activities";
@@ -64,6 +68,10 @@ import { grade5Mathematics } from "./upper-primary/mathematics-grade5";
 import { grade6Mathematics } from "./upper-primary/mathematics-grade6";
 import { grade4Kiswahili } from "./upper-primary/kiswahili";
 import { grade6Kiswahili } from "./upper-primary/kiswahili-grade6";
+import {
+  grade4AGI, grade5AGI, grade6AGI, grade7AGI, grade8AGI,
+  grade9AGI, grade10AGI, grade11AGI, grade12AGI,
+} from "./senior-school/agi";
 
 // ─── Strand registry keyed by "Grade X|Subject" ───
 
@@ -112,6 +120,15 @@ const hardcodedStrands: Record<CurriculumKey, StrandInfo[]> = {
   "Grade 5|Mathematics": grade5Mathematics,
   "Grade 6|Mathematics": grade6Mathematics,
   "Grade 6|Social Studies": grade6SocialStudies,
+  "Grade 4|AGI": grade4AGI,
+  "Grade 5|AGI": grade5AGI,
+  "Grade 6|AGI": grade6AGI,
+  "Grade 7|AGI": grade7AGI,
+  "Grade 8|AGI": grade8AGI,
+  "Grade 9|AGI": grade9AGI,
+  "Grade 10|AGI": grade10AGI,
+  "Grade 11|AGI": grade11AGI,
+  "Grade 12|AGI": grade12AGI,
 };
 
 /**
@@ -187,6 +204,11 @@ const juniorSecondaryLessons: Record<string, number> = {
   "CRE": 3, "HRE": 3, "IRE": 3,
   "Arabic": 2, "French": 2, "German": 2, "Mandarin": 2,
   "Indigenous Language": 2,
+  "AGI": 3,
+};
+
+const seniorSchoolLessons: Record<string, number> = {
+  "AGI": 4,
 };
 
 export function getLessonsPerWeek(grade: string, subject: string): number {
@@ -194,7 +216,8 @@ export function getLessonsPerWeek(grade: string, subject: string): number {
   let map: Record<string, number>;
   if (num >= 1 && num <= 3) map = lowerPrimaryLessons;
   else if (num >= 4 && num <= 6) map = upperPrimaryLessons;
-  else map = juniorSecondaryLessons;
+  else if (num >= 7 && num <= 9) map = juniorSecondaryLessons;
+  else map = seniorSchoolLessons;
   return map[subject] || 5;
 }
 
@@ -202,6 +225,7 @@ export const grades = [
   "Grade 1", "Grade 2", "Grade 3",
   "Grade 4", "Grade 5", "Grade 6",
   "Grade 7", "Grade 8", "Grade 9",
+  "Grade 10", "Grade 11", "Grade 12",
 ];
 
 const lowerPrimarySubjects = [
@@ -216,6 +240,7 @@ const lowerPrimarySubjects = [
 ];
 
 const upperPrimarySubjects = [
+  "AGI",
   "Agriculture",
   "Arabic",
   "Creative Arts",
@@ -234,6 +259,7 @@ const upperPrimarySubjects = [
 ];
 
 const juniorSecondarySubjects = [
+  "AGI",
   "Agriculture",
   "Arabic",
   "Creative Arts",
@@ -252,10 +278,15 @@ const juniorSecondarySubjects = [
   "Social Studies",
 ];
 
+const seniorSchoolSubjects = [
+  "AGI",
+];
+
 export function getSubjectsForGrade(grade: string): string[] {
   const num = parseInt(grade.replace("Grade ", ""));
   if (num >= 1 && num <= 3) return lowerPrimarySubjects;
   if (num >= 4 && num <= 6) return upperPrimarySubjects;
   if (num >= 7 && num <= 9) return juniorSecondarySubjects;
+  if (num >= 10 && num <= 12) return seniorSchoolSubjects;
   return upperPrimarySubjects;
 }
