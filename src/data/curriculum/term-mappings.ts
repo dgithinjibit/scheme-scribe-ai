@@ -77,7 +77,7 @@ const STRAND_TERM_RULES: Record<string, StrandTermRule> = {
     "Term 2": ["Performing"],
     "Term 3": ["Appreciation"],
   },
-  "AGI": {
+  "AI": {
     "Term 1": ["Foundations of Intelligence", "Data and Representation"],
     "Term 2": ["AI Techniques", "AI System Design"],
     "Term 3": ["Ethics"],
