@@ -240,6 +240,7 @@ const lowerPrimarySubjects = [
 ];
 
 const upperPrimarySubjects = [
+  "AGI",
   "Agriculture",
   "Arabic",
   "Creative Arts",
@@ -258,6 +259,7 @@ const upperPrimarySubjects = [
 ];
 
 const juniorSecondarySubjects = [
+  "AGI",
   "Agriculture",
   "Arabic",
   "Creative Arts",
@@ -276,10 +278,15 @@ const juniorSecondarySubjects = [
   "Social Studies",
 ];
 
+const seniorSchoolSubjects = [
+  "AGI",
+];
+
 export function getSubjectsForGrade(grade: string): string[] {
   const num = parseInt(grade.replace("Grade ", ""));
   if (num >= 1 && num <= 3) return lowerPrimarySubjects;
   if (num >= 4 && num <= 6) return upperPrimarySubjects;
   if (num >= 7 && num <= 9) return juniorSecondarySubjects;
+  if (num >= 10 && num <= 12) return seniorSchoolSubjects;
   return upperPrimarySubjects;
 }
