@@ -239,7 +239,6 @@ const lowerPrimarySubjects = [
 ];
 
 const upperPrimarySubjects = [
-  "AI",
   "Agriculture",
   "Arabic",
   "Creative Arts",
@@ -284,6 +283,8 @@ const seniorSchoolSubjects = [
 export function getSubjectsForGrade(grade: string): string[] {
   const num = parseInt(grade.replace("Grade ", ""));
   if (num >= 1 && num <= 3) return lowerPrimarySubjects;
+  // AI is introduced at Grade 6 only within upper primary
+  if (num === 6) return ["AI", ...upperPrimarySubjects];
   if (num >= 4 && num <= 6) return upperPrimarySubjects;
   if (num >= 7 && num <= 9) return juniorSecondarySubjects;
   if (num >= 10 && num <= 12) return seniorSchoolSubjects;
