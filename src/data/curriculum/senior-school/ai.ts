@@ -2,7 +2,7 @@ import type { StrandInfo, SubStrandInfo } from "../types";
 
 /**
  * AI (Artificial General Intelligence) Learning Area
- * Kenyan CBE-aligned design, Grades 4-12.
+ * Kenyan CBE-aligned design, Grades 6-12 (Grade 6 = introduction).
  *
  * Sources blended into this design:
  *  - "A Strategic Framework for an AI Education Model in the Kenyan CBE" (Daniel Wachira)
