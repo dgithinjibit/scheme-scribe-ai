@@ -33,7 +33,7 @@ export { grade4Kiswahili } from "./upper-primary/kiswahili";
 export { grade6Kiswahili } from "./upper-primary/kiswahili-grade6";
 export { grade1IRE, grade2IRE, grade3IRE } from "./lower-primary/ire";
 export {
-  grade4AI, grade5AI, grade6AI, grade7AI, grade8AI,
+  grade6AI, grade7AI, grade8AI,
   grade9AI, grade10AI, grade11AI, grade12AI,
 } from "./senior-school/ai";
 
@@ -69,7 +69,7 @@ import { grade6Mathematics } from "./upper-primary/mathematics-grade6";
 import { grade4Kiswahili } from "./upper-primary/kiswahili";
 import { grade6Kiswahili } from "./upper-primary/kiswahili-grade6";
 import {
-  grade4AI, grade5AI, grade6AI, grade7AI, grade8AI,
+  grade6AI, grade7AI, grade8AI,
   grade9AI, grade10AI, grade11AI, grade12AI,
 } from "./senior-school/ai";
 
@@ -120,8 +120,6 @@ const hardcodedStrands: Record<CurriculumKey, StrandInfo[]> = {
   "Grade 5|Mathematics": grade5Mathematics,
   "Grade 6|Mathematics": grade6Mathematics,
   "Grade 6|Social Studies": grade6SocialStudies,
-  "Grade 4|AI": grade4AI,
-  "Grade 5|AI": grade5AI,
   "Grade 6|AI": grade6AI,
   "Grade 7|AI": grade7AI,
   "Grade 8|AI": grade8AI,
@@ -190,6 +188,7 @@ const upperPrimaryLessons: Record<string, number> = {
   "CRE": 3, "HRE": 3, "IRE": 3,
   "Arabic": 2, "French": 2, "German": 2, "Mandarin": 2,
   "Indigenous Language": 2,
+  "AI": 2,
 };
 
 const juniorSecondaryLessons: Record<string, number> = {
