@@ -82,6 +82,11 @@ const STRAND_TERM_RULES: Record<string, StrandTermRule> = {
     "Term 2": ["AI Techniques", "AI System Design"],
     "Term 3": ["Ethics"],
   },
+  "Blockchain": {
+    "Term 1": ["Records, Trust and Value", "Blockchain Technology and Cryptography"],
+    "Term 2": ["Digital Assets and Digital Finance", "Smart Contracts and Applications"],
+    "Term 3": ["Ethics, Law and Society"],
+  },
   "English Activities": {
     "Term 1": ["Listening and Speaking"],
     "Term 2": ["Reading"],

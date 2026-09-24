@@ -36,6 +36,10 @@ export {
   grade6AI, grade7AI, grade8AI,
   grade9AI, grade10AI, grade11AI, grade12AI,
 } from "./senior-school/ai";
+export { grade6Blockchain } from "./blockchain/grade6";
+export { grade7Blockchain, grade8Blockchain, grade9Blockchain } from "./blockchain/junior";
+export { grade10Blockchain, grade11Blockchain, grade12Blockchain } from "./blockchain/senior";
+
 
 import type { StrandInfo } from "./types";
 import { grade1CreativeActivities, grade2CreativeActivities, grade3CreativeActivities } from "./lower-primary/creative-activities";
@@ -72,6 +76,9 @@ import {
   grade6AI, grade7AI, grade8AI,
   grade9AI, grade10AI, grade11AI, grade12AI,
 } from "./senior-school/ai";
+import { grade6Blockchain } from "./blockchain/grade6";
+import { grade7Blockchain, grade8Blockchain, grade9Blockchain } from "./blockchain/junior";
+import { grade10Blockchain, grade11Blockchain, grade12Blockchain } from "./blockchain/senior";
 
 // ─── Strand registry keyed by "Grade X|Subject" ───
 
@@ -127,6 +134,13 @@ const hardcodedStrands: Record<CurriculumKey, StrandInfo[]> = {
   "Grade 10|AI": grade10AI,
   "Grade 11|AI": grade11AI,
   "Grade 12|AI": grade12AI,
+  "Grade 6|Blockchain": grade6Blockchain,
+  "Grade 7|Blockchain": grade7Blockchain,
+  "Grade 8|Blockchain": grade8Blockchain,
+  "Grade 9|Blockchain": grade9Blockchain,
+  "Grade 10|Blockchain": grade10Blockchain,
+  "Grade 11|Blockchain": grade11Blockchain,
+  "Grade 12|Blockchain": grade12Blockchain,
 };
 
 /**
@@ -189,6 +203,7 @@ const upperPrimaryLessons: Record<string, number> = {
   "Arabic": 2, "French": 2, "German": 2, "Mandarin": 2,
   "Indigenous Language": 2,
   "AI": 2,
+  "Blockchain": 5,
 };
 
 const juniorSecondaryLessons: Record<string, number> = {
@@ -204,10 +219,12 @@ const juniorSecondaryLessons: Record<string, number> = {
   "Arabic": 2, "French": 2, "German": 2, "Mandarin": 2,
   "Indigenous Language": 2,
   "AI": 3,
+  "Blockchain": 5,
 };
 
 const seniorSchoolLessons: Record<string, number> = {
   "AI": 4,
+  "Blockchain": 5,
 };
 
 export function getLessonsPerWeek(grade: string, subject: string): number {
@@ -259,6 +276,7 @@ const upperPrimarySubjects = [
 const juniorSecondarySubjects = [
   "AI",
   "Agriculture",
+  "Blockchain",
   "Arabic",
   "Creative Arts",
   "CRE",
@@ -278,13 +296,14 @@ const juniorSecondarySubjects = [
 
 const seniorSchoolSubjects = [
   "AI",
+  "Blockchain",
 ];
 
 export function getSubjectsForGrade(grade: string): string[] {
   const num = parseInt(grade.replace("Grade ", ""));
   if (num >= 1 && num <= 3) return lowerPrimarySubjects;
-  // AI is introduced at Grade 6 only within upper primary
-  if (num === 6) return ["AI", ...upperPrimarySubjects];
+  // AI and Blockchain are introduced at Grade 6 only within upper primary
+  if (num === 6) return ["AI", "Blockchain", ...upperPrimarySubjects];
   if (num >= 4 && num <= 6) return upperPrimarySubjects;
   if (num >= 7 && num <= 9) return juniorSecondarySubjects;
   if (num >= 10 && num <= 12) return seniorSchoolSubjects;
