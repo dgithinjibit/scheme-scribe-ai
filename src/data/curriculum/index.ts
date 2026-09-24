@@ -76,6 +76,9 @@ import {
   grade6AI, grade7AI, grade8AI,
   grade9AI, grade10AI, grade11AI, grade12AI,
 } from "./senior-school/ai";
+import { grade6Blockchain } from "./blockchain/grade6";
+import { grade7Blockchain, grade8Blockchain, grade9Blockchain } from "./blockchain/junior";
+import { grade10Blockchain, grade11Blockchain, grade12Blockchain } from "./blockchain/senior";
 
 // ─── Strand registry keyed by "Grade X|Subject" ───
 
@@ -131,6 +134,13 @@ const hardcodedStrands: Record<CurriculumKey, StrandInfo[]> = {
   "Grade 10|AI": grade10AI,
   "Grade 11|AI": grade11AI,
   "Grade 12|AI": grade12AI,
+  "Grade 6|Blockchain": grade6Blockchain,
+  "Grade 7|Blockchain": grade7Blockchain,
+  "Grade 8|Blockchain": grade8Blockchain,
+  "Grade 9|Blockchain": grade9Blockchain,
+  "Grade 10|Blockchain": grade10Blockchain,
+  "Grade 11|Blockchain": grade11Blockchain,
+  "Grade 12|Blockchain": grade12Blockchain,
 };
 
 /**
