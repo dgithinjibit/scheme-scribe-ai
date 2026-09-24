@@ -203,6 +203,7 @@ const upperPrimaryLessons: Record<string, number> = {
   "Arabic": 2, "French": 2, "German": 2, "Mandarin": 2,
   "Indigenous Language": 2,
   "AI": 2,
+  "Blockchain": 5,
 };
 
 const juniorSecondaryLessons: Record<string, number> = {
@@ -218,10 +219,12 @@ const juniorSecondaryLessons: Record<string, number> = {
   "Arabic": 2, "French": 2, "German": 2, "Mandarin": 2,
   "Indigenous Language": 2,
   "AI": 3,
+  "Blockchain": 5,
 };
 
 const seniorSchoolLessons: Record<string, number> = {
   "AI": 4,
+  "Blockchain": 5,
 };
 
 export function getLessonsPerWeek(grade: string, subject: string): number {
@@ -273,6 +276,7 @@ const upperPrimarySubjects = [
 const juniorSecondarySubjects = [
   "AI",
   "Agriculture",
+  "Blockchain",
   "Arabic",
   "Creative Arts",
   "CRE",
