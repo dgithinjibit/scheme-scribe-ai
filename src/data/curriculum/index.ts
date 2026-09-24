@@ -36,6 +36,10 @@ export {
   grade6AI, grade7AI, grade8AI,
   grade9AI, grade10AI, grade11AI, grade12AI,
 } from "./senior-school/ai";
+export { grade6Blockchain } from "./blockchain/grade6";
+export { grade7Blockchain, grade8Blockchain, grade9Blockchain } from "./blockchain/junior";
+export { grade10Blockchain, grade11Blockchain, grade12Blockchain } from "./blockchain/senior";
+
 
 import type { StrandInfo } from "./types";
 import { grade1CreativeActivities, grade2CreativeActivities, grade3CreativeActivities } from "./lower-primary/creative-activities";
