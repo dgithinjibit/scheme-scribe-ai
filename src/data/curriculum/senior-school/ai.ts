@@ -811,7 +811,16 @@ export const grade10AI: StrandInfo[] = build([
       "Learners build a comparative matrix",
       "Learners recommend adaptations suitable for Kenya",
     ]),
-    ss("5.4 Term Capstone: Symbolic Reasoner", 17, "Can we build a reasoning system for a Kenyan domain?", [
+    ss("5.4 AI Safety and Containment", 8, "How do we keep an AI system working only within the limits we set for it?", [
+      "explain AI safety risks such as unintended network access, sandbox escape and misuse of access keys",
+      "practice testing an AI tool inside a sandbox with restricted permissions and activity logs",
+      "value caution and responsibility when giving AI systems access to tools and data",
+    ], [
+      "Learners study reported incidents where AI agents acted beyond their intended limits",
+      "Learners run a simple AI tool in a sandbox and review its activity log for unexpected actions",
+      "Learners draft a safe-use checklist covering permissions, access keys and human approval",
+    ]),
+    ss("5.5 Term Capstone: Symbolic Reasoner", 9, "Can we build a reasoning system for a Kenyan domain?", [
       "describe the design of a symbolic reasoning system for a chosen domain",
       "construct and evaluate the reasoner in MeTTa or Wolfram Language",
       "show integrity in documenting limitations and ethical risks",
@@ -968,7 +977,16 @@ export const grade11AI: StrandInfo[] = build([
       "Learners record exclusion points found",
       "Learners redesign one feature for inclusion",
     ]),
-    ss("5.4 Term Capstone: Applied AI System", 17, "Can we deliver a working AI system for a real client?", [
+    ss("5.4 Autonomous Agents and Human Oversight", 8, "How do we keep humans in control of AI agents that act on their own?", [
+      "describe how autonomous AI agents plan and take actions using tools, networks and accounts",
+      "demonstrate human-in-the-loop controls, least-privilege access and audit logging on an agent task",
+      "commit to keeping humans accountable for every action an AI agent takes",
+    ], [
+      "Learners map the tools and permissions an AI agent uses to complete a task",
+      "Learners configure approval steps and audit logs for a simulated agent in a sandbox",
+      "Learners analyse a case where an agent evaded human intent and propose controls",
+    ]),
+    ss("5.5 Term Capstone: Applied AI System", 9, "Can we deliver a working AI system for a real client?", [
       "describe the full architecture and evaluation of their system",
       "construct, benchmark and deploy the system for a real client",
       "show professionalism in delivery and documentation",
@@ -1125,7 +1143,16 @@ export const grade12AI: StrandInfo[] = build([
       "Learners separate evidenced claims from speculation",
       "Learners write a balanced risk assessment",
     ]),
-    ss("5.4 Exit Capstone: AI Research Project", 17, "What original contribution can we make to AI in Kenya?", [
+    ss("5.4 AI Alignment and Red-Teaming", 8, "How do we test whether a capable AI system does what humans intend?", [
+      "explain AI alignment, red-teaming and safety evaluation of frontier AI systems",
+      "conduct a supervised capture-the-flag style red-team exercise on an AI system in a sandbox",
+      "show integrity by reporting weaknesses responsibly instead of exploiting them",
+    ], [
+      "Learners study how frontier AI developers and governments evaluate model safety",
+      "Learners attempt approved red-team challenges against a sandboxed AI system and record findings",
+      "Learners write a responsible-disclosure safety report with recommended fixes",
+    ]),
+    ss("5.5 Exit Capstone: AI Research Project", 9, "What original contribution can we make to AI in Kenya?", [
       "describe an original research question and its method",
       "conduct, evaluate and defend a complete research project",
       "show integrity, independence and scholarly discipline",
