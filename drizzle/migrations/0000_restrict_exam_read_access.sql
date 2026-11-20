@@ -1,0 +1,1 @@
+ALTER POLICY "Authenticated users can read exams" ON public.exams USING (auth.uid() = created_by);

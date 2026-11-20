@@ -38,11 +38,9 @@ const TakeExam = () => {
     }
     if (!examId) return;
     (async () => {
-      const { data, error } = await supabase
-        .from("exams")
-        .select("id, grade, subject, term, questions, total_marks")
-        .eq("id", examId)
-        .maybeSingle();
+      const { data, error } = await supabase.functions.invoke("get-shared-exam", {
+        body: { examId },
+      });
       if (error || !data) {
         toast.error("Exam not found.");
         setLoading(false);
@@ -53,7 +51,7 @@ const TakeExam = () => {
         grade: data.grade,
         subject: data.subject,
         term: data.term,
-        questions: data.questions as unknown as ExamQuestion[],
+        questions: data.questions as ExamQuestion[],
         total_marks: data.total_marks,
       });
       setLoading(false);
