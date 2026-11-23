@@ -90,7 +90,11 @@ function getKLBBookTitle(subject: string, grade: string): string {
   const gradeNum = parseInt(grade.replace("Grade ", ""));
   const isSw = kiswahiliSubjects.includes(subject);
   if (subject === "AI") {
-    return `KICD AI (Artificial Intelligence) Learning Area Design ${grade}`;
+    const kicdResource = `KICD AI (Artificial Intelligence) Learning Area Design ${grade}`;
+    if (gradeNum >= 10) {
+      return `${kicdResource}; AI Engineering from Scratch by Rohit Ghumare — selected teacher reference topics on deep learning, LLMs, retrieval, agents, evaluation and deployment (MIT License): https://github.com/rohitg00/ai-engineering-from-scratch`;
+    }
+    return kicdResource;
   }
   if (subject === "Blockchain") {
     return `KICD Blockchain Learning Area Design ${grade}`;

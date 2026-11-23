@@ -1,7 +1,7 @@
 import type { StrandInfo, SubStrandInfo } from "../types";
 
 /**
- * AI (Artificial General Intelligence) Learning Area
+ * AI (Artificial Intelligence) Learning Area
  * Kenyan CBE-aligned design, Grades 6-12 (Grade 6 = introduction).
  *
  * Sources blended into this design:
@@ -12,6 +12,9 @@ import type { StrandInfo, SubStrandInfo } from "../types";
  *  - China MOE "Guide to General AI Education in Primary and Secondary Schools (2025)":
  *    tiered progression — primary = experience, junior = technical logic,
  *    senior = model building, systems thinking and social responsibility.
+ *  - AI Engineering from Scratch by Rohit Ghumare (MIT License): selected,
+ *    age-adapted concepts in deep learning, LLMs, retrieval, agents, evaluation,
+ *    reliability and deployment; not a verbatim import of its 542 lessons.
  *
  * Every sub-strand carries official-style learning outcomes written in the rigid
  * KSA order required by this project: a) Knowledge, b) Skills, c) Attitudes.
@@ -425,13 +428,13 @@ export const grade8AI: StrandInfo[] = build([
       "Learners refactor the pipeline into reusable functions",
     ]),
     ss("3.3 Introduction to Neural Networks", 6, "How is a neural network different from a set of rules?", [
-      "describe the structure of a simple neural network",
-      "practice training a small neural network on a prepared data set",
-      "appreciate the learning behaviour of neural networks",
+      "explain how layers and weights contribute to a simple neural network's output",
+      "practice training a small neural network on a prepared data set and record its results",
+      "value testing a model before trusting its predictions",
     ], [
-      "Learners build a paper model of neurons, weights and layers",
-      "Learners train a small network in a browser tool",
-      "Learners observe how changing layers changes results",
+      "Learners build a paper model showing how input, layers and weights produce an output",
+      "Learners train a small neural network with a prepared classroom data set",
+      "Learners compare predictions before and after changing one model setting",
     ]),
   ],
   [
@@ -515,13 +518,13 @@ export const grade9AI: StrandInfo[] = build([
       "Learners present a comparison of two architectures",
     ]),
     ss("1.2 Foundation Models and Generative AI", 5, "How does a model generate new text or images?", [
-      "explain in outline how a generative model produces new content",
-      "use a generative tool and evaluate the quality of its output",
-      "value critical judgement of generated content",
+      "describe how a language model uses text patterns to produce likely next words",
+      "compare a generated answer with a trusted source and identify unsupported claims",
+      "value critical judgement and honest attribution when using generated content",
     ], [
-      "Learners prompt a generative tool on a familiar topic",
-      "Learners fact-check the output against reliable sources",
-      "Learners record where the output was wrong or invented",
+      "Learners observe a teacher demonstration of a language model completing a short prompt",
+      "Learners check a generated response against a supplied textbook passage or approved source",
+      "Learners mark unsupported claims and acknowledge any tool assistance in their work",
     ]),
     ss("1.3 Limits of Current AI", 5, "What still defeats today's best systems?", [
       "identify the known weaknesses of current AI systems",
@@ -764,14 +767,14 @@ export const grade10AI: StrandInfo[] = build([
       "Learners assign roles and deliverables per stage",
       "Learners review the plan against a professional template",
     ]),
-    ss("4.2 Building a Baseline Model", 7, "Why start with the simplest model that works?", [
-      "explain the purpose of a baseline model",
-      "construct and evaluate a baseline model for their problem",
-      "value modest starting points before complexity",
+    ss("4.2 Retrieval-Grounded AI Applications", 7, "How can an AI answer questions using trusted source material?", [
+      "explain how retrieving relevant source material can ground a generative system's response",
+      "construct a small retrieval-assisted prototype using approved texts and check its answers against those texts",
+      "value source checking and honest reporting of system limits",
     ], [
-      "Learners implement a simple baseline in code",
-      "Learners record its metrics as a reference point",
-      "Learners justify any added complexity against the baseline",
+      "Learners prepare a small collection of teacher-approved public or classroom texts for searching",
+      "Learners build a simple question-and-answer prototype that retrieves relevant passages before responding",
+      "Learners compare answers with the retrieved passages and record unsupported claims",
     ]),
     ss("4.3 Version Control and Collaboration", 6, "How do teams build software together without losing work?", [
       "describe how version control supports team development",
@@ -910,14 +913,14 @@ export const grade11AI: StrandInfo[] = build([
       "Learners inspect model information and performance reports",
       "Learners compare the built-in model with a hand-built one",
     ]),
-    ss("3.3 Neural Network Implementation", 8, "What happens inside the layers we train?", [
-      "explain the operation of layers, weights and training loops",
-      "construct and train a neural network for a chosen task",
-      "show perseverance through long training and tuning cycles",
+    ss("3.3 Neural Networks, Attention and Transformer Models", 8, "How do transformer models use context to process a sequence?", [
+      "explain how attention relates different parts of a sequence in a transformer model",
+      "construct and test a small neural-network or attention demonstration with prepared data",
+      "value careful testing and documentation of model limitations",
     ], [
-      "Learners implement a small network layer by layer",
-      "Learners tune learning rate and architecture",
-      "Learners record every experiment in a results log",
+      "Learners trace a token sequence through a visual model of attention and a transformer block",
+      "Learners build or run a small supervised neural-network demonstration using a prepared data set",
+      "Learners change one setting at a time, compare outputs and keep an experiment log",
     ]),
   ],
   [
@@ -930,23 +933,23 @@ export const grade11AI: StrandInfo[] = build([
       "Learners write a specification document",
       "Learners have the client confirm the specification",
     ]),
-    ss("4.2 Building an Intelligent Agent", 7, "How do we build an agent that plans and acts?", [
-      "describe the architecture of a planning agent",
-      "construct an agent that plans and executes multi-step tasks",
-      "show responsibility in bounding agent autonomy",
+    ss("4.2 Building an Intelligent Agent with Tools", 7, "How can an agent use approved tools while keeping people in control?", [
+      "describe an agent loop that plans, selects an approved tool, observes the result and decides what to do next",
+      "construct a sandboxed agent task with a small set of approved tools and a human approval step",
+      "commit to least-privilege access and human oversight for agent actions",
     ], [
-      "Learners design an agent architecture diagram",
-      "Learners implement planning and execution components",
-      "Learners test the agent and impose safety limits",
+      "Learners diagram the plan, tool call, observation and response stages of a simple agent",
+      "Learners test a supervised agent with teacher-provided, low-risk tasks and restricted tools",
+      "Learners inspect an action log and add approval points or limits where needed",
     ]),
-    ss("4.3 Evaluation and Benchmarking", 6, "How do we prove that our system is genuinely better?", [
-      "explain benchmarking methods for AI systems",
-      "conduct a benchmark comparison and report the results",
-      "value honesty in reporting comparative results",
+    ss("4.3 AI Evaluation and Reliability Engineering", 6, "How can repeated tests show whether an AI system is reliable?", [
+      "explain how test cases, metrics and failure analysis are used to evaluate an AI system",
+      "conduct a repeatable evaluation, compare results with a baseline and record failures",
+      "value honest reporting of reliability limits and regressions",
     ], [
-      "Learners define benchmark tasks and metrics",
-      "Learners run the benchmark on competing systems",
-      "Learners publish a results table with limitations noted",
+      "Learners create a small test set covering normal, edge and locally relevant examples",
+      "Learners run the same tests across two model versions and compare agreed metrics",
+      "Learners classify failures, retest after a change and report limitations without hiding regressions",
     ]),
   ],
   [
@@ -1076,14 +1079,14 @@ export const grade12AI: StrandInfo[] = build([
       "Learners validate the model against real data",
       "Learners present findings with visualisations",
     ]),
-    ss("3.3 Multi-Agent and Generative Systems", 8, "What happens when several intelligent agents interact?", [
-      "describe how multiple agents coordinate or compete",
-      "construct a multi-agent or generative system for a chosen task",
-      "show responsibility in controlling emergent behaviour",
+    ss("3.3 Multi-Agent Systems and Tool Protocols", 8, "How can several agents coordinate safely on a shared task?", [
+      "describe how agents share tasks, messages and approved tool access in a coordinated workflow",
+      "construct a controlled multi-agent simulation with scoped tools, activity logs and a human stop condition",
+      "value observability and human accountability when agents interact",
     ], [
-      "Learners implement two or more interacting agents",
-      "Learners observe and record emergent behaviour",
-      "Learners add coordination and safety rules",
+      "Learners map roles, message flow and tool permissions in a small multi-agent workflow",
+      "Learners run a teacher-supervised simulation with synthetic data and restricted tools",
+      "Learners inspect the activity log and add clear limits, approval steps and a stop condition",
     ]),
   ],
   [
@@ -1096,14 +1099,14 @@ export const grade12AI: StrandInfo[] = build([
       "Learners run controlled trials and record results",
       "Learners write the study in research report format",
     ]),
-    ss("4.2 Productisation and Scaling", 7, "How does a prototype become a product people rely on?", [
-      "explain what is required to take a prototype to a reliable product",
-      "practice packaging, testing and scaling a solution",
-      "value reliability and user trust",
+    ss("4.2 AI Deployment, Serving and MLOps", 7, "How can an AI solution stay reliable after it is released?", [
+      "outline how deployment, model serving, monitoring and maintenance support a reliable AI product",
+      "practice releasing a small AI solution to a controlled test group and interpreting its quality and service logs",
+      "value reliability, privacy and responsible maintenance after release",
     ], [
-      "Learners package a solution for distribution",
-      "Learners load-test and harden the solution",
-      "Learners write user and maintenance documentation",
+      "Learners prepare a release checklist covering model and data versions, access, testing and rollback",
+      "Learners examine a simulated service log for quality, latency, availability and cost signals",
+      "Learners write user, monitoring and maintenance instructions for a controlled release",
     ]),
     ss("4.3 Portfolio and Professional Presentation", 6, "How do we present ourselves as AI professionals?", [
       "describe the contents of a professional AI portfolio",
